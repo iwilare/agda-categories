@@ -3,16 +3,22 @@
 module Categories.Diagram.Coend.Properties where
 
 open import Categories.Category.Core using (Category)
-open import Categories.Category.Product
+--open import Categories.Category.Product
 import Categories.Category.Construction.Cowedges as Cowedges
 open import Categories.Category.Construction.Functors
 open import Categories.Category.Equivalence
 open import Categories.Category.Equivalence.Preserves
+open import Categories.Category.CartesianClosed
+open import Categories.Category.Cartesian
+open import Categories.Category.BinaryProducts
 open import Categories.Diagram.Coend
+open import Categories.Object.Product
+open import Categories.Functor using (Functor; _∘F_) renaming (id to idF)
+open Categories.Functor.Functor using (F₀; F₁; homomorphism; identity; F-resp-≈)
 open import Categories.Diagram.Colimit
 open import Categories.Diagram.Cowedge
 open import Categories.Diagram.Cowedge.Properties
-open import Categories.Functor using (Functor)
+import Categories.Functor using (Functor)
 open import Categories.Functor.Bifunctor using (Bifunctor)
 open import Categories.Functor.Instance.Twisted
 import Categories.Morphism as M
@@ -26,6 +32,49 @@ import Categories.Morphism.Reasoning as MR
 open import Level
 open import Data.Product using (Σ; _,_)
 open import Function using (_$_)
+
+module _ {o ℓ e} {C : Category o ℓ e} (CC : CartesianClosed C) where
+  module CC = CartesianClosed CC
+  module P = Cartesian CC.cartesian
+  open BinaryProducts P.products
+  open Category C
+
+  F : Obj → Bifunctor (Category.op C) C C
+  F x = record
+    { F₀ = λ (c , c') → (c CC.⇨ x) × c'
+    ; F₁ = λ (f , f') → Functor.F₁ (CC.-⇨_ x) f ⁂ f'
+    ; identity =
+       begin _ ≈⟨ ⟨⟩-congˡ identityˡ ⟩
+             _ ≈⟨ ⟨⟩-congʳ (elimˡ (identity (CC.-⇨ x))) ⟩
+             _ ≈⟨ η ⟩
+             _ ∎
+    ; homomorphism = {!   !}
+    ; F-resp-≈ = {!   !}
+    } where open HomReasoning
+            open MR C
+
+  Coenda : ∀ x → Coend (F x)
+  Coenda x = record
+    { cowedge = record
+      { E = x
+      ; dinatural = record
+        { α = λ c → CC.eval′
+        ; commute = {!   !}
+        ; op-commute = {!   !}
+        }
+      }
+    ; factor = λ W →
+        let module W = Cowedge W in
+         {!  !}
+    ; universal = {!   !}
+    ; unique = {!   !}
+    }
+
+
+{-
+
+
+-- ⟨⟩-cong
 
 module _ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′}
   (F : Bifunctor (Category.op C) C D) where
@@ -128,6 +177,8 @@ module _ {P Q : Functor (Product (Category.op C) C) D} (P⇒Q : NaturalTransform
     open Cowedge
     open MR D
 
+
+{-
 module _ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′}  {E : Category o′ ℓ′ e′}
   (F : Bifunctor (Category.op C) C D) where
   private
@@ -211,3 +262,5 @@ module _ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ �
           module ∫∀s X = Coend (AllCoends X)
           open Category E
           open HomReasoning
+-}
+-}
