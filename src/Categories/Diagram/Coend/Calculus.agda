@@ -86,11 +86,14 @@ module _ {ℓ} {E : Category ℓ ℓ ℓ} where
   FΓ : ∀ {n} → Ctx n → Set _
   FΓ Γ = Functor (⊤ {ℓ} {ℓ} {ℓ}) (CΓ Γ)
 
+  transport-CΓ : {!   !}
+  transport-CΓ = {!   !}
+
   transport-CF : ∀ {n} {Γ Δ : Ctx n}
         → (t : CΓ Γ ≅ CΓ Δ)
         → {F : FΓ Γ}
           {G : FΓ Δ}
-        → F F.≅ {!   !}
+        → F F.≅ {! transport-CΓ G  !}
   transport-CF = {!   !}
 
   coend : ∀ {A n} {Γ : Ctx n}
