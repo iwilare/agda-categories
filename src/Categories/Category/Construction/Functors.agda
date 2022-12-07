@@ -143,6 +143,37 @@ module curry {o₁ e₁ ℓ₁} {C₁ : Category o₁ e₁ ℓ₁}
       }
     }
 
+uncurry : Functor (Functors C₁ (Functors C₂ D)) (Functors (C₁ × C₂) D)
+uncurry {C₁ = C₁} {C₂ = C₂} {D = D} = record
+  { F₀ = uncurry₀
+  ; F₁ = {!   !}
+  ; identity = {!   !}
+  ; homomorphism = {!   !}
+  ; F-resp-≈ = {!   !}
+  } where 
+      open Category 
+      open HomReasoning D
+      open MR D
+      uncurry₀ : Functor C₁ (Functors C₂ D) → Bifunctor C₁ C₂ D
+      uncurry₀ F = record
+        { F₀ = λ {(x , y) → Functor.F₀ (F₀ x) y}
+        ; F₁ = λ { {(x , a)} {(y , b)} (f , g) → D [ Functor.F₁ (F₀ y) g ∘ NaturalTransformation.η (F₁ f) a ]}
+        ; identity = λ { {x , y} → (MR.elimʳ D identity) ○ Functor.identity (F₀ x) {y} }
+        ; homomorphism = λ { {x , y} {a , b} {c , d} {f1 , f2} {g1 , g2} → 
+          begin _ ≈⟨ (Functor.homomorphism (F₀ c) ⟩∘⟨refl) ⟩ 
+                _ ≈⟨ {!   !} ⟩ 
+                _ ∎}
+        ; F-resp-≈ = {!   !}
+        } 
+        where
+          open Functor F
+          -- open Category D
+          -- open HomReasoning D
+          -- open MR D
+    
+      -- uncurry₁ : {!   !}
+      -- uncurry₁ = {!   !}
+
 -- Godement product ?
 product : {A B C : Category o ℓ e} → Bifunctor (Functors B C) (Functors A B) (Functors A C)
 product {A = A} {B = B} {C = C} = record
