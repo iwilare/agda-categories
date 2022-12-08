@@ -14,7 +14,7 @@ open import Categories.Functor using (Functor; _∘F_)
 open import Categories.Functor.Bifunctor
 open import Categories.Functor.Construction.Constant using (constNat)
 open import Categories.NaturalTransformation
-  using (NaturalTransformation; _∘ᵥ_; _∘ˡ_; _∘ₕ_) renaming (id to idN)
+  using (NaturalTransformation; ntHelper; _∘ᵥ_; _∘ˡ_; _∘ₕ_) renaming (id to idN)
 open import Categories.NaturalTransformation.Equivalence using (_≃_; ≃-isEquivalence)
 open import Categories.NaturalTransformation.NaturalIsomorphism
   using (NaturalIsomorphism)
@@ -146,7 +146,7 @@ module curry {o₁ e₁ ℓ₁} {C₁ : Category o₁ e₁ ℓ₁}
 uncurry : Functor (Functors C₁ (Functors C₂ D)) (Functors (C₁ × C₂) D)
 uncurry {C₁ = C₁} {C₂ = C₂} {D = D} = record
   { F₀ = uncurry₀
-  ; F₁ = {!   !}
+  ; F₁ = {! uncurry₁  !}
   ; identity = {!   !}
   ; homomorphism = {!   !}
   ; F-resp-≈ = {!   !}
@@ -165,7 +165,7 @@ uncurry {C₁ = C₁} {C₂ = C₂} {D = D} = record
                 _ ≈⟨ refl⟩∘⟨ refl⟩∘⟨ F.homomorphism ⟩
                 _ ≈⟨ refl⟩∘⟨ pullˡ (sym-commute (F.F₁ g1) f2) ⟩
                 _ ≈⟨ assoc²'' ⟩
-                _ ∎}
+                _ ∎ }
         ; F-resp-≈ = λ (f≈f₁ , f≈f₂) → F-resp-≈ (F.F₀ _) f≈f₂ ⟩∘⟨ F.F-resp-≈ f≈f₁
         }
         where
@@ -174,13 +174,26 @@ uncurry {C₁ = C₁} {C₂ = C₂} {D = D} = record
           open Equiv
           open NaturalTransformation
 
-          --open HomReasoning D
-          -- open Category D
-          -- open HomReasoning D
-          -- open MR D
+      uncurry₁ : ∀ {A B}
+               → NaturalTransformation A B
+               → NaturalTransformation (uncurry₀ A) (uncurry₀ B)
+      uncurry₁ t = ntHelper record
+          { η = λ _ → η (t.η _) _
+          ; commute = λ { (f , g) →
+              begin _ ≈⟨ (refl⟩∘⟨ {! sym-commute (t.η _) ? ⟩∘⟨refl !}) ⟩
+                    _ ≈⟨ {!   !} ⟩
+                    _ ≈⟨ {!   !} ⟩
+                    _ ∎ }
+η (t.η (proj₁ Y)) (Data.Product.proj₂ Y) ∘
+      Functor.F₁ (Functor.F₀ A (proj₁ Y)) g ∘
+      η (Functor.F₁ A f) (Data.Product.proj₂ X)
 
-      -- uncurry₁ : {!   !}
-      -- uncurry₁ = {!   !}
+                          (Functor.F₁ (Functor.F₀ B (proj₁ Y)) g ∘
+       η (Functor.F₁ B f) (Data.Product.proj₂ X))
+      ∘ η (t.η (proj₁ X)) (Data.Product.proj₂ X)
+          }
+        where module t = NaturalTransformation t
+              open NaturalTransformation
 
 -- Godement product ?
 product : {A B C : Category o ℓ e} → Bifunctor (Functors B C) (Functors A B) (Functors A C)
