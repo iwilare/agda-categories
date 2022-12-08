@@ -150,27 +150,35 @@ uncurry {C₁ = C₁} {C₂ = C₂} {D = D} = record
   ; identity = {!   !}
   ; homomorphism = {!   !}
   ; F-resp-≈ = {!   !}
-  } where 
-      open Category 
-      open HomReasoning D
+  } where
+      open Category D
+      open HomReasoning
       open MR D
       uncurry₀ : Functor C₁ (Functors C₂ D) → Bifunctor C₁ C₂ D
       uncurry₀ F = record
-        { F₀ = λ {(x , y) → Functor.F₀ (F₀ x) y}
-        ; F₁ = λ { {(x , a)} {(y , b)} (f , g) → D [ Functor.F₁ (F₀ y) g ∘ NaturalTransformation.η (F₁ f) a ]}
-        ; identity = λ { {x , y} → (MR.elimʳ D identity) ○ Functor.identity (F₀ x) {y} }
-        ; homomorphism = λ { {x , y} {a , b} {c , d} {f1 , f2} {g1 , g2} → 
-          begin _ ≈⟨ (Functor.homomorphism (F₀ c) ⟩∘⟨refl) ⟩ 
-                _ ≈⟨ {!   !} ⟩ 
+        { F₀ = λ {(x , y) → F₀ (F.F₀ x) y}
+        ; F₁ = λ { {(x , a)} {(y , b)} (f , g) → D [ F₁ (F.F₀ y) g ∘ η (F.F₁ f) a ]}
+        ; identity = λ { {x , y} → elimʳ F.identity ○ identity (F.F₀ x) {y} }
+        ; homomorphism = λ { {x , y} {a , b} {c , d} {f1 , f2} {g1 , g2} →
+          begin _ ≈⟨ (homomorphism (F.F₀ c) ⟩∘⟨refl) ⟩
+                _ ≈⟨ assoc ⟩
+                _ ≈⟨ refl⟩∘⟨ refl⟩∘⟨ F.homomorphism ⟩
+                _ ≈⟨ refl⟩∘⟨ pullˡ (sym-commute (F.F₁ g1) f2) ⟩
+                _ ≈⟨ assoc²'' ⟩
                 _ ∎}
-        ; F-resp-≈ = {!   !}
-        } 
+        ; F-resp-≈ = λ (f≈f₁ , f≈f₂) → F-resp-≈ (F.F₀ _) f≈f₂ ⟩∘⟨ F.F-resp-≈ f≈f₁
+        }
         where
-          open Functor F
+          open Functor
+          module F = Functor F
+          open Equiv
+          open NaturalTransformation
+
+          --open HomReasoning D
           -- open Category D
           -- open HomReasoning D
           -- open MR D
-    
+
       -- uncurry₁ : {!   !}
       -- uncurry₁ = {!   !}
 
