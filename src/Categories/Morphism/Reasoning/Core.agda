@@ -265,3 +265,125 @@ intro-last {a = a} {b = b} {f = f} {g = g} eq = begin
   (f ∘ g) ∘ a ∘ b ≈⟨ assoc ⟩
   f ∘ g ∘ a ∘ b   ≈˘⟨ refl⟩∘⟨ assoc ⟩
   f ∘ (g ∘ a) ∘ b ∎
+
+
+
+super-assoc : _
+super-assoc = {! assoc  !}
+
+
+
+{-
+
+
+shifter-0 : (a ≈ b)
+        → a ≈ b
+shifter-0 = ?
+
+shifter-1 : ∀ {h}
+          → (a ≈ b)
+          → h ∘ a ≈ h ∘ b
+shifter-1 = ?
+
+shifter-2 : ∀ {h'}
+           (∀ {h}
+          → (a ≈ b)
+          → cong (h'∘ ) (h ∘ a) ≈ cong (h′ ∘) (h ∘ b))
+shifter-1 = ?
+
+
+
+
+
+
+
+
+
+
+
+
+
+param-shifter-0 : (a ≈ b)
+        → f a ≈ f b
+param-shifter-0 = ?
+
+param-shifter-1 : ∀ {h}
+          → (a ≈ b)
+          → f (h ∘ a) ≈ f (h ∘ b)
+param-shifter-1 = ?
+
+param-shifter-2 : ∀ {h'}
+           (∀ {h}
+          → (a ≈ b)
+          → f (h' ∘ h ∘ a) ≈ f (h' ∘ h ∘ b))
+param-shifter-1 = ?
+
+
+-}
+
+module _ {o ℓ e} (C : Category o ℓ e) where
+  module C = Category C
+  param-shifter-0 : Set (o ⊔ ℓ ⊔ e)
+  param-shifter-0 =
+     ∀ {Last : C.Obj}
+       {A : C.Obj} {a b : A C.⇒ Last} {f : ∀ {H} → (Last C.⇒ H) → (Last C.⇒ H)}
+          → (a C.≈ b)
+          → ∀ {H} → f {A} a C.≈ f {A} b
+
+  param-shifter-1 : Set (o ⊔ ℓ ⊔ e)
+  param-shifter-1 =
+     ∀ {C B A : C.Obj} {c : B C.⇒ C}
+           {a b : A C.⇒ B} {f : ∀ {H} → (H C.⇒ B) → (H C.⇒ B)}
+          → (a C.≈ b)
+          → ∀ {H} → f {B} (c C.∘ a) C.≈ f {B} (c C.∘ b)
+  param-shifter-1 = ?
+
+
+{-
+
+
+{-
+shifter : (a ≈ b)
+        ∀ {hs : DepVecArrows (f) n}
+        → repeat hs n a
+        → repeat hs n b
+shifter = ?
+
+-}
+
+
+{-
+shifter-1 : {A B C : Obj} {C = C₁ : Obj} {D : Obj} {f : A ⇒ B} {g : B ⇒ C₁} {r : _} {l : _} {h : C₁ ⇒ D}
+          → h ∘ a
+          → h ∘ b
+
+shifter-2 : {A B C : Obj} {C = C₁ : Obj} {D : Obj} {f : A ⇒ B} {g : B ⇒ C₁} {r : _} {l : _} {h : C₁ ⇒ D}
+          → h ∘ h' ∘ a
+          → h ∘ h' ∘ b
+
+shifter-3 : {A B C : Obj} {C = C₁ : Obj} {D : Obj} {f : A ⇒ B} {g : B ⇒ C₁} {r : _} {l : _} {h : C₁ ⇒ D}
+          → h ∘ h' ∘ h'' ∘ a
+          → h ∘ h' ∘ h'' ∘ b
+          -}
+
+_ : {A B : Obj} {C = C₁ : Obj} {D : Obj} {f : A ⇒ B} {g : B ⇒ C₁}
+  → g ∘ f ≈ g ∘ f
+_ = {!   !}
+
+_ : {A B : Obj} {C = C₁ : Obj} {D : Obj} {f : A ⇒ B} {g : B ⇒ C₁} {h : C₁ ⇒ D} → (h ∘ g) ∘ f ≈ h ∘ g ∘ f
+_ = {!   !}
+{-
+veritàbase : {A B C : Obj} {C = C₁ : Obj} {D : Obj} {f : A ⇒ B} {g : B ⇒ C₁} {r : veritàbase} {h : C₁ ⇒ D}
+  → (h ∘ g ∘ r) ∘ f ≈ h ∘ g ∘ r ∘ f
+veritàbase = {!   !}
+
+expandveritàbase : {A B C : Obj} {C = C₁ : Obj} {D : Obj} {f : A ⇒ B} {g : B ⇒ C₁} {r : e} {h : C₁ ⇒ D}
+  → (h ∘ g ∘ r ∘ l) ∘ f ≈ h ∘ g ∘ (r ∘ l) ∘ f
+expandveritàbase = {!   !}
+
+
+_ : {A B C : Obj} {C = C₁ : Obj} {D : Obj} {f : A ⇒ B} {g : B ⇒ C₁} {r : _} {l : _} {h : C₁ ⇒ D}
+  → (h ∘ g ∘ r ∘ l) ∘ f ≈ h ∘ g ∘ r ∘ l ∘ f
+_ = {!   !}
+-}
+-}
