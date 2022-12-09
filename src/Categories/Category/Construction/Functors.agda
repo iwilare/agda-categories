@@ -12,6 +12,7 @@ open import Categories.Category using (Category; _[_∘_])
 open import Categories.Category.Product using (_※ⁿ_) renaming (Product to _×_)
 open import Categories.Functor using (Functor; _∘F_) renaming (id to idF)
 open import Categories.Functor.Bifunctor
+open import Categories.Functor.Bifunctor.Properties using ([_]-decompose₂)
 open import Categories.Functor.Construction.Constant using (constNat)
 open import Categories.NaturalTransformation
   using (NaturalTransformation; ntHelper; _∘ᵥ_; _∘ˡ_; _∘ₕ_) renaming (id to idN)
@@ -230,7 +231,36 @@ module _ {o₁ e₁ ℓ₁} {C₁ : Category o₁ e₁ ℓ₁}
     } where module D = Category D
             open D.HomReasoning
             open MR D
-{-
+
+  uncurry∘curry≅id : NaturalIsomorphism (uncurry {C₁ = C₁} {C₂ = C₂} {D = D} ∘F curry {C₁ = C₁} {C₂ = C₂} {D = D}) idF
+  uncurry∘curry≅id = record
+    { F⇒G = ntHelper (record
+      { η = λ X → ntHelper (record
+        { η = λ Y → D.id
+        ; commute = λ (f₁ , f₂) →
+            begin _ ≈⟨ refl⟩∘⟨ D.Equiv.sym [ X ]-decompose₂ ⟩
+                  _ ≈⟨ id-comm-sym ⟩
+                  _ ∎
+        })
+      ; commute = λ f → id-comm-sym
+      })
+    ; F⇐G = ntHelper (record
+      { η = λ X → ntHelper (record
+        { η = λ Y → D.id
+        ; commute = λ (f₁ , f₂) →
+            begin _ ≈⟨ id-comm-sym ⟩
+                  _ ≈⟨ ([ X ]-decompose₂ ⟩∘⟨refl) ⟩
+                  _ ∎
+        })
+      ; commute = λ f → id-comm-sym
+      })
+    ; iso = λ X → record
+      { isoˡ = D.identity²
+      ; isoʳ = D.identity²
+      }
+    } where module D = Category D
+            open D.HomReasoning
+            open MR D
 
 -- Godement product ?
 product : {A B C : Category o ℓ e} → Bifunctor (Functors B C) (Functors A B) (Functors A C)
@@ -329,4 +359,3 @@ Functorsᵒᵖ-equiv A B = record
         open MR B
 
 module Functorsᵒᵖ-equiv {o ℓ e o′ ℓ′ e′} (A : Category o ℓ e) (B : Category o′ ℓ′ e′) = ⊣Equivalence (Functorsᵒᵖ-equiv A B)
--}
