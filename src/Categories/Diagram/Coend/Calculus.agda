@@ -10,18 +10,18 @@ open import Categories.Category.Cartesian
 open import Categories.Category.Cartesian.Monoidal
 open import Categories.Category.Construction.Functors
 open import Categories.Category.Core using (Category)
-open import Categories.Category.Equivalence
-open import Categories.Category.Equivalence.Preserves
 open import Categories.Category.Instance.Cats
 open import Categories.Category.Instance.One renaming (One to ⊤)
 open import Categories.Category.Monoidal
 open import Categories.Category.Monoidal.Instance.Cats
+open import Categories.Category.CartesianClosed
+open import Categories.Category.Instance.Properties.Cats
 open import Categories.Category.Product
 open import Categories.Diagram.Coend
 open import Categories.Diagram.Colimit
 open import Categories.Diagram.Cowedge
 open import Categories.Diagram.Cowedge.Properties
-open import Categories.Functor using (Functor)
+open import Categories.Functor using (Functor; _∘F_) renaming (id to idF)
 open import Categories.Functor.Bifunctor using (Bifunctor)
 open import Categories.Functor.Instance.Twisted
 open import Categories.NaturalTransformation hiding (id)
@@ -48,7 +48,10 @@ module _ {ℓ} {E : Category ℓ ℓ ℓ} where
   open _≅_
   module F {C} {D} = Categories.Morphism (Functors {ℓ} {ℓ} {ℓ} {ℓ} {ℓ} {ℓ} C D)
 
+  module Cats = Category (Cats ℓ ℓ ℓ)
+
   open BinaryProducts (Product.Cats-has-all {ℓ} {ℓ} {ℓ})
+  --open Category.Closed
 
   data Pos : Set (sucℓ ℓ) where
     ⁺ : Pos
@@ -73,11 +76,22 @@ module _ {ℓ} {E : Category ℓ ℓ ℓ} where
   CΓ [] = E
   CΓ ((C , P) ∷ Γ) = Functors (PosΓ C P) (CΓ Γ)
 
+  open CartesianMonoidalClosed (Cats ℓ ℓ ℓ) (Cats-CCC)
+
   σ-Γ : ∀ {A B n} {Γ : Ctx n}
         → CΓ (A ∷ B ∷ Γ)
         ≅ CΓ (B ∷ A ∷ Γ)
-  σ-Γ = {!   !}
-
+  σ-Γ = record
+    { from = curry ∘F [ swap , idF ]₁ ∘F uncurry
+    ; to = curry ∘F [ swap , idF ]₁ ∘F uncurry
+    ; iso = record
+      { isoˡ = begin {!   !} ≈⟨ {!   !} ⟩
+                     {!   !} ≈⟨ {!   !} ⟩
+                     {!   !} ∎
+      ; isoʳ = {!   !}
+      }
+    } where open Cats.HomReasoning
+{-
   ⊗-Γ : ∀ {A B P n} {Γ : Ctx n}
         → CΓ ((A , P) ∷ (B , P) ∷ Γ)
         ≅ CΓ ((A × B , P) ∷ Γ)
@@ -106,3 +120,4 @@ module _ {ℓ} {E : Category ℓ ℓ ℓ} where
          → coend (coend F)
        F.≅ coend {! (⊗-Γ) .isoˡ !}
   fubini = {!   !}
+-}
