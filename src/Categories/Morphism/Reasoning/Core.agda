@@ -321,69 +321,240 @@ param-shifter-1 = ?
 
 -}
 
-module _ {o ℓ e} (C : Category o ℓ e) where
-  module C = Category C
-  param-shifter-0 : Set (o ⊔ ℓ ⊔ e)
-  param-shifter-0 =
-     ∀ {Last : C.Obj}
-       {A : C.Obj} {a b : A C.⇒ Last} {f : ∀ {H} → (Last C.⇒ H) → (Last C.⇒ H)}
-          → (a C.≈ b)
-          → ∀ {H} → f {A} a C.≈ f {A} b
+module C = Category C
 
-  param-shifter-1 : Set (o ⊔ ℓ ⊔ e)
-  param-shifter-1 =
-     ∀ {C B A : C.Obj} {c : B C.⇒ C}
-           {a b : A C.⇒ B} {f : ∀ {H} → (H C.⇒ B) → (H C.⇒ B)}
-          → (a C.≈ b)
-          → ∀ {H} → f {B} (c C.∘ a) C.≈ f {B} (c C.∘ b)
-  param-shifter-1 = ?
+param-shifter-0 : C.Obj → C.Obj → Set (o ⊔ ℓ ⊔ e)
+param-shifter-0 A B =
+    ∀ {A B : C.Obj}
+      {a b : A C.⇒ B}
+    → a C.≈ b
+    → a C.≈ b
+
+param-shifter-1 : C.Obj → C.Obj → C.Obj → Set (ℓ ⊔ e)
+param-shifter-1 A B C =
+    ∀ {a b : A C.⇒ B} {c : B C.⇒ C}
+    → a C.≈ b
+    → c C.∘ a C.≈ c C.∘ b
+
+param-shifter-2 : C.Obj → C.Obj → C.Obj → Set (o ⊔ ℓ ⊔ e)
+param-shifter-2 A B C =
+    ∀ {D} {c' : C C.⇒ D}
+    → {a b : A C.⇒ B} {c : B C.⇒ C}
+    → a C.≈ b
+    → c' C.∘ c C.∘ a C.≈ c' C.∘ c C.∘ b
+
+param-shifter-3 : C.Obj → C.Obj → C.Obj → Set (o ⊔ ℓ ⊔ e)
+param-shifter-3 A B C =
+    ∀ {D D'} {c'' : D C.⇒ D'} {c' : C C.⇒ D}
+    → {a b : A C.⇒ B} {c : B C.⇒ C}
+    → a C.≈ b
+    → c'' C.∘ c' C.∘ c C.∘ a C.≈ c'' C.∘ c' C.∘ c C.∘ b
+
+
+open import Data.Nat using (ℕ; suc; zero)
+
+param-shifter : ℕ → Set (o ⊔ ℓ ⊔ e)
+param-shifter zero = ∀ {A B C} → param-shifter-1 A B C
+param-shifter (suc n) = {! ∀ {C D : Obj} → param-shifter n  !}
+
+param-shifterOnis : ℕ → Set (o ⊔ ℓ ⊔ e)
+param-shifterOnis zero = ∀ {A B C} → param-shifter-1 A B C
+param-shifterOnis (suc n) = {! ∀ {C D : Obj} → param-shifter n  !}
+
+
+bello : ∀ {A B C} {a b : A C.⇒ B} {c : B C.⇒ C}
+    → ℕ → Set (o ⊔ ℓ ⊔ e)
+bello {A} {B} {C} {a} {b} {c} ℕ.zero = Lift (o ⊔ ℓ ⊔ e)
+        (       a C.≈       b
+        → c C.∘ a C.≈ c C.∘ b)
+bello (ℕ.suc a) =
+  {! ∀ {D} {B} → bello a  !} --
+
+open import Data.Product
+
+module _ {A B} {a b : A C.⇒ B} (p : a C.≈ b) where
+  shifter : ∀ {Y} (f : A C.⇒ B → A C.⇒ Y)
+       → ℕ → Set (o ⊔ ℓ ⊔ e)
+  shifter f ℕ.zero = Lift (o ⊔ ℓ ⊔ e) (f a C.≈ f b)
+  shifter {Y = Y} f (ℕ.suc n) =
+    ∀ {G : C.Obj} {k : Y C.⇒ G}
+        → shifter (λ x → k ∘ f x) n
+
+  shifter-id : ℕ → Set (o ⊔ ℓ ⊔ e)
+  shifter-id n = shifter (λ x → x) n
+
+  suc-f : ∀ {Y} {f : A C.⇒ B → A C.⇒ Y} n
+             → shifter f n
+             → shifter f (ℕ.suc n)
+  suc-f ℕ.zero (lift h) = lift (refl⟩∘⟨ h)
+  suc-f (ℕ.suc n) h = suc-f n h
+
+  actual-proof : ∀ n → shifter-id n
+  actual-proof ℕ.zero = lift p
+  actual-proof (ℕ.suc n) = suc-f n (actual-proof n)
+
+module _ where
+
+  assoc-general : ∀ {A B C D X Y} {a : A C.⇒ B} {b : C C.⇒ D}
+           (l : {!   !} C.⇒ {!   !} → {!   !} C.⇒ {!   !})
+           (r : {!   !} C.⇒ {!   !} → {!   !} C.⇒ {!   !})
+         → ℕ → Set (o ⊔ ℓ ⊔ e)
+  assoc-general {A} {B} {C} {D} {X} {Y} {a} {b} l r ℕ.zero =
+    Lift (o ⊔ ℓ ⊔ e) (l a ∘ b C.≈ a ∘ r b)
+  assoc-general {A} {B} {C} {D} {X} {Y} {a} {b} l r (ℕ.suc n) =
+    ∀ {P G : C.Obj} {k : {!   !} C.⇒ {! G !}}
+        → assoc-general
+                {!   !} --(λ x → x ∘ l k)
+                {!   !} --(λ x → k ∘ r x)
+                n
+
+  assoc-id : ℕ → Set (o ⊔ ℓ ⊔ e)
+  assoc-id = assoc-general (λ x → x) (λ x → x)
 
 
 {-
 
 
-{-
-shifter : (a ≈ b)
-        ∀ {hs : DepVecArrows (f) n}
-        → repeat hs n a
-        → repeat hs n b
-shifter = ?
+a (b c d f)
+(a b c d) f
 
+a (b c d e f)
+(a b c d e) f
+
+
+
+(a b c d) f = a b c d f
+------------ instanziando f
+(a b c d) (f g) = a b c d f g
+(a (b c d)) (f g)
+a (b c d) (f g) = a b c d f g
+
+
+
+((a b c d) f) p = (a b c d f) p
+
+
+
+
+    (l a ∘ b C.≈ a ∘ r b)
+    ((a ∘ l k) ∘ b C.≈ a ∘ (k ∘ r b))
+    ((a ∘ k ∘ l k') ∘ b C.≈ a ∘ k ∘ (k' ∘ r b))
+-}
+{-
+  assocs : ∀ {A B C D X Y} {a : A C.⇒ B} {b : C C.⇒ D}
+           (l : {!   !} C.⇒ {!   !} → {!   !} C.⇒ {!   !})
+           (r : {!   !} C.⇒ {!   !} → {!   !} C.⇒ {!   !})
+         → ℕ → Set (o ⊔ ℓ ⊔ e)
+  assocs {A} {B} {C} {D} {a} {b} l r ℕ.zero =
+  assocs {A} {B} {C} {D} {a} {b} l r (ℕ.suc n) =
+    ∀ {k : {!   !} C.⇒ {!   !}} →
+    Lift (o ⊔ ℓ ⊔ e) ((a ∘ l k) ∘ b C.≈ a ∘ (k ∘ r b))
+    Lift (o ⊔ ℓ ⊔ e) ((a ∘ k ∘ l k') ∘ b C.≈ a ∘ k ∘ (k' ∘ r b))
+  assocs {A} {B} {C} {D} {a} {b} l r (ℕ.suc (ℕ.suc n)) =
+    ∀ {k  : {!   !} C.⇒ {!   !}} →
+      {k' : {!   !} C.⇒ {!   !}} →
+    Lift (o ⊔ ℓ ⊔ e) ((a ∘ k ∘ l k') ∘ b C.≈ a ∘ k ∘ (k' ∘ r b))
+  assocs {A} {B} {C} {D} {a} {b} l r (ℕ.suc (ℕ.suc (ℕ.suc n))) =
+    ∀ {P G : C.Obj} {k : {!   !} C.⇒ {!   !}}
+        → assocs {!   !} --(λ x → l x ∘ k)
+                 {!   !} --(λ x → r x) --k ∘ ?)
+                 n
+
+  assoc-general : ∀ {A B C D X Y} {a : A C.⇒ B} {b : C C.⇒ D}
+           (l : {!   !} C.⇒ {!   !} → {!   !} C.⇒ {!   !})
+           (r : {!   !} C.⇒ {!   !} → {!   !} C.⇒ {!   !})
+         → ℕ → Set (o ⊔ ℓ ⊔ e)
+  assoc-general {A} {B} {C} {D} {a} {b} l r ℕ.zero =
+    Lift (o ⊔ ℓ ⊔ e) (l a ∘ b C.≈ a ∘ r b)
+  assoc-general {A} {B} {C} {D} {a} {b} l r (ℕ.suc n) =
+    ∀ {P G : C.Obj} {k : {! P  !} C.⇒ {! G !}}
+        → kriatur-definitive
+                (λ x → x ∘ l k)
+                (λ x → k ∘ r x)
+                n
+
+
+
+
+
+
+  --l a ∘ r b C.≈ l a ∘ r b
+
+  n1ormalata : ℕ → Set (o ⊔ ℓ ⊔ e)
+  n1ormalata n = assocs {!   !} {!   !} n --(λ x → x) (λ x → {!   !}) n --(λ x → x) (λ x → x) n
+{-
+
+  l1emmatorum : ∀ {G} {n} {k : {!   !}}
+             → assocs (λ x → x) n
+             → assocs (λ x → k C.∘ x) n
+  l1emmatorum {n = ℕ.zero} = {!   !}
+  l1emmatorum {n = ℕ.suc n} = {! lemma {n = n}  !}
+
+  t1rasc : ∀ n → shifter-id n
+  t1rasc ℕ.zero = lift ? --p
+  t1rasc (ℕ.suc n) = l1emmatorum (t1rasc n)
+
+  t1est-miracolo = {! shifter-id 4  !} --{! shifter-id 4  !}
 -}
 
 
-{-
-shifter-1 : {A B C : Obj} {C = C₁ : Obj} {D : Obj} {f : A ⇒ B} {g : B ⇒ C₁} {r : _} {l : _} {h : C₁ ⇒ D}
-          → h ∘ a
-          → h ∘ b
+  -- ∀ {C D : Obj} → param-shifter-1 {!   !}
 
-shifter-2 : {A B C : Obj} {C = C₁ : Obj} {D : Obj} {f : A ⇒ B} {g : B ⇒ C₁} {r : _} {l : _} {h : C₁ ⇒ D}
-          → h ∘ h' ∘ a
-          → h ∘ h' ∘ b
-
-shifter-3 : {A B C : Obj} {C = C₁ : Obj} {D : Obj} {f : A ⇒ B} {g : B ⇒ C₁} {r : _} {l : _} {h : C₁ ⇒ D}
-          → h ∘ h' ∘ h'' ∘ a
-          → h ∘ h' ∘ h'' ∘ b
-          -}
-
-_ : {A B : Obj} {C = C₁ : Obj} {D : Obj} {f : A ⇒ B} {g : B ⇒ C₁}
-  → g ∘ f ≈ g ∘ f
-_ = {!   !}
-
-_ : {A B : Obj} {C = C₁ : Obj} {D : Obj} {f : A ⇒ B} {g : B ⇒ C₁} {h : C₁ ⇒ D} → (h ∘ g) ∘ f ≈ h ∘ g ∘ f
-_ = {!   !}
-{-
-veritàbase : {A B C : Obj} {C = C₁ : Obj} {D : Obj} {f : A ⇒ B} {g : B ⇒ C₁} {r : veritàbase} {h : C₁ ⇒ D}
-  → (h ∘ g ∘ r) ∘ f ≈ h ∘ g ∘ r ∘ f
-veritàbase = {!   !}
-
-expandveritàbase : {A B C : Obj} {C = C₁ : Obj} {D : Obj} {f : A ⇒ B} {g : B ⇒ C₁} {r : e} {h : C₁ ⇒ D}
-  → (h ∘ g ∘ r ∘ l) ∘ f ≈ h ∘ g ∘ (r ∘ l) ∘ f
-expandveritàbase = {!   !}
+  {-
 
 
-_ : {A B C : Obj} {C = C₁ : Obj} {D : Obj} {f : A ⇒ B} {g : B ⇒ C₁} {r : _} {l : _} {h : C₁ ⇒ D}
-  → (h ∘ g ∘ r ∘ l) ∘ f ≈ h ∘ g ∘ r ∘ l ∘ f
-_ = {!   !}
+  {-
+  shifter : (a ≈ b)
+          ∀ {hs : DepVecArrows (f) n}
+          → repeat hs n a
+          → repeat hs n b
+  shifter = ?
+
+  -}
+
+
+  {-
+  shifter-1 : {A B C : Obj} {C = C₁ : Obj} {D : Obj} {f : A ⇒ B} {g : B ⇒ C₁} {r : _} {l : _} {h : C₁ ⇒ D}
+            → h ∘ a
+            → h ∘ b
+
+  shifter-2 : {A B C : Obj} {C = C₁ : Obj} {D : Obj} {f : A ⇒ B} {g : B ⇒ C₁} {r : _} {l : _} {h : C₁ ⇒ D}
+            → h ∘ h' ∘ a
+            → h ∘ h' ∘ b
+
+  shifter-3 : {A B C : Obj} {C = C₁ : Obj} {D : Obj} {f : A ⇒ B} {g : B ⇒ C₁} {r : _} {l : _} {h : C₁ ⇒ D}
+            → h ∘ h' ∘ h'' ∘ a
+            → h ∘ h' ∘ h'' ∘ b
+            -}
+
+  _ : {A B : Obj} {C = C₁ : Obj} {D : Obj} {f : A ⇒ B} {g : B ⇒ C₁}
+    → g ∘ f ≈ g ∘ f
+  _ = {!   !}
+
+  _ : {A B : Obj} {C = C₁ : Obj} {D : Obj} {f : A ⇒ B} {g : B ⇒ C₁} {h : C₁ ⇒ D} → (h ∘ g) ∘ f ≈ h ∘ g ∘ f
+  _ = {!   !}
+  {-
+  veritàbase : {A B C : Obj} {C = C₁ : Obj} {D : Obj} {f : A ⇒ B} {g : B ⇒ C₁} {r : veritàbase} {h : C₁ ⇒ D}
+    → (h ∘ g ∘ r) ∘ f ≈ h ∘ g ∘ r ∘ f
+  veritàbase = {!   !}
+
+  expandveritàbase : {A B C : Obj} {C = C₁ : Obj} {D : Obj} {f : A ⇒ B} {g : B ⇒ C₁} {r : e} {h : C₁ ⇒ D}
+      (h ∘ g ∘ r) ∘ f ≈ h ∘ g ∘ r ∘ f
+    → (h ∘ g ∘ r ∘ l) ∘ f ≈ h ∘ g ∘ r ∘ l ∘ f
+  expandveritàbase = {!   !}
+
+
+  _ : {A B C : Obj} {C = C₁ : Obj} {D : Obj} {f : A ⇒ B} {g : B ⇒ C₁} {r : _} {l : _} {h : C₁ ⇒ D}
+    → (h ∘ g ∘ r ∘ l) ∘ f ≈ h ∘ g ∘ r ∘ l ∘ f
+  _ = {!   !}
+  -}
+  -}
 -}
--}
+
+
+
+{-
+      (h ∘ g ∘ r) ∘ f ≈ h ∘ g ∘ r ∘ f
+      (h ∘ g ∘ r) ∘ l ∘ f ≈ h ∘ g ∘ r ∘ l ∘ f
+      (h ∘ (g ∘ r ∘ l)) ∘ f
+      -}
