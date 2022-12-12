@@ -13,7 +13,7 @@ open import Categories.Category
 -}
 module Categories.Morphism.Reasoning.Core {o ℓ e} (C : Category o ℓ e) where
 
-open import Level
+open import Level using (Level; _⊔_; Lift; lift)
 open import Function renaming (id to idᶠ; _∘_ to _∙_)
 
 open import Relation.Binary hiding (_⇒_)
@@ -266,150 +266,63 @@ intro-last {a = a} {b = b} {f = f} {g = g} eq = begin
   f ∘ g ∘ a ∘ b   ≈˘⟨ refl⟩∘⟨ assoc ⟩
   f ∘ (g ∘ a) ∘ b ∎
 
-
-
-super-assoc : _
-super-assoc = {! assoc  !}
-
-
-
-{-
-
-
-shifter-0 : (a ≈ b)
-        → a ≈ b
-shifter-0 = ?
-
-shifter-1 : ∀ {h}
-          → (a ≈ b)
-          → h ∘ a ≈ h ∘ b
-shifter-1 = ?
-
-shifter-2 : ∀ {h'}
-           (∀ {h}
-          → (a ≈ b)
-          → cong (h'∘ ) (h ∘ a) ≈ cong (h′ ∘) (h ∘ b))
-shifter-1 = ?
-
-
-
-
-
-
-
-
-
-
-
-
-
-param-shifter-0 : (a ≈ b)
-        → f a ≈ f b
-param-shifter-0 = ?
-
-param-shifter-1 : ∀ {h}
-          → (a ≈ b)
-          → f (h ∘ a) ≈ f (h ∘ b)
-param-shifter-1 = ?
-
-param-shifter-2 : ∀ {h'}
-           (∀ {h}
-          → (a ≈ b)
-          → f (h' ∘ h ∘ a) ≈ f (h' ∘ h ∘ b))
-param-shifter-1 = ?
-
-
--}
-
-module C = Category C
-
-param-shifter-0 : C.Obj → C.Obj → Set (o ⊔ ℓ ⊔ e)
-param-shifter-0 A B =
-    ∀ {A B : C.Obj}
-      {a b : A C.⇒ B}
-    → a C.≈ b
-    → a C.≈ b
-
-param-shifter-1 : C.Obj → C.Obj → C.Obj → Set (ℓ ⊔ e)
-param-shifter-1 A B C =
-    ∀ {a b : A C.⇒ B} {c : B C.⇒ C}
-    → a C.≈ b
-    → c C.∘ a C.≈ c C.∘ b
-
-param-shifter-2 : C.Obj → C.Obj → C.Obj → Set (o ⊔ ℓ ⊔ e)
-param-shifter-2 A B C =
-    ∀ {D} {c' : C C.⇒ D}
-    → {a b : A C.⇒ B} {c : B C.⇒ C}
-    → a C.≈ b
-    → c' C.∘ c C.∘ a C.≈ c' C.∘ c C.∘ b
-
-param-shifter-3 : C.Obj → C.Obj → C.Obj → Set (o ⊔ ℓ ⊔ e)
-param-shifter-3 A B C =
-    ∀ {D D'} {c'' : D C.⇒ D'} {c' : C C.⇒ D}
-    → {a b : A C.⇒ B} {c : B C.⇒ C}
-    → a C.≈ b
-    → c'' C.∘ c' C.∘ c C.∘ a C.≈ c'' C.∘ c' C.∘ c C.∘ b
-
-
-open import Data.Nat using (ℕ; suc; zero)
-
-param-shifter : ℕ → Set (o ⊔ ℓ ⊔ e)
-param-shifter zero = ∀ {A B C} → param-shifter-1 A B C
-param-shifter (suc n) = {! ∀ {C D : Obj} → param-shifter n  !}
-
-param-shifterOnis : ℕ → Set (o ⊔ ℓ ⊔ e)
-param-shifterOnis zero = ∀ {A B C} → param-shifter-1 A B C
-param-shifterOnis (suc n) = {! ∀ {C D : Obj} → param-shifter n  !}
-
-
-bello : ∀ {A B C} {a b : A C.⇒ B} {c : B C.⇒ C}
-    → ℕ → Set (o ⊔ ℓ ⊔ e)
-bello {A} {B} {C} {a} {b} {c} ℕ.zero = Lift (o ⊔ ℓ ⊔ e)
-        (       a C.≈       b
-        → c C.∘ a C.≈ c C.∘ b)
-bello (ℕ.suc a) =
-  {! ∀ {D} {B} → bello a  !} --
-
 open import Data.Product
 
-module _ {A B} {a b : A C.⇒ B} (p : a C.≈ b) where
-  shifter : ∀ {Y} (f : A C.⇒ B → A C.⇒ Y)
+module _ {A B} {a b : A ⇒ B} (p : a ≈ b) where
+  open import Data.Nat using (ℕ; zero; suc)
+
+  shifter : ∀ {Y} (f : A ⇒ B → A ⇒ Y)
        → ℕ → Set (o ⊔ ℓ ⊔ e)
-  shifter f ℕ.zero = Lift (o ⊔ ℓ ⊔ e) (f a C.≈ f b)
-  shifter {Y = Y} f (ℕ.suc n) =
-    ∀ {G : C.Obj} {k : Y C.⇒ G}
+  shifter f zero = Lift (o ⊔ ℓ ⊔ e) (f a ≈ f b)
+  shifter {Y = Y} f (suc n) =
+    ∀ {G : Obj} {k : Y ⇒ G}
         → shifter (λ x → k ∘ f x) n
 
   shifter-id : ℕ → Set (o ⊔ ℓ ⊔ e)
   shifter-id n = shifter (λ x → x) n
 
-  suc-f : ∀ {Y} {f : A C.⇒ B → A C.⇒ Y} n
+  suc-f : ∀ {Y} {f : A ⇒ B → A ⇒ Y} n
              → shifter f n
-             → shifter f (ℕ.suc n)
-  suc-f ℕ.zero (lift h) = lift (refl⟩∘⟨ h)
-  suc-f (ℕ.suc n) h = suc-f n h
+             → shifter f (suc n)
+  suc-f zero (lift h) = lift (refl⟩∘⟨ h)
+  suc-f (suc n) h = suc-f n h
 
   actual-proof : ∀ n → shifter-id n
-  actual-proof ℕ.zero = lift p
-  actual-proof (ℕ.suc n) = suc-f n (actual-proof n)
+  actual-proof zero = lift p
+  actual-proof (suc n) = suc-f n (actual-proof n)
 
 module _ where
+  open import Data.Nat using (ℕ; zero; suc)
 
-  assoc-general : ∀ {A B C D X Y} {a : A C.⇒ B} {b : C C.⇒ D}
-           (l : {!   !} C.⇒ {!   !} → {!   !} C.⇒ {!   !})
-           (r : {!   !} C.⇒ {!   !} → {!   !} C.⇒ {!   !})
+  assoc-general : ∀ {A B C D E F} {a : A ⇒ B} {b : C ⇒ D} {k : E ⇒ F}
+           (^ : ({!   !} ⇒ {!   !}
+              → {!   !} ⇒ {!   !})
+              → C ⇒ D
+              → {!   !} ⇒ {!   !})
+           (^ : ({!   !} ⇒ {!   !}
+              → {!   !} ⇒ {!   !})
+              → C ⇒ D
+              → {!   !} ⇒ {!   !})
+           (f : {!   !} ⇒ {!   !}
+              → {!   !} ⇒ {!   !})
          → ℕ → Set (o ⊔ ℓ ⊔ e)
-  assoc-general {A} {B} {C} {D} {X} {Y} {a} {b} l r ℕ.zero =
-    Lift (o ⊔ ℓ ⊔ e) (l a ∘ b C.≈ a ∘ r b)
-  assoc-general {A} {B} {C} {D} {X} {Y} {a} {b} l r (ℕ.suc n) =
-    ∀ {P G : C.Obj} {k : {!   !} C.⇒ {! G !}}
+  assoc-general {A} {B} {C} {D} {X} {Y} {a} {b} {k} ^ * f zero =
+    Lift (o ⊔ ℓ ⊔ e) (^ f b ≈ * f b)
+  assoc-general {A} {B} {C} {D} {X} {Y} {a} {b} ^ * f (suc n) =
+    ∀ {P G : Obj} {k : {!   !} ⇒ {! G !}}
         → assoc-general
-                {!   !} --(λ x → x ∘ l k)
-                {!   !} --(λ x → k ∘ r x)
-                n
+            (λ f x → f x ∘ b)
+            (λ f x → a ∘ f x)
+            (λ x → k ∘ f x)
+            n
+  -- l a ∘ b ≈ a ∘ r b
+  -- l (a ∘ k) ∘ b ≈ a ∘ r (k ∘ b)
+  -- l (a ∘ k) ∘ b ≈ a ∘ r (k ∘ b)
+
 
   assoc-id : ℕ → Set (o ⊔ ℓ ⊔ e)
-  assoc-id = assoc-general (λ x → x) (λ x → x)
+  assoc-id = assoc-general {!   !} {!   !} {!   !}
+
 
 
 {-
@@ -436,26 +349,26 @@ a (b c d) (f g) = a b c d f g
 
 
 
-    (l a ∘ b C.≈ a ∘ r b)
-    ((a ∘ l k) ∘ b C.≈ a ∘ (k ∘ r b))
-    ((a ∘ k ∘ l k') ∘ b C.≈ a ∘ k ∘ (k' ∘ r b))
+    (l a ∘ b ≈ a ∘ r b)
+    ((a ∘ l k) ∘ b ≈ a ∘ (k ∘ r b))
+    ((a ∘ k ∘ l k') ∘ b ≈ a ∘ k ∘ (k' ∘ r b))
 -}
 {-
-  assocs : ∀ {A B C D X Y} {a : A C.⇒ B} {b : C C.⇒ D}
-           (l : {!   !} C.⇒ {!   !} → {!   !} C.⇒ {!   !})
-           (r : {!   !} C.⇒ {!   !} → {!   !} C.⇒ {!   !})
+  assocs : ∀ {A B C D X Y} {a : A ⇒ B} {b : C ⇒ D}
+           (l : {!   !} ⇒ {!   !} → {!   !} ⇒ {!   !})
+           (r : {!   !} ⇒ {!   !} → {!   !} ⇒ {!   !})
          → ℕ → Set (o ⊔ ℓ ⊔ e)
-  assocs {A} {B} {C} {D} {a} {b} l r ℕ.zero =
-  assocs {A} {B} {C} {D} {a} {b} l r (ℕ.suc n) =
-    ∀ {k : {!   !} C.⇒ {!   !}} →
-    Lift (o ⊔ ℓ ⊔ e) ((a ∘ l k) ∘ b C.≈ a ∘ (k ∘ r b))
-    Lift (o ⊔ ℓ ⊔ e) ((a ∘ k ∘ l k') ∘ b C.≈ a ∘ k ∘ (k' ∘ r b))
-  assocs {A} {B} {C} {D} {a} {b} l r (ℕ.suc (ℕ.suc n)) =
-    ∀ {k  : {!   !} C.⇒ {!   !}} →
-      {k' : {!   !} C.⇒ {!   !}} →
-    Lift (o ⊔ ℓ ⊔ e) ((a ∘ k ∘ l k') ∘ b C.≈ a ∘ k ∘ (k' ∘ r b))
-  assocs {A} {B} {C} {D} {a} {b} l r (ℕ.suc (ℕ.suc (ℕ.suc n))) =
-    ∀ {P G : C.Obj} {k : {!   !} C.⇒ {!   !}}
+  assocs {A} {B} {C} {D} {a} {b} l r zero =
+  assocs {A} {B} {C} {D} {a} {b} l r (suc n) =
+    ∀ {k : {!   !} ⇒ {!   !}} →
+    Lift (o ⊔ ℓ ⊔ e) ((a ∘ l k) ∘ b ≈ a ∘ (k ∘ r b))
+    Lift (o ⊔ ℓ ⊔ e) ((a ∘ k ∘ l k') ∘ b ≈ a ∘ k ∘ (k' ∘ r b))
+  assocs {A} {B} {C} {D} {a} {b} l r (suc (suc n)) =
+    ∀ {k  : {!   !} ⇒ {!   !}} →
+      {k' : {!   !} ⇒ {!   !}} →
+    Lift (o ⊔ ℓ ⊔ e) ((a ∘ k ∘ l k') ∘ b ≈ a ∘ k ∘ (k' ∘ r b))
+  assocs {A} {B} {C} {D} {a} {b} l r (suc (suc (suc n))) =
+    ∀ {P G : Obj} {k : {!   !} ⇒ {!   !}}
         → assocs {!   !} --(λ x → l x ∘ k)
                  {!   !} --(λ x → r x) --k ∘ ?)
                  n
@@ -464,9 +377,9 @@ a (b c d) (f g) = a b c d f g
            (l : {!   !} C.⇒ {!   !} → {!   !} C.⇒ {!   !})
            (r : {!   !} C.⇒ {!   !} → {!   !} C.⇒ {!   !})
          → ℕ → Set (o ⊔ ℓ ⊔ e)
-  assoc-general {A} {B} {C} {D} {a} {b} l r ℕ.zero =
+  assoc-general {A} {B} {C} {D} {a} {b} l r zero =
     Lift (o ⊔ ℓ ⊔ e) (l a ∘ b C.≈ a ∘ r b)
-  assoc-general {A} {B} {C} {D} {a} {b} l r (ℕ.suc n) =
+  assoc-general {A} {B} {C} {D} {a} {b} l r (suc n) =
     ∀ {P G : C.Obj} {k : {! P  !} C.⇒ {! G !}}
         → kriatur-definitive
                 (λ x → x ∘ l k)
@@ -487,12 +400,12 @@ a (b c d) (f g) = a b c d f g
   l1emmatorum : ∀ {G} {n} {k : {!   !}}
              → assocs (λ x → x) n
              → assocs (λ x → k C.∘ x) n
-  l1emmatorum {n = ℕ.zero} = {!   !}
-  l1emmatorum {n = ℕ.suc n} = {! lemma {n = n}  !}
+  l1emmatorum {n = zero} = {!   !}
+  l1emmatorum {n = suc n} = {! lemma {n = n}  !}
 
   t1rasc : ∀ n → shifter-id n
-  t1rasc ℕ.zero = lift ? --p
-  t1rasc (ℕ.suc n) = l1emmatorum (t1rasc n)
+  t1rasc zero = lift ? --p
+  t1rasc (suc n) = l1emmatorum (t1rasc n)
 
   t1est-miracolo = {! shifter-id 4  !} --{! shifter-id 4  !}
 -}
