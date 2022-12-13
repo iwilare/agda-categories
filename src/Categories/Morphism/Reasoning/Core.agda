@@ -271,50 +271,55 @@ open import Data.Product
 module _ {A B} {a b : A ⇒ B} (p : a ≈ b) where
   open import Data.Nat using (ℕ; zero; suc)
 
-  shifter : ∀ {Y} (f : A ⇒ B → A ⇒ Y)
+  skip-param : ∀ {Y} (y : A ⇒ B → A ⇒ Y)
        → ℕ → Set (o ⊔ ℓ ⊔ e)
-  shifter f zero = Lift (o ⊔ ℓ ⊔ e) (f a ≈ f b)
-  shifter {Y = Y} f (suc n) =
+  skip-param y zero = Lift (o ⊔ ℓ ⊔ e) (y a ≈ y b)
+  skip-param {Y = Y} y (suc n) =
     ∀ {G : Obj} {k : Y ⇒ G}
-        → shifter (λ x → k ∘ f x) n
+        → skip-param (λ x → k ∘ y x) n
 
-  shifter-id : ℕ → Set (o ⊔ ℓ ⊔ e)
-  shifter-id n = shifter (λ x → x) n
+  skip-type : ℕ → Set (o ⊔ ℓ ⊔ e)
+  skip-type n = skip-param (λ x → x) n
 
-  suc-f : ∀ {Y} {f : A ⇒ B → A ⇒ Y} n
-             → shifter f n
-             → shifter f (suc n)
-  suc-f zero (lift h) = lift (refl⟩∘⟨ h)
-  suc-f (suc n) h = suc-f n h
+  skip-suc : ∀ {Y} {y : A ⇒ B → A ⇒ Y} n
+             → skip-param y n
+             → skip-param y (suc n)
+  skip-suc zero (lift h) = lift (refl⟩∘⟨ h)
+  skip-suc (suc n) h = skip-suc n h
 
-  actual-proof : ∀ n → shifter-id n
-  actual-proof zero = lift p
-  actual-proof (suc n) = suc-f n (actual-proof n)
+  skip : ∀ n → skip-type n
+  skip zero = lift p
+  skip (suc n) = skip-suc n (skip n)
 
-module _ {C D : Obj} {b : C ⇒ D} where
+module _ {A B : Obj} {a : A ⇒ B} where
   open import Data.Nat using (ℕ; zero; suc)
 
-  assoc-general : ∀ {A B C D} {a : A ⇒ B}
-           (k : D ⇒ A)
-           (f : C ⇒ D → C ⇒ A)
+  assoc-general : ∀ {X}
+           (f : B ⇒ X)
+           (y : A ⇒ B → A ⇒ X)
          → ℕ → Set (o ⊔ ℓ ⊔ e)
-  assoc-general {A} {B} {C} {D} {a} k f zero =
-    ∀ {C D} {b : C ⇒ D} {b} → Lift (o ⊔ ℓ ⊔ e) ((a ∘ k) ∘ b ≈ a ∘ f b)
-  assoc-general {A} {B} {C} {D} {a} k f (suc n) =
-    ∀ {X Y R : Obj} {k' : A ⇒ Y} {R : Y ⇒ R}
-        → assoc-general {a = R}
-            (k' ∘ k)
-            (λ x → k' ∘ f x)
-            n
-  -- l a ∘ b ≈ a ∘ r b
-  -- l (a ∘ k) ∘ b ≈ a ∘ r (k ∘ b)
-  -- l (a ∘ k ∘ p) ∘ b ≈ a ∘ r (k ∘ p ∘ b)
-
+  assoc-general {X} f y zero =
+    Lift (o ⊔ ℓ ⊔ e) (f ∘ a ≈ y a)
+  assoc-general {X} f y (suc n) =
+    ∀ {Y : Obj} {f' : X ⇒ Y}
+        → assoc-general (f' ∘ f) (λ x → f' ∘ y x) n
 
   assoc-id : ℕ → Set (o ⊔ ℓ ⊔ e)
-  assoc-id n = ∀ {R M} {k : R ⇒ M} → assoc-general k (λ x → k ∘ x) n
+  assoc-id n = ∀ {X} {f : B ⇒ X}
+             → assoc-general f (λ x → f ∘ x) n
 
-  test = {!  assoc-id 4 !}
+  assoc-suc : ∀ {f} {y : A ⇒ B → A ⇒ Y} n
+            → assoc-general f y n
+            → assoc-general f y (suc n)
+  assoc-suc zero (lift a) = lift (Equiv.trans assoc (refl⟩∘⟨ a))
+  assoc-suc (suc n) h = assoc-suc n h
+
+  assoc-proof : ∀ n → assoc-id n
+  assoc-proof zero = lift Equiv.refl
+  assoc-proof (suc n) = assoc-suc n (assoc-proof n)
+
+  _ : {! assoc-suc  !}
+  _ = {!   !}
 
 {-
 
@@ -394,39 +399,39 @@ a (b c d) (f g) = a b c d f g
   l1emmatorum {n = zero} = {!   !}
   l1emmatorum {n = suc n} = {! lemma {n = n}  !}
 
-  t1rasc : ∀ n → shifter-id n
+  t1rasc : ∀ n → skip-type n
   t1rasc zero = lift ? --p
   t1rasc (suc n) = l1emmatorum (t1rasc n)
 
-  t1est-miracolo = {! shifter-id 4  !} --{! shifter-id 4  !}
+  t1est-miracolo = {! skip-type 4  !} --{! skip-type 4  !}
 -}
 
 
-  -- ∀ {C D : Obj} → param-shifter-1 {!   !}
+  -- ∀ {C D : Obj} → param-skip-param-1 {!   !}
 
   {-
 
 
   {-
-  shifter : (a ≈ b)
+  skip-param : (a ≈ b)
           ∀ {hs : DepVecArrows (f) n}
           → repeat hs n a
           → repeat hs n b
-  shifter = ?
+  skip-param = ?
 
   -}
 
 
   {-
-  shifter-1 : {A B C : Obj} {C = C₁ : Obj} {D : Obj} {f : A ⇒ B} {g : B ⇒ C₁} {r : _} {l : _} {h : C₁ ⇒ D}
+  skip-param-1 : {A B C : Obj} {C = C₁ : Obj} {D : Obj} {f : A ⇒ B} {g : B ⇒ C₁} {r : _} {l : _} {h : C₁ ⇒ D}
             → h ∘ a
             → h ∘ b
 
-  shifter-2 : {A B C : Obj} {C = C₁ : Obj} {D : Obj} {f : A ⇒ B} {g : B ⇒ C₁} {r : _} {l : _} {h : C₁ ⇒ D}
+  skip-param-2 : {A B C : Obj} {C = C₁ : Obj} {D : Obj} {f : A ⇒ B} {g : B ⇒ C₁} {r : _} {l : _} {h : C₁ ⇒ D}
             → h ∘ h' ∘ a
             → h ∘ h' ∘ b
 
-  shifter-3 : {A B C : Obj} {C = C₁ : Obj} {D : Obj} {f : A ⇒ B} {g : B ⇒ C₁} {r : _} {l : _} {h : C₁ ⇒ D}
+  skip-param-3 : {A B C : Obj} {C = C₁ : Obj} {D : Obj} {f : A ⇒ B} {g : B ⇒ C₁} {r : _} {l : _} {h : C₁ ⇒ D}
             → h ∘ h' ∘ h'' ∘ a
             → h ∘ h' ∘ h'' ∘ b
             -}
