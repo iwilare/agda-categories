@@ -271,12 +271,12 @@ open import Data.Product
 module _ {A B} {a b : A ⇒ B} (p : a ≈ b) where
   open import Data.Nat using (ℕ; zero; suc)
 
-  skip-param : ∀ {Y} (y : A ⇒ B → A ⇒ Y)
-       → ℕ → Set (o ⊔ ℓ ⊔ e)
+  skip-param : ∀ {X} (y : A ⇒ B → A ⇒ X)
+    → ℕ → Set (o ⊔ ℓ ⊔ e)
   skip-param y zero = Lift (o ⊔ ℓ ⊔ e) (y a ≈ y b)
-  skip-param {Y = Y} y (suc n) =
-    ∀ {G : Obj} {k : Y ⇒ G}
-        → skip-param (λ x → k ∘ y x) n
+  skip-param {X} y (suc n) =
+    ∀ {Y : Obj} {f : X ⇒ Y}
+    → skip-param (λ x → f ∘ y x) n
 
   skip-type : ℕ → Set (o ⊔ ℓ ⊔ e)
   skip-type n = skip-param (λ x → x) n
@@ -294,176 +294,23 @@ module _ {A B} {a b : A ⇒ B} (p : a ≈ b) where
 module _ {A B : Obj} {a : A ⇒ B} where
   open import Data.Nat using (ℕ; zero; suc)
 
-  assoc-general : ∀ {X}
-           (f : B ⇒ X)
-           (y : A ⇒ B → A ⇒ X)
-         → ℕ → Set (o ⊔ ℓ ⊔ e)
-  assoc-general {X} f y zero =
-    Lift (o ⊔ ℓ ⊔ e) (f ∘ a ≈ y a)
-  assoc-general {X} f y (suc n) =
+  assoc-param : ∀ {X} (f : B ⇒ X) (y : A ⇒ B → A ⇒ X)
+    → ℕ → Set (o ⊔ ℓ ⊔ e)
+  assoc-param {X} f y zero = Lift (o ⊔ ℓ ⊔ e) (f ∘ a ≈ y a)
+  assoc-param {X} f y (suc n) =
     ∀ {Y : Obj} {f' : X ⇒ Y}
-        → assoc-general (f' ∘ f) (λ x → f' ∘ y x) n
+    → assoc-param (f' ∘ f) (λ x → f' ∘ y x) n
 
-  assoc-id : ℕ → Set (o ⊔ ℓ ⊔ e)
-  assoc-id n = ∀ {X} {f : B ⇒ X}
-             → assoc-general f (λ x → f ∘ x) n
+  assoc-type : ℕ → Set (o ⊔ ℓ ⊔ e)
+  assoc-type n = ∀ {X} {f : B ⇒ X}
+             → assoc-param f (λ x → f ∘ x) n
 
   assoc-suc : ∀ {f} {y : A ⇒ B → A ⇒ Y} n
-            → assoc-general f y n
-            → assoc-general f y (suc n)
+            → assoc-param f y n
+            → assoc-param f y (suc n)
   assoc-suc zero (lift a) = lift (Equiv.trans assoc (refl⟩∘⟨ a))
   assoc-suc (suc n) h = assoc-suc n h
 
-  assoc-proof : ∀ n → assoc-id n
-  assoc-proof zero = lift Equiv.refl
-  assoc-proof (suc n) = assoc-suc n (assoc-proof n)
-
-  _ : {! assoc-suc  !}
-  _ = {!   !}
-
-{-
-
-
-a (b c d f)
-(a b c d) f
-
-a (b c d e f)
-(a b c d e) f
-
-
-
-(a b c d) f = a b c d f
------------- instanziando f
-(a b c d) (f g) = a b c d f g
-(a (b c d)) (f g)
-a (b c d) (f g) = a b c d f g
-
-
-
-((a b c d) f) p = (a b c d f) p
-
-
-
-
-    (l a ∘ b ≈ a ∘ r b)
-    ((a ∘ l k) ∘ b ≈ a ∘ (k ∘ r b))
-    ((a ∘ k ∘ l k') ∘ b ≈ a ∘ k ∘ (k' ∘ r b))
--}
-{-
-  assocs : ∀ {A B C D X Y} {a : A ⇒ B} {b : C ⇒ D}
-           (l : {!   !} ⇒ {!   !} → {!   !} ⇒ {!   !})
-           (r : {!   !} ⇒ {!   !} → {!   !} ⇒ {!   !})
-         → ℕ → Set (o ⊔ ℓ ⊔ e)
-  assocs {A} {B} {C} {D} {a} {b} l r zero =
-  assocs {A} {B} {C} {D} {a} {b} l r (suc n) =
-    ∀ {k : {!   !} ⇒ {!   !}} →
-    Lift (o ⊔ ℓ ⊔ e) ((a ∘ l k) ∘ b ≈ a ∘ (k ∘ r b))
-    Lift (o ⊔ ℓ ⊔ e) ((a ∘ k ∘ l k') ∘ b ≈ a ∘ k ∘ (k' ∘ r b))
-  assocs {A} {B} {C} {D} {a} {b} l r (suc (suc n)) =
-    ∀ {k  : {!   !} ⇒ {!   !}} →
-      {k' : {!   !} ⇒ {!   !}} →
-    Lift (o ⊔ ℓ ⊔ e) ((a ∘ k ∘ l k') ∘ b ≈ a ∘ k ∘ (k' ∘ r b))
-  assocs {A} {B} {C} {D} {a} {b} l r (suc (suc (suc n))) =
-    ∀ {P G : Obj} {k : {!   !} ⇒ {!   !}}
-        → assocs {!   !} --(λ x → l x ∘ k)
-                 {!   !} --(λ x → r x) --k ∘ ?)
-                 n
-
-  assoc-general : ∀ {A B C D X Y} {a : A C.⇒ B} {b : C C.⇒ D}
-           (l : {!   !} C.⇒ {!   !} → {!   !} C.⇒ {!   !})
-           (r : {!   !} C.⇒ {!   !} → {!   !} C.⇒ {!   !})
-         → ℕ → Set (o ⊔ ℓ ⊔ e)
-  assoc-general {A} {B} {C} {D} {a} {b} l r zero =
-    Lift (o ⊔ ℓ ⊔ e) (l a ∘ b C.≈ a ∘ r b)
-  assoc-general {A} {B} {C} {D} {a} {b} l r (suc n) =
-    ∀ {P G : C.Obj} {k : {! P  !} C.⇒ {! G !}}
-        → kriatur-definitive
-                (λ x → x ∘ l k)
-                (λ x → k ∘ r x)
-                n
-
-
-
-
-
-
-  --l a ∘ r b C.≈ l a ∘ r b
-
-  n1ormalata : ℕ → Set (o ⊔ ℓ ⊔ e)
-  n1ormalata n = assocs {!   !} {!   !} n --(λ x → x) (λ x → {!   !}) n --(λ x → x) (λ x → x) n
-{-
-
-  l1emmatorum : ∀ {G} {n} {k : {!   !}}
-             → assocs (λ x → x) n
-             → assocs (λ x → k C.∘ x) n
-  l1emmatorum {n = zero} = {!   !}
-  l1emmatorum {n = suc n} = {! lemma {n = n}  !}
-
-  t1rasc : ∀ n → skip-type n
-  t1rasc zero = lift ? --p
-  t1rasc (suc n) = l1emmatorum (t1rasc n)
-
-  t1est-miracolo = {! skip-type 4  !} --{! skip-type 4  !}
--}
-
-
-  -- ∀ {C D : Obj} → param-skip-param-1 {!   !}
-
-  {-
-
-
-  {-
-  skip-param : (a ≈ b)
-          ∀ {hs : DepVecArrows (f) n}
-          → repeat hs n a
-          → repeat hs n b
-  skip-param = ?
-
-  -}
-
-
-  {-
-  skip-param-1 : {A B C : Obj} {C = C₁ : Obj} {D : Obj} {f : A ⇒ B} {g : B ⇒ C₁} {r : _} {l : _} {h : C₁ ⇒ D}
-            → h ∘ a
-            → h ∘ b
-
-  skip-param-2 : {A B C : Obj} {C = C₁ : Obj} {D : Obj} {f : A ⇒ B} {g : B ⇒ C₁} {r : _} {l : _} {h : C₁ ⇒ D}
-            → h ∘ h' ∘ a
-            → h ∘ h' ∘ b
-
-  skip-param-3 : {A B C : Obj} {C = C₁ : Obj} {D : Obj} {f : A ⇒ B} {g : B ⇒ C₁} {r : _} {l : _} {h : C₁ ⇒ D}
-            → h ∘ h' ∘ h'' ∘ a
-            → h ∘ h' ∘ h'' ∘ b
-            -}
-
-  _ : {A B : Obj} {C = C₁ : Obj} {D : Obj} {f : A ⇒ B} {g : B ⇒ C₁}
-    → g ∘ f ≈ g ∘ f
-  _ = {!   !}
-
-  _ : {A B : Obj} {C = C₁ : Obj} {D : Obj} {f : A ⇒ B} {g : B ⇒ C₁} {h : C₁ ⇒ D} → (h ∘ g) ∘ f ≈ h ∘ g ∘ f
-  _ = {!   !}
-  {-
-  veritàbase : {A B C : Obj} {C = C₁ : Obj} {D : Obj} {f : A ⇒ B} {g : B ⇒ C₁} {r : veritàbase} {h : C₁ ⇒ D}
-    → (h ∘ g ∘ r) ∘ f ≈ h ∘ g ∘ r ∘ f
-  veritàbase = {!   !}
-
-  expandveritàbase : {A B C : Obj} {C = C₁ : Obj} {D : Obj} {f : A ⇒ B} {g : B ⇒ C₁} {r : e} {h : C₁ ⇒ D}
-      (h ∘ g ∘ r) ∘ f ≈ h ∘ g ∘ r ∘ f
-    → (h ∘ g ∘ r ∘ l) ∘ f ≈ h ∘ g ∘ r ∘ l ∘ f
-  expandveritàbase = {!   !}
-
-
-  _ : {A B C : Obj} {C = C₁ : Obj} {D : Obj} {f : A ⇒ B} {g : B ⇒ C₁} {r : _} {l : _} {h : C₁ ⇒ D}
-    → (h ∘ g ∘ r ∘ l) ∘ f ≈ h ∘ g ∘ r ∘ l ∘ f
-  _ = {!   !}
-  -}
-  -}
--}
-
-
-
-{-
-      (h ∘ g ∘ r) ∘ f ≈ h ∘ g ∘ r ∘ f
-      (h ∘ g ∘ r) ∘ l ∘ f ≈ h ∘ g ∘ r ∘ l ∘ f
-      (h ∘ (g ∘ r ∘ l)) ∘ f
-      -}
+  iassoc : ∀ n → assoc-type n
+  iassoc zero = lift Equiv.refl
+  iassoc (suc n) = assoc-suc n (iassoc n)
