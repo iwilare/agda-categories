@@ -291,39 +291,30 @@ module _ {A B} {a b : A ⇒ B} (p : a ≈ b) where
   actual-proof zero = lift p
   actual-proof (suc n) = suc-f n (actual-proof n)
 
-module _ where
+module _ {C D : Obj} {b : C ⇒ D} where
   open import Data.Nat using (ℕ; zero; suc)
 
-  assoc-general : ∀ {A B C D E F} {a : A ⇒ B} {b : C ⇒ D} {k : E ⇒ F}
-           (^ : ({!   !} ⇒ {!   !}
-              → {!   !} ⇒ {!   !})
-              → C ⇒ D
-              → {!   !} ⇒ {!   !})
-           (^ : ({!   !} ⇒ {!   !}
-              → {!   !} ⇒ {!   !})
-              → C ⇒ D
-              → {!   !} ⇒ {!   !})
-           (f : {!   !} ⇒ {!   !}
-              → {!   !} ⇒ {!   !})
+  assoc-general : ∀ {A B C D} {a : A ⇒ B}
+           (k : D ⇒ A)
+           (f : C ⇒ D → C ⇒ A)
          → ℕ → Set (o ⊔ ℓ ⊔ e)
-  assoc-general {A} {B} {C} {D} {X} {Y} {a} {b} {k} ^ * f zero =
-    Lift (o ⊔ ℓ ⊔ e) (^ f b ≈ * f b)
-  assoc-general {A} {B} {C} {D} {X} {Y} {a} {b} ^ * f (suc n) =
-    ∀ {P G : Obj} {k : {!   !} ⇒ {! G !}}
-        → assoc-general
-            (λ f x → f x ∘ b)
-            (λ f x → a ∘ f x)
-            (λ x → k ∘ f x)
+  assoc-general {A} {B} {C} {D} {a} k f zero =
+    ∀ {C D} {b : C ⇒ D} {b} → Lift (o ⊔ ℓ ⊔ e) ((a ∘ k) ∘ b ≈ a ∘ f b)
+  assoc-general {A} {B} {C} {D} {a} k f (suc n) =
+    ∀ {X Y R : Obj} {k' : A ⇒ Y} {R : Y ⇒ R}
+        → assoc-general {a = R}
+            (k' ∘ k)
+            (λ x → k' ∘ f x)
             n
   -- l a ∘ b ≈ a ∘ r b
   -- l (a ∘ k) ∘ b ≈ a ∘ r (k ∘ b)
-  -- l (a ∘ k) ∘ b ≈ a ∘ r (k ∘ b)
+  -- l (a ∘ k ∘ p) ∘ b ≈ a ∘ r (k ∘ p ∘ b)
 
 
   assoc-id : ℕ → Set (o ⊔ ℓ ⊔ e)
-  assoc-id = assoc-general {!   !} {!   !} {!   !}
+  assoc-id n = ∀ {R M} {k : R ⇒ M} → assoc-general k (λ x → k ∘ x) n
 
-
+  test = {!  assoc-id 4 !}
 
 {-
 
