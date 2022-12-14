@@ -136,10 +136,44 @@ module _ {A B : Obj} {a : A ⇒ B} where
   take-unwrap n t = {!   !}
 -}
 
+macro
+  rewrite-∘ : ℕ → ℕ → ℕ → Term → Term
+  rewrite-∘ s n m goal =
+    skip s (Equiv.trans (Level.lower (take n))
+           (Equiv.trans (r ⟩∘⟨refl)
+                        (Level.lower (Equiv.sym (take n)))))
 {-
+
+solve-macro : Term → Term → TC _
+solve-macro mon hole = do
+  hole′ ← inferType hole >>= normalise
+  names ← findCategoryNames mon
+  just (lhs , rhs) ← returnTC (getArgs hole′)
+    where nothing → typeError (termErr hole′ ∷ [])
+  let soln = constructSoln mon names lhs rhs
+  unify hole soln
+
+macro
+  solve : Term → Term → TC _
+  solve = solve-macro
+
+
+open import Agda.Builtin.Reflection
+open import Reflection.Argument
+open import Reflection.Term using (getName; _⋯⟅∷⟆_)
+open import Reflection.TypeChecking.Monad.Syntax
+
+quote Category.Equiv.trans ⟨ def ⟩ 3 ⋯⟅∷⟆ cat ⟨∷⟩
+    (quote Category.Equiv.sym ⟨ def ⟩ 3 ⋯⟅∷⟆ cat ⟨∷⟩
+      (quote preserves-≈ ⟨ def ⟩ 3 ⋯⟅∷⟆ cat ⟨∷⟩ buildExpr names lhs ⟨∷⟩ []) ⟨∷⟩ [])
+    ⟨∷⟩
+    (quote preserves-≈ ⟨ def ⟩ 3 ⋯⟅∷⟆ cat ⟨∷⟩ buildExpr names rhs ⟨∷⟩ [])
+    ⟨∷⟩ []
+-}
+
+
 module _ {A B : Obj} {a b : A ⇒ B} (r : a ≈ b) where
   rewrite-∘ : ∀ s n m → _
   rewrite-∘ s n m = skip s (Equiv.trans {!  take n !}
                            (Equiv.trans (r ⟩∘⟨refl)
                                         {! Equiv.sym (take n)  !}))
--}
