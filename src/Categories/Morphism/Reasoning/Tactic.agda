@@ -36,7 +36,7 @@ module _ {A B} {a b : A ⇒ B} where
   skip-param : ∀ {X} (y : A ⇒ B → A ⇒ X)
     → ℕ → Set (o ⊔ ℓ ⊔ e)
   skip-param y zero = Lift (o ⊔ ℓ ⊔ e) (y a ≈ y b)
-  skip-param {X} y (suc n) =
+  skip-param {X = X} y (suc n) =
     ∀ {Y : Obj} {f : X ⇒ Y}
     → skip-param (λ x → f ∘ y x) n
 
@@ -49,9 +49,56 @@ module _ {A B} {a b : A ⇒ B} where
   skip-suc zero (lift h) = lift (refl⟩∘⟨ h)
   skip-suc (suc n) h = skip-suc n h
 
-  skip : ∀ n (p : a ≈ b) → skip-type n
-  skip zero p = lift p
-  skip (suc n) p = skip-suc n (skip n p)
+  skip : ∀ n (r : a ≈ b) → skip-type n
+  skip zero r = lift r
+  skip (suc n) r = skip-suc n (skip n r)
+
+module _ where
+  data MorVec : ℕ → Obj → Obj → Set (ℓ ⊔ o) where
+    idV  : ∀ {A} → MorVec 1 A A
+    _∘V_ : ∀ {n A B C} → B ⇒ C → MorVec n A B → MorVec (suc n) A C
+
+  interpret : ∀ {n A B C} → MorVec n A B → C ⇒ A → C ⇒ B
+  interpret idV f = f
+  interpret (x ∘V v) f = x ∘ interpret v f
+
+  skip-v : ∀ {X} n {v : MorVec n _ X} (r : a ≈ b)
+         → interpret v a ≈ interpret v b
+  skip-v .1 {idV} r = r
+  skip-v (suc n) {x ∘V v} r = refl⟩∘⟨ skip-v n {v} r
+
+  test-skip1 : ∀ {A B C : Obj}
+             → {a b : A ⇒ B}
+             → {c : B ⇒ C}
+             → (r : a ≈ b)
+             → c ∘ a ≈ c ∘ b
+  test-skip1 r = skip-v 2 {v = _ ∘V idV} r
+  test-skip2 : ∀ {A B C D : Obj}
+             → {a b : A ⇒ B}
+             → {c : B ⇒ C}
+             → {d : C ⇒ D}
+             → (r : a ≈ b)
+             → d ∘ c ∘ a ≈ d ∘ c ∘ b
+  test-skip2 {a = a} {b} {c} {d} r = solution2
+    where
+      solution1 : d ∘ c ∘ a ≈ d ∘ c ∘ b
+      solution1 = skip-v 3 {v = _ ∘V (_ ∘V idV)} r
+      solution2 : d ∘ c ∘ a ≈ d ∘ c ∘ b
+      solution2 = Level.lower (skip 2 r)
+
+
+--  gg : ∀ {A B C D E F H R : Obj}
+--        {q : H ⇒ R}
+--        {w : F ⇒ H}
+--        {e : E ⇒ F}
+--        {r : D ⇒ E}
+--        {t : C ⇒ D}
+--        {y : B ⇒ C}
+--        {a b : A ⇒ B}
+--        (p : a ≈ b)
+--    → q ∘ w ∘ e ∘ r ∘ t ∘ y ∘ a
+--    ≈ q ∘ w ∘ e ∘ r ∘ t ∘ y ∘ b
+--  gg p = skip-v 7 {v = {!   !} ∘V ({!   !} ∘V ({!   !} ∘V {!   !}))} p -- q ∘V {! ∘V  !}} p
 
 module _ {A B : Obj} {a : A ⇒ B} where
   take-param : ∀ {X} (k : B ⇒ X) (y : A ⇒ B → A ⇒ X)
@@ -64,7 +111,7 @@ module _ {A B : Obj} {a : A ⇒ B} where
 
   take-type : ℕ → Set (o ⊔ ℓ ⊔ e)
   take-type n = ∀ {X} {f : B ⇒ X}
-              → take-param f (λ x → f ∘ x) n
+              → take-param f (f ∘_) n
 
   take-suc : ∀ {f} {y : A ⇒ B → A ⇒ Y} n
            → take-param f y (suc n)
@@ -76,7 +123,23 @@ module _ {A B : Obj} {a : A ⇒ B} where
   take zero = lift Equiv.refl
   take (suc zero) = lift Equiv.refl
   take (suc (suc n)) = take-suc n (take (suc n))
+{-
+  take-right : ∀ n → {!   !}
+  take-right n = {!   !}
 
-module _ {A B : Obj} {a : A ⇒ B} where
+  take-left : ∀ n → {!   !}
+  take-left n = {!   !}
+
+  take-unwrap : ∀ n → take-type n
+                    → take-left n
+                    ≈ take-right n
+  take-unwrap n t = {!   !}
+-}
+
+{-
+module _ {A B : Obj} {a b : A ⇒ B} (r : a ≈ b) where
   rewrite-∘ : ∀ s n m → _
-  rewrite-∘ s n m = {!   !}
+  rewrite-∘ s n m = skip s (Equiv.trans {!  take n !}
+                           (Equiv.trans (r ⟩∘⟨refl)
+                                        {! Equiv.sym (take n)  !}))
+-}
