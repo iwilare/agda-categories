@@ -1,28 +1,36 @@
 open import Level
-open import Data.Product using (_,_)
 open import Categories.Category
+-- open import Data.Product
 open import Categories.Monad
+open import Function hiding (_∘_)
+open import Categories.Object.Terminal
+open import Categories.Category.BinaryProducts
 open import Categories.Category.Monoidal.Bundle
   using (SymmetricMonoidalCategory)
 
-module Mealy {o l e} {C : SymmetricMonoidalCategory o l e} where
+open import Categories.Category.Cartesian
+
+module Mealy {o l e} {C : Category o l e} {K : Cartesian C} where
+
+
+open module Cart = Cartesian K
+open Category C
+
+open Terminal Cart.terminal
+open BinaryProducts products
 
 open import Categories.Functor
-open import Categories.Category.Monoidal
 open import Categories.Monad.Strong
 open import Categories.Functor renaming (id to idF)
 import Categories.Morphism.Reasoning as MR
 
-open SymmetricMonoidalCategory C
-
--- open module SMC = SymmetricMonoidalCategory C
--- module CC = SMC.U ?
+open import Categories.Morphism C
 
 record MealyObj {I O : Obj} : Set (o ⊔ l ⊔ e) where
   field
     E : Obj
-    d : E ⊗₀ I ⇒ E
-    s : E ⊗₀ I ⇒ O
+    d : E × I ⇒ E
+    s : E × I ⇒ O
 
 open MealyObj
 
@@ -31,22 +39,59 @@ record Mealy⇒ {I O : Obj} (X Y : MealyObj {I} {O}) : Set (o ⊔ l ⊔ e) where
   module Y = MealyObj Y
   field
     hom    : X.E ⇒ Y.E
-    comm-d : hom ∘ X.d ≈ Y.d ∘ Functor.F₁ (-⊗ I) hom
-    comm-s : X.s ≈ Y.s ∘ Functor.F₁ (-⊗ I) hom
+    comm-d : hom ∘ X.d ≈ Y.d ∘ first hom
+    comm-s : X.s ≈ Y.s ∘ first hom
 
 open Mealy⇒
 
-Mealy : {I O : Obj} → Category (o ⊔ l ⊔ e) (o ⊔ l ⊔ e) {!   !}
+comp : {I O : Obj} {A B C : MealyObj {I} {O}} → (g : Mealy⇒ B C) → (f : Mealy⇒ A B) → Mealy⇒ A C
+comp {I = I} g f = record
+  { hom = g.hom ∘ f.hom
+  ; comm-d = begin _ ≈⟨ MR.pullʳ C f.comm-d ⟩
+                   _ ≈⟨ MR.pullˡ C g.comm-d ⟩
+                   _ ≈⟨ MR.pullʳ C (Equiv.sym {!   !}) ⟩
+                   _ ∎
+  ; comm-s = begin _ ≈⟨ f.comm-s ⟩
+                   _ ≈⟨ (g.comm-s ⟩∘⟨refl) ⟩
+                   _ ≈⟨ MR.pullʳ C (Equiv.sym {!   !}) ⟩
+                   _ ∎
+  } where module f = Mealy⇒ f
+          module g = Mealy⇒ g
+          open HomReasoning
+
+Mealy : {I O : Obj} → Category (o ⊔ l ⊔ e) (o ⊔ l ⊔ e) e
 Mealy {I} {O} = record
   { Obj = MealyObj {I} {O}
   ; _⇒_ = Mealy⇒
   ; _≈_ = λ f g → hom f ≈ hom g
   ; id = λ {A} → let module A = MealyObj A in
-    record { hom = SymmetricMonoidalCategory.id C {A.E}
-           ; comm-d = identityˡ ○ MR.introʳ U (Functor.identity ⊗)
-           ; comm-s = MR.introʳ U (Functor.identity ⊗)
+    record { hom = {!   !} -- SymmetricMonoidalCategory.id C {A.E}
+           ; comm-d = identityˡ ○ MR.introʳ C {!   !}
+           ; comm-s = MR.introʳ C {!   !}
            }
-  ; _∘_ = {!   !}
+  ; _∘_ = comp
+  ; assoc = assoc
+  ; sym-assoc = sym-assoc
+  ; identityˡ = identityˡ
+  ; identityʳ = identityʳ
+  ; identity² = identity²
+  ; equiv = record { refl = Equiv.refl ; sym = Equiv.sym ; trans = Equiv.trans }
+  ; ∘-resp-≈ = ∘-resp-≈
+  } where open HomReasoning
+
+private
+  variable
+    I O : Obj
+    X Y Z : MealyObj {I} {O}
+
+
+2Mealy : Category o (o ⊔ l ⊔ e) (l ⊔ e)
+2Mealy = record
+  { Obj = Obj
+  ; _⇒_ = λ X Y → MealyObj {X} {Y}
+  ; _≈_ = _≈ₑ_
+  ; id = record { E = ⊤ ; d = ! ; s = π₂ }
+  ; _∘_ = _∘ₑ_ --_∘ₑ_
   ; assoc = {!   !}
   ; sym-assoc = {!   !}
   ; identityˡ = {!   !}
@@ -54,5 +99,25 @@ Mealy {I} {O} = record
   ; identity² = {!   !}
   ; equiv = {!   !}
   ; ∘-resp-≈ = {!   !}
-  } where open HomReasoning
-          -- open MR C
+  } where
+      record _≈ₑ_ {X} {Y} (A B : MealyObj {X} {Y}) : Set (l ⊔ e) where
+            module A = MealyObj A
+            module B = MealyObj B
+            field
+              e-iso : A.E ≅ B.E
+            module e-iso = _≅_ e-iso
+            field
+              d-iso : e-iso.from ∘ A.d ≈ B.d ∘ Functor.F₁ (-× X) e-iso.from
+              s-iso : A.s ≈ B.s ∘ Functor.F₁ (-× X) e-iso.from
+      _∘ₑ_ : ∀ {X Y Z : Obj} (B : MealyObj {Y} {Z}) → (A : MealyObj {X} {Y}) → MealyObj {X} {Z}
+      B ∘ₑ A = let module A = MealyObj A in let module B = MealyObj B in record
+        { E = B.E × A.E
+        ; d = second A.d ∘ assocˡ
+        ; s = B.s ∘ second A.s ∘ assocˡ
+        }
+      assocₑ : {X Y Z W : Obj} {A : MealyObj {X} {Y}} {B : MealyObj {Y} {Z}} {C : MealyObj {Z} {W}} → ((C ∘ₑ B) ∘ₑ A) ≈ₑ (C ∘ₑ (B ∘ₑ A))
+      assocₑ {A = A} {B = B} {C = C} = let module A = MealyObj A in let module B = MealyObj B in let module C = MealyObj C in record
+        { e-iso = ≅.sym ×-assoc
+        ; d-iso = {!   !}
+        ; s-iso = {!   !}
+        } where open HomReasoning
