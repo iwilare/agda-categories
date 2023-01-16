@@ -35,6 +35,9 @@ record IsPullback {P : Obj} (p₁ : P ⇒ X) (p₂ : P ⇒ Y) (f : X ⇒ Z) (g :
     p₂∘universal≈h₂  : ∀ {eq : f ∘ h₁ ≈ g ∘ h₂} →
                          p₂ ∘ universal eq ≈ h₂
 
+  diag : _
+  diag = f ∘ p₁
+
   unique′ : (eq eq′ : f ∘ h₁ ≈ g ∘ h₂) → universal eq ≈ universal eq′
   unique′ eq eq′ = unique p₁∘universal≈h₁ p₂∘universal≈h₂
 
