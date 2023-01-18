@@ -1,5 +1,6 @@
 {-# OPTIONS --without-K --safe #-}
 
+open import Level
 open import Categories.Category.Core using (Category)
 
 module Categories.Diagram.Pullback.Limit {o ℓ e} (C : Category o ℓ e) where
@@ -9,6 +10,7 @@ open import Function.Base using (_$_)
 
 open import Categories.Category using (_[_≈_])
 open import Categories.Category.Instance.Span
+open import Categories.Category.Complete
 open import Categories.Functor.Core
 open import Categories.Diagram.Pullback C
 open import Categories.Morphism.Reasoning C as MR hiding (center)
@@ -89,8 +91,7 @@ module _ {F : Functor Span.op C} where
                           }
             }
 
-module _ {fA fB gA : Obj} {f : fA ⇒ fB} {g : gA ⇒ fB} (p : Pullback f g) where
-  open Pullback p
+module _ {fA fB gA : Obj} {f : fA ⇒ fB} {g : gA ⇒ fB} where
   open Equiv
 
   pullback⇒limit-F : Functor Span.op C
@@ -129,8 +130,8 @@ module _ {fA fB gA : Obj} {f : fA ⇒ fB} {g : gA ⇒ fB} (p : Pullback f g) whe
   open Lim pullback⇒limit-F
   open Con pullback⇒limit-F
 
-  pullback⇒limit : Limit
-  pullback⇒limit = record
+  pullback⇒limit : Pullback f g → Limit
+  pullback⇒limit p = record
     { terminal = record
       { ⊤        = ⊤
       ; ⊤-is-terminal = record
@@ -139,7 +140,9 @@ module _ {fA fB gA : Obj} {f : fA ⇒ fB} {g : gA ⇒ fB} (p : Pullback f g) whe
         }
       }
     }
-    where ⊤ : Cone
+    where open Pullback p
+
+          ⊤ : Cone
           ⊤ = record
             { apex = record
               { ψ       = λ { center → g ∘ p₂
@@ -172,3 +175,8 @@ module _ {fA fB gA : Obj} {f : fA ⇒ fB} {g : gA ⇒ fB} (p : Pullback f g) whe
           !-unique : ∀ {A : Cone} (h : Cone⇒ A ⊤) → Cones [ ! ≈ h ]
           !-unique {A} h = sym (unique h.commute h.commute)
             where module h = Cone⇒ h
+
+module _ (Com0 : Complete 0ℓ 0ℓ 0ℓ C) where
+
+  complete⇒pullback : ∀ {A B C} (f : A ⇒ C) (g : B ⇒ C) → Pullback f g
+  complete⇒pullback f g = limit⇒pullback (Com0 (pullback⇒limit-F {f = f} {g = g}))
