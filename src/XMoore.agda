@@ -74,6 +74,7 @@ import Categories.Category.Complete
 open import Categories.Category.Complete using (Complete)
 open import Categories.Category.BinaryProducts
 open import Categories.Object.Product.Indexed
+open import Categories.Object.Terminal
 open import Categories.Diagram.Pullback
 open import Categories.Adjoint
 open import Data.Nat
@@ -93,7 +94,7 @@ module _ {R : Functor C C} (adj : X ⊣ R) {complete : ∀ {o ℓ e} → Complet
   F ^ suc n $ O = Functor.₀ F (F ^ n $ O)
 
   R∞ : IndexedProductOf C (R ^_$ O)
-  R∞ = Complete⇒IndexedProductOf {i = 0ℓ} complete {I = ℕ} (R ^_$ O)
+  R∞ = Complete⇒IndexedProductOf {0ℓ} {0ℓ} {0ℓ} {0ℓ} complete {I = ℕ} (R ^_$ O)
 
   module R∞ = IndexedProductOf R∞
 
@@ -101,18 +102,82 @@ module _ {R : Functor C C} (adj : X ⊣ R) {complete : ∀ {o ℓ e} → Complet
   Rδ A zero = s A
   Rδ A (suc i) = Ladjunct (Rδ A i ∘ d A)
 
+  behaviour : (A : XMooreObj) → E A ⇒ R∞.X
+  behaviour A = R∞.⟨ Rδ A ⟩
 
+  Terminal-XMoore : Terminal XMoore
+  Terminal-XMoore = record
+    { ⊤ = record
+      { E = R∞.X
+      ; d = d∞
+      ; s = R∞.π 0
+      }
+    ; ⊤-is-terminal = record
+      { ! = λ {A} → let module A = XMooreObj A in record
+        { hom = behaviour A
+        ; comm-d =
+            begin
+              R∞.⟨ Rδ A ⟩ ∘ A.d
+                ≈⟨ R∞.⟨⟩∘ (Rδ A) (d A) ⟩
+              R∞.⟨ (λ i → Rδ A i ∘ A.d) ⟩
+                ≈⟨ R∞.⟨⟩-cong _ _ pointwise-comm-d ⟩
+              R∞.⟨ (λ i → (Radjunct (R∞.π (ℕ.suc i))) ∘ X.₁ (behaviour A)) ⟩
+                ≈⟨ ⟺ (R∞.⟨⟩∘ _ (X.₁ (behaviour A))) ⟩
+              d∞ ∘ X.₁ (behaviour A) ∎
+        ; comm-s = ⟺ (R∞.commute (Rδ A) 0)
+        }
+      ; !-unique = λ {A} f → R∞.unique _ _ (uniqueness f)
+      }
+    } where
+      d∞ : X.₀ R∞.X ⇒ R∞.X
+      d∞ = R∞.⟨ (λ i → Radjunct (R∞.π (ℕ.suc i))) ⟩
 
-  extractBehaviour : (A : XMooreObj)
-                   → E A ⇒ R∞.X
-  extractBehaviour A = R∞.⟨ Rδ A ⟩
+      module _ {A : XMooreObj} where
+        private module A = XMooreObj A
+
+        module _ (f : XMoore⇒ A _) where
+          private module f = XMoore⇒ f
+          uniqueness : (i : ℕ) → R∞.π i ∘ f.hom ≈ Rδ A i
+          uniqueness ℕ.zero = Equiv.sym f.comm-s
+          uniqueness (ℕ.suc i) = begin
+            R∞.π (ℕ.suc i) ∘ f.hom
+              ≈⟨ introˡ zag ⟩
+            (R.₁ (counit.η (R ^ i $ O)) ∘ unit.η _) ∘ R∞.π (ℕ.suc i) ∘ f.hom
+              ≈⟨ assoc ⟩
+            R.₁ (counit.η (R ^ i $ O)) ∘ unit.η _ ∘ R∞.π (ℕ.suc i) ∘ f.hom
+              ≈⟨ refl⟩∘⟨ unit.commute _ ⟩
+            R.₁ (counit.η (R ^ i $ O)) ∘ R.₁ (X.₁ (R∞.π (ℕ.suc i) ∘ f.hom)) ∘ unit.η _
+              ≈⟨ pullˡ (Equiv.sym R.homomorphism) ⟩
+            R.₁ (counit.η (R ^ i $ O) ∘ X.₁ (R∞.π (ℕ.suc i) ∘ f.hom)) ∘ unit.η _
+              ≈⟨ R.F-resp-≈ (refl⟩∘⟨ X.homomorphism) ⟩∘⟨refl ⟩
+            R.₁ (counit.η (R ^ i $ O) ∘ X.₁ (R∞.π (ℕ.suc i)) ∘ X.₁ f.hom) ∘ unit.η _
+              ≈⟨ R.F-resp-≈ (extendʳ (Equiv.sym (R∞.commute _ i))) ⟩∘⟨refl ⟩
+            R.₁ (R∞.π i ∘ d∞ ∘ X.₁ f.hom) ∘ unit.η _
+              ≈⟨ R.F-resp-≈ (refl⟩∘⟨ Equiv.sym f.comm-d) ⟩∘⟨refl ⟩
+            R.₁ (R∞.π i ∘ f.hom ∘ A.d) ∘ unit.η _
+              ≈⟨ R.F-resp-≈ (pullˡ (uniqueness i)) ⟩∘⟨refl ⟩
+            R.₁ (Rδ A i ∘ A.d) ∘ unit.η _
+              ≈⟨ Equiv.refl ⟩
+            Ladjunct (Rδ A i ∘ A.d) ∎
+
+        pointwise-comm-d : (i : ℕ)
+          → Rδ A i ∘ A.d
+          ≈ Radjunct (R∞.π (ℕ.suc i)) ∘ X.₁ (behaviour A)
+        pointwise-comm-d i = begin
+          Rδ A i ∘ A.d ≈⟨ Equiv.sym (elimʳ zig) ⟩
+          (Rδ A i ∘ A.d) ∘ counit.η (X.F₀ A.E) ∘ X.₁ (unit.η A.E) ≈⟨ Equiv.sym (extendʳ (counit.commute _)) ⟩
+          counit.η (R ^ i $ O) ∘ X.₁ (R.₁ (Rδ A i ∘ A.d)) ∘ X.₁ (unit.η A.E) ≈⟨ refl⟩∘⟨ Equiv.sym X.homomorphism ⟩
+          counit.η (R ^ i $ O) ∘ X.₁ (Ladjunct (Rδ A i ∘ A.d)) ≈⟨ refl⟩∘⟨ X.F-resp-≈ (Equiv.sym (R∞.commute _ (ℕ.suc i))) ⟩
+          counit.η (R ^ i $ O) ∘ X.₁ (R∞.π (ℕ.suc i) ∘ R∞.⟨ Rδ A ⟩) ≈⟨ refl⟩∘⟨ X.homomorphism ⟩
+          counit.η (R ^ i $ O) ∘ X.₁ (R∞.π (ℕ.suc i)) ∘ X.₁ R∞.⟨ Rδ A ⟩ ≈⟨ sym-assoc ⟩
+          Radjunct (R∞.π (ℕ.suc i)) ∘ X.₁ R∞.⟨ Rδ A ⟩ ∎
 
   BinaryProducts-XMoore : BinaryProducts (XMoore)
   BinaryProducts-XMoore = record
     { product = λ { {A} {B} →
         let module A = XMooreObj A
             module B = XMooreObj B
-            module P = Pullback (complete⇒pullback complete (extractBehaviour A) (extractBehaviour B))
+            module P = Pullback (complete⇒pullback complete (behaviour A) (behaviour B))
 
           in record
           { A×B = record
@@ -141,58 +206,3 @@ module _ {R : Functor C C} (adj : X ⊣ R) {complete : ∀ {o ℓ e} → Complet
           }
       }
     }
-
-
-
-
-{-
-  open import Categories.Adjoint
-  -- open import Categories.Category.BinaryProducts (Cartesian.products cartesian)
-  open import Categories.Diagram.Pullback
-  open import Categories.Diagram.Equalizer
-  open import Categories.Object.Product
-  open Product
-  open Equalizer
-
-  -- open Product
-
-  module R = Functor R
-
-  thmmmh : → (adj : X ⊣ R) → BinaryProducts (XMoore)
-  thmmmh adj = record
-    { product = λ { {A} {B} →
-      let module A = XMooreObj A
-          module B = XMooreObj B
-          module P = Pullback (pullback (Ladjunct A.s) (Ladjunct B.s)) in record
-        { A×B = record
-          { E = P.P
-          ; d = P.universal {X.F₀ P.P} {A.d ∘ X.₁ P.p₁} {B.d ∘ X.₁ P.p₂}
-            (begin (R.₁ A.s ∘ unit.η A.E) ∘ A.d ∘ X.₁ P.p₁
-                     ≈⟨ assoc ⟩
-                   R.₁ A.s ∘ unit.η A.E ∘ A.d ∘ X.₁ P.p₁
-                     ≈⟨ refl⟩∘⟨ MR.extendʳ C (unit.commute _) ⟩
-                   R.₁ A.s ∘ R.₁ (X.₁ A.d) ∘ unit.η (X.F₀ A.E) ∘ X.₁ P.p₁
-                     ≈⟨ refl⟩∘⟨ refl⟩∘⟨ unit.commute _ ⟩
-                   R.₁ A.s ∘ R.₁ (X.₁ A.d) ∘ R.₁ (X.₁ (X.F₁ P.p₁)) ∘ unit.η (X.F₀ P.P)
-                     ≈⟨ {!   !} ⟩
-                   {!   !} ≈⟨ {!   !} ⟩
-                   {!   !} ≈⟨ {!   !} ⟩
-                   {!   !} ≈⟨ {!   !} ⟩
-                   (R.₁ B.s ∘ unit.η B.E) ∘ B.d ∘ X.₁ P.p₂ ∎)
-          -- XP --> XRO --> O
-          ; s = Radjunct P.diag
-          }
-        ; π₁ = record { hom = P.p₁
-                      ; comm-d = {!   !}
-                      ; comm-s = {!   !}
-                      }
-        ; π₂ = record { hom = P.p₂
-                      ; comm-d = {!   !} ; comm-s = {!   !} }
-        ; ⟨_,_⟩ = {!   !}
-        ; project₁ = {!   !}
-        ; project₂ = {!   !}
-        ; unique = {!   !}
-        }}
-    } where open Adjoint adj
-            open HomReasoning
--}
