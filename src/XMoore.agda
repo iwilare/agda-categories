@@ -113,9 +113,6 @@ module _ {R : Functor C C} (adj : X ⊣ R) {complete : ∀ {o ℓ e} → Complet
   behaviour : (A : XMooreObj) → E A ⇒ R∞.X
   behaviour A = R∞.⟨ Rδ A ⟩
 
-  delta-from-behaviour : ∀ {A} → A ⇒ R∞.X → X.₀ A ⇒ A
-  delta-from-behaviour behaviour = {!   !} -- Is this possible?
-
   Terminal-XMoore : Terminal XMoore
   Terminal-XMoore = record
     { ⊤ = record
@@ -171,17 +168,18 @@ module _ {R : Functor C C} (adj : X ⊣ R) {complete : ∀ {o ℓ e} → Complet
               ≈⟨ Equiv.refl ⟩
             Ladjunct (Rδ A i ∘ A.d) ∎
 
-        pointwise-comm-d : (i : ℕ)
-          → Rδ A i ∘ A.d
-          ≈ Radjunct (R∞.π (ℕ.suc i)) ∘ X.₁ (behaviour A)
-        pointwise-comm-d i = begin
-          Rδ A i ∘ A.d ≈⟨ Equiv.sym (elimʳ zig) ⟩
-          (Rδ A i ∘ A.d) ∘ counit.η (X.F₀ A.E) ∘ X.₁ (unit.η A.E) ≈⟨ Equiv.sym (extendʳ (counit.commute _)) ⟩
-          counit.η (R ^ i $ O) ∘ X.₁ (R.₁ (Rδ A i ∘ A.d)) ∘ X.₁ (unit.η A.E) ≈⟨ refl⟩∘⟨ Equiv.sym X.homomorphism ⟩
-          counit.η (R ^ i $ O) ∘ X.₁ (Ladjunct (Rδ A i ∘ A.d)) ≈⟨ refl⟩∘⟨ X.F-resp-≈ (Equiv.sym (R∞.commute _ (ℕ.suc i))) ⟩
-          counit.η (R ^ i $ O) ∘ X.₁ (R∞.π (ℕ.suc i) ∘ R∞.⟨ Rδ A ⟩) ≈⟨ refl⟩∘⟨ X.homomorphism ⟩
-          counit.η (R ^ i $ O) ∘ X.₁ (R∞.π (ℕ.suc i)) ∘ X.₁ R∞.⟨ Rδ A ⟩ ≈⟨ sym-assoc ⟩
-          Radjunct (R∞.π (ℕ.suc i)) ∘ X.₁ R∞.⟨ Rδ A ⟩ ∎
+        abstract
+          pointwise-comm-d : (i : ℕ)
+            → Rδ A i ∘ A.d
+            ≈ Radjunct (R∞.π (ℕ.suc i)) ∘ X.₁ (behaviour A)
+          pointwise-comm-d i = begin
+            Rδ A i ∘ A.d ≈⟨ Equiv.sym (elimʳ zig) ⟩
+            (Rδ A i ∘ A.d) ∘ counit.η (X.F₀ A.E) ∘ X.₁ (unit.η A.E) ≈⟨ Equiv.sym (extendʳ (counit.commute _)) ⟩
+            counit.η (R ^ i $ O) ∘ X.₁ (R.₁ (Rδ A i ∘ A.d)) ∘ X.₁ (unit.η A.E) ≈⟨ refl⟩∘⟨ Equiv.sym X.homomorphism ⟩
+            counit.η (R ^ i $ O) ∘ X.₁ (Ladjunct (Rδ A i ∘ A.d)) ≈⟨ refl⟩∘⟨ X.F-resp-≈ (Equiv.sym (R∞.commute _ (ℕ.suc i))) ⟩
+            counit.η (R ^ i $ O) ∘ X.₁ (R∞.π (ℕ.suc i) ∘ R∞.⟨ Rδ A ⟩) ≈⟨ refl⟩∘⟨ X.homomorphism ⟩
+            counit.η (R ^ i $ O) ∘ X.₁ (R∞.π (ℕ.suc i)) ∘ X.₁ R∞.⟨ Rδ A ⟩ ≈⟨ sym-assoc ⟩
+            Radjunct (R∞.π (ℕ.suc i)) ∘ X.₁ R∞.⟨ Rδ A ⟩ ∎
 
   module ⊤ = Terminal Terminal-XMoore
 
@@ -193,25 +191,30 @@ module _ {R : Functor C C} (adj : X ⊣ R) {complete : ∀ {o ℓ e} → Complet
       record
         { A×B = record
           { E = P∞.P
-          ; d = P∞.universal {_} {_} {X.F₀ P∞.P} {A.d ∘ X.₁ P∞.p₁} {B.d ∘ X.₁ P∞.p₂} (universal-d)
+          ; d = P∞.universal {_} {_} {X.F₀ P∞.P} {A.d ∘ X.₁ P∞.p₁} {B.d ∘ X.₁ P∞.p₂} universal-d
           ; s = R∞.π 0 ∘ P∞.diag
           }
         ; π₁ = record
           { hom = P∞.p₁
           ; comm-d = {!   !}
-          ; comm-s = {!   !}
+          ; comm-s =  begin
+               R∞.π 0 ∘ behaviour A ∘ P∞.p₁ ≈⟨ pullˡ (Equiv.sym (comm-s (⊤.! {A}))) ⟩
+               A.s ∘ P∞.p₁                  ∎
           }
         ; π₂ = record
           { hom = P∞.p₂
           ; comm-d = {!   !}
-          ; comm-s = {!   !}
+          ; comm-s = begin
+               R∞.π 0 ∘ behaviour A ∘ P∞.p₁ ≈⟨ refl⟩∘⟨ P∞.commute ⟩
+               R∞.π 0 ∘ behaviour B ∘ P∞.p₂ ≈⟨ pullˡ (Equiv.sym (comm-s (⊤.! {B}))) ⟩
+               B.s ∘ P∞.p₂ ∎
           }
         ; ⟨_,_⟩ = λ {C} PA PB →
           let module PA = XMoore⇒ PA
               module PB = XMoore⇒ PB
               in record
           { hom = P∞.universal {_} {_} {E C} {PA.hom} {PB.hom} (universal-⟨-,-⟩ PA PB)
-          ; comm-d = {!  comm-d (⊤.! {C}) !}
+          ; comm-d = {!  !}
           ; comm-s = begin
               s C                                 ≈⟨ comm-s (⊤.! {C}) ⟩
               R∞.π 0 ∘ behaviour C                ≈⟨ refl⟩∘⟨ commute-behaviour PA (⊤.! {C}) ⟩
@@ -219,9 +222,9 @@ module _ {R : Functor C C} (adj : X ⊣ R) {complete : ∀ {o ℓ e} → Complet
               R∞.π 0 ∘ P∞.diag ∘ P∞.universal _   ≈⟨ sym-assoc ⟩
               (R∞.π 0 ∘ P∞.diag) ∘ P∞.universal _ ∎
           }
-        ; project₁ = {!   !}
-        ; project₂ = {!   !}
-        ; unique = {!   !}
+        ; project₁ = P∞.p₁∘universal≈h₁
+        ; project₂ = P∞.p₂∘universal≈h₂
+        ; unique = λ a b → Equiv.sym (P∞.unique a b)
         } }
     } where
         module _ {A B : XMooreObj} where
@@ -259,33 +262,33 @@ module _ {R : Functor C C} (adj : X ⊣ R) {complete : ∀ {o ℓ e} → Complet
               module PA = XMoore⇒ PA
               module PB = XMoore⇒ PB
 
-            pointwiso : (i : ℕ)
-                      → Rδ A i ∘ PA.hom ≈ Rδ B i ∘ PB.hom
-            pointwiso ℕ.zero = Equiv.sym PA.comm-s ○ PB.comm-s
-            pointwiso (ℕ.suc i) = begin
-               (R.F₁ (Rδ A i ∘ A.d) ∘ unit.η A.E) ∘ PA.hom
-                 ≈⟨ pullʳ (unit.commute _) ⟩
-               R.F₁ (Rδ A i ∘ A.d) ∘ R.F₁ (X.₁ PA.hom) ∘ unit.η (E G)
-                 ≈⟨ pullˡ (Equiv.sym R.homomorphism) ⟩
-               R.F₁ ((Rδ A i ∘ A.d) ∘ X.₁ PA.hom) ∘ unit.η (E G)
-                 ≈⟨ R.F-resp-≈ (pullʳ (Equiv.sym PA.comm-d)) ⟩∘⟨refl ⟩
-               R.F₁ (Rδ A i ∘ PA.hom ∘ d G) ∘ unit.η (E G)
-                 ≈⟨ R.F-resp-≈ (extendʳ (pointwiso i)) ⟩∘⟨refl ⟩
-               R.F₁ (Rδ B i ∘ PB.hom ∘ d G) ∘ unit.η (E G)
-                 ≈˘⟨ R.F-resp-≈ (pullʳ (Equiv.sym PB.comm-d)) ⟩∘⟨refl ⟩
-               R.F₁ ((Rδ B i ∘ B.d) ∘ X.₁ PB.hom) ∘ unit.η (E G)
-                 ≈˘⟨ pullˡ (Equiv.sym R.homomorphism) ⟩
-               R.F₁ (Rδ B i ∘ B.d) ∘ R.₁ (X.₁ PB.hom) ∘ unit.η (E G)
-                 ≈˘⟨ pullʳ (unit.commute _) ⟩
-               (R.F₁ (Rδ B i ∘ B.d) ∘ unit.η B.E) ∘ PB.hom ∎
-
             abstract
               universal-⟨-,-⟩ : R∞.⟨ Rδ A ⟩ ∘ PA.hom ≈ R∞.⟨ Rδ B ⟩ ∘ PB.hom
               universal-⟨-,-⟩ = begin
                 R∞.⟨ Rδ A ⟩ ∘ PA.hom           ≈⟨ R∞.⟨⟩∘ _ _ ⟩
-                R∞.⟨ (λ i → Rδ A i ∘ PA.hom) ⟩ ≈⟨ R∞.⟨⟩-cong _ _ pointwiso ⟩
+                R∞.⟨ (λ i → Rδ A i ∘ PA.hom) ⟩ ≈⟨ R∞.⟨⟩-cong _ _ universal-⟨-,-⟩-pointwise ⟩
                 R∞.⟨ (λ i → Rδ B i ∘ PB.hom) ⟩ ≈˘⟨ R∞.⟨⟩∘ _ _ ⟩
                 R∞.⟨ Rδ B ⟩ ∘ PB.hom ∎
+                where
+                  universal-⟨-,-⟩-pointwise : (i : ℕ)
+                            → Rδ A i ∘ PA.hom ≈ Rδ B i ∘ PB.hom
+                  universal-⟨-,-⟩-pointwise ℕ.zero = Equiv.sym PA.comm-s ○ PB.comm-s
+                  universal-⟨-,-⟩-pointwise (ℕ.suc i) = begin
+                    (R.F₁ (Rδ A i ∘ A.d) ∘ unit.η A.E) ∘ PA.hom
+                      ≈⟨ pullʳ (unit.commute _) ⟩
+                    R.F₁ (Rδ A i ∘ A.d) ∘ R.F₁ (X.₁ PA.hom) ∘ unit.η (E G)
+                      ≈⟨ pullˡ (Equiv.sym R.homomorphism) ⟩
+                    R.F₁ ((Rδ A i ∘ A.d) ∘ X.₁ PA.hom) ∘ unit.η (E G)
+                      ≈⟨ R.F-resp-≈ (pullʳ (Equiv.sym PA.comm-d)) ⟩∘⟨refl ⟩
+                    R.F₁ (Rδ A i ∘ PA.hom ∘ d G) ∘ unit.η (E G)
+                      ≈⟨ R.F-resp-≈ (extendʳ (universal-⟨-,-⟩-pointwise i)) ⟩∘⟨refl ⟩
+                    R.F₁ (Rδ B i ∘ PB.hom ∘ d G) ∘ unit.η (E G)
+                      ≈˘⟨ R.F-resp-≈ (pullʳ (Equiv.sym PB.comm-d)) ⟩∘⟨refl ⟩
+                    R.F₁ ((Rδ B i ∘ B.d) ∘ X.₁ PB.hom) ∘ unit.η (E G)
+                      ≈˘⟨ pullˡ (Equiv.sym R.homomorphism) ⟩
+                    R.F₁ (Rδ B i ∘ B.d) ∘ R.₁ (X.₁ PB.hom) ∘ unit.η (E G)
+                      ≈˘⟨ pullʳ (unit.commute _) ⟩
+                    (R.F₁ (Rδ B i ∘ B.d) ∘ unit.η B.E) ∘ PB.hom ∎
 
             commute-behaviour : behaviour G ≈ behaviour A ∘ PA.hom
             commute-behaviour =
