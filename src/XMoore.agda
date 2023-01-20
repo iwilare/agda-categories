@@ -72,18 +72,26 @@ XMoore = record
 
 import Categories.Category.Complete
 open import Categories.Category.Complete using (Complete)
+open import Categories.Category.Complete.Finitely using (FinitelyComplete)
+open import Categories.Category.Complete.Properties using (Complete⇒FinitelyComplete)
 open import Categories.Category.BinaryProducts
 open import Categories.Object.Product.Indexed
+open import Categories.Object.Product
+open import Categories.Diagram.Pullback.Indexed
 open import Categories.Object.Terminal
 open import Categories.Diagram.Pullback
 open import Categories.Adjoint
 open import Data.Nat
 open import Relation.Binary.PropositionalEquality
 
-module _ {R : Functor C C} (adj : X ⊣ R) {complete : ∀ {o ℓ e} → Complete o ℓ e C} where
+module _ {R : Functor C C} (adj : X ⊣ R) {complete : ∀ {o ℓ e} → Complete o ℓ e C}
+   {allIndexedPullbacks : ∀ i → AllPullbacksOf C i}
+   where
 
   open import Categories.Object.Product.Indexed.Properties C
   open import Categories.Diagram.Pullback.Limit C
+
+  --module FinComp = FinitelyComplete (Complete⇒FinitelyComplete complete)
 
   module R = Functor R
 
@@ -175,69 +183,72 @@ module _ {R : Functor C C} (adj : X ⊣ R) {complete : ∀ {o ℓ e} → Complet
           counit.η (R ^ i $ O) ∘ X.₁ (R∞.π (ℕ.suc i)) ∘ X.₁ R∞.⟨ Rδ A ⟩ ≈⟨ sym-assoc ⟩
           Radjunct (R∞.π (ℕ.suc i)) ∘ X.₁ R∞.⟨ Rδ A ⟩ ∎
 
+  module ⊤ = Terminal Terminal-XMoore
+
   BinaryProducts-XMoore : BinaryProducts (XMoore)
   BinaryProducts-XMoore = record
     { product = λ { {A} {B} →
-        let module A = XMooreObj A
-            module B = XMooreObj B
-
-            -- Pullback on i-step behaviour
-            module Pi i = Pullback (complete⇒pullback complete (Rδ A i) (Rδ B i))
-
-            -- Pullback on full behaviour
-            module P∞ = Pullback (complete⇒pullback complete (behaviour A) (behaviour B))
-
-            -- Product of pullbacks
-            module Pall = IndexedProductOf (Complete⇒IndexedProductOf {0ℓ} {0ℓ} {0ℓ} {0ℓ} complete {I = ℕ} λ i → Pi.P i)
-
-          in record
-          { A×B = record
-            { E = P∞.P
-            ; d = Radjunct {!   !}
-            {-
-            P.universal {A = X.F₀ P.P} {A.d ∘ X.₁ P.p₁} {B.d ∘ X.₁ P.p₂}
-                           (begin
-           {!   !} ≈⟨ pullˡ (R∞.⟨⟩∘ {!   !} {!   !}) ⟩
-           {!   !} ≈⟨ R∞.⟨⟩∘ {!   !} {!   !} ⟩
-           {!   !} ≈⟨ R∞.⟨⟩-cong _ _ {!   !} ⟩
-           {!   !} ≈˘⟨ R∞.⟨⟩∘ {!   !} {!   !} ⟩
-           {!   !} ≈˘⟨ pullˡ (R∞.⟨⟩∘ {!   !} {!   !}) ⟩
-           {!   !} ∎)
-            -}
-            ; s = R∞.π 0 ∘ P∞.diag
-            }
-          ; π₁ = record
-            { hom = P∞.p₁
-            ; comm-d = {!   !}
-            ; comm-s = {!   !}
-            }
-          ; π₂ = record
-            { hom = P∞.p₂
-            ; comm-d = {!   !}
-            ; comm-s = {!   !}
-            }
-          ; ⟨_,_⟩ = λ {C} PA PB →
-            let module PA = XMoore⇒ PA
-                module PB = XMoore⇒ PB in record
-            { hom = P∞.universal {A = E C} {PA.hom} {PB.hom} (begin
-               R∞.⟨ Rδ A ⟩ ∘ PA.hom ≈⟨ R∞.⟨⟩∘ _ _ ⟩
-               R∞.⟨ (λ i → Rδ A i ∘ PA.hom) ⟩ ≈⟨ R∞.⟨⟩-cong _ _ (pointwiso PA PB) ⟩
-               R∞.⟨ (λ i → Rδ B i ∘ PB.hom) ⟩ ≈˘⟨ R∞.⟨⟩∘ _ _ ⟩
-               R∞.⟨ Rδ B ⟩ ∘ PB.hom ∎)
-            ; comm-d = {! P∞.unique  !}
-            ; comm-s = {!  PA.comm-s !}
-            }
-          ; project₁ = {!   !}
-          ; project₂ = {!   !}
-          ; unique = {!   !}
+    let module A = XMooreObj A
+        module B = XMooreObj B in
+      record
+        { A×B = record
+          { E = P∞.P
+          ; d = P∞.universal {_} {_} {X.F₀ P∞.P} {A.d ∘ X.₁ P∞.p₁} {B.d ∘ X.₁ P∞.p₂} (universal-d)
+          ; s = R∞.π 0 ∘ P∞.diag
           }
-      }
+        ; π₁ = record
+          { hom = P∞.p₁
+          ; comm-d = {!   !}
+          ; comm-s = {!   !}
+          }
+        ; π₂ = record
+          { hom = P∞.p₂
+          ; comm-d = {!   !}
+          ; comm-s = {!   !}
+          }
+        ; ⟨_,_⟩ = λ {C} PA PB →
+          let module PA = XMoore⇒ PA
+              module PB = XMoore⇒ PB
+              in record
+          { hom = P∞.universal {_} {_} {E C} {PA.hom} {PB.hom} (universal-⟨-,-⟩ PA PB)
+          ; comm-d = {!  comm-d (⊤.! {C}) !}
+          ; comm-s = begin
+              s C                                 ≈⟨ comm-s (⊤.! {C}) ⟩
+              R∞.π 0 ∘ behaviour C                ≈⟨ refl⟩∘⟨ commute-behaviour PA (⊤.! {C}) ⟩
+              R∞.π 0 ∘ behaviour A ∘ PA.hom       ≈⟨ refl⟩∘⟨ Equiv.sym (pullʳ P∞.p₁∘universal≈h₁) ⟩
+              R∞.π 0 ∘ P∞.diag ∘ P∞.universal _   ≈⟨ sym-assoc ⟩
+              (R∞.π 0 ∘ P∞.diag) ∘ P∞.universal _ ∎
+          }
+        ; project₁ = {!   !}
+        ; project₂ = {!   !}
+        ; unique = {!   !}
+        } }
     } where
         module _ {A B : XMooreObj} where
           private
             module A = XMooreObj A
             module B = XMooreObj B
             module P = Pullback (complete⇒pullback complete (behaviour A) (behaviour B))
+
+          -- Pullback on i-step behaviour
+          module Pi i = Pullback (complete⇒pullback complete (Rδ A i) (Rδ B i))
+
+          -- Pullback on full behaviour
+          module P∞ = Pullback (complete⇒pullback complete (behaviour A) (behaviour B))
+
+          -- Product of pullbacks
+          module Pall = IndexedProductOf (Complete⇒IndexedProductOf {0ℓ} {0ℓ} {0ℓ} {0ℓ} complete {I = ℕ} λ i → Pi.P i)
+
+          universal-d : behaviour A ∘ A.d ∘ X.F₁ P∞.p₁
+                      ≈ behaviour B ∘ B.d ∘ X.F₁ P∞.p₂
+          universal-d = begin
+            behaviour A ∘ A.d ∘ X.F₁ P∞.p₁      ≈⟨ extendʳ (comm-d (⊤.! {A})) ⟩
+            _ ∘ X.F₁ (behaviour A) ∘ X.F₁ P∞.p₁ ≈⟨ refl⟩∘⟨ (Equiv.sym X.homomorphism ○ X.F-resp-≈ P∞.commute ○ X.homomorphism) ⟩
+            _ ∘ X.₁ (behaviour B) ∘ X.F₁ P∞.p₂  ≈⟨ extendʳ (Equiv.sym (comm-d (⊤.! {B}))) ⟩
+            behaviour B ∘ B.d ∘ X.F₁ P∞.p₂ ∎
+
+          --module E×F = Product {! Complete⇒FinitelyComplete  !} --(complete⇒product complete A.E B.E)
+          --module WidePullback = IndexedPullbackOf {! allIndexedPullbacks Level.zero {ℕ} (P)  !}
 
           private
             variable
@@ -267,3 +278,29 @@ module _ {R : Functor C C} (adj : X ⊣ R) {complete : ∀ {o ℓ e} → Complet
                R.F₁ (Rδ B i ∘ B.d) ∘ R.₁ (X.₁ PB.hom) ∘ unit.η (E G)
                  ≈˘⟨ pullʳ (unit.commute _) ⟩
                (R.F₁ (Rδ B i ∘ B.d) ∘ unit.η B.E) ∘ PB.hom ∎
+
+            abstract
+              universal-⟨-,-⟩ : R∞.⟨ Rδ A ⟩ ∘ PA.hom ≈ R∞.⟨ Rδ B ⟩ ∘ PB.hom
+              universal-⟨-,-⟩ = begin
+                R∞.⟨ Rδ A ⟩ ∘ PA.hom           ≈⟨ R∞.⟨⟩∘ _ _ ⟩
+                R∞.⟨ (λ i → Rδ A i ∘ PA.hom) ⟩ ≈⟨ R∞.⟨⟩-cong _ _ pointwiso ⟩
+                R∞.⟨ (λ i → Rδ B i ∘ PB.hom) ⟩ ≈˘⟨ R∞.⟨⟩∘ _ _ ⟩
+                R∞.⟨ Rδ B ⟩ ∘ PB.hom ∎
+
+            commute-behaviour : behaviour G ≈ behaviour A ∘ PA.hom
+            commute-behaviour =
+              begin
+                behaviour G                    ≈⟨ R∞.⟨⟩-cong _ _ commute-behaviour-pointwise ⟩
+                R∞.⟨ (λ i → Rδ A i ∘ PA.hom) ⟩ ≈⟨ Equiv.sym (R∞.⟨⟩∘ _ _) ⟩
+                behaviour A ∘ PA.hom           ∎
+              where
+                commute-behaviour-pointwise : (i : ℕ) → Rδ G i ≈ Rδ A i ∘ PA.hom
+                commute-behaviour-pointwise ℕ.zero = PA.comm-s
+                commute-behaviour-pointwise (ℕ.suc i) = begin
+                  R.F₁ (Rδ G i ∘ d G) ∘ unit.η (E G)                     ≈⟨ R.F-resp-≈ (pushˡ (commute-behaviour-pointwise i)) ⟩∘⟨refl ⟩
+                  R.F₁ (Rδ A i ∘ PA.hom ∘ d G) ∘ unit.η (E G)            ≈⟨ R.F-resp-≈ (refl⟩∘⟨ PA.comm-d) ⟩∘⟨refl ⟩
+                  R.F₁ (Rδ A i ∘ A.d ∘ X.₁ PA.hom) ∘ unit.η (E G)        ≈⟨ R.F-resp-≈ sym-assoc ⟩∘⟨refl ⟩
+                  R.F₁ ((Rδ A i ∘ A.d) ∘ X.₁ PA.hom) ∘ unit.η (E G)      ≈⟨ pushˡ R.homomorphism ⟩
+                  R.F₁ (Rδ A i ∘ A.d) ∘ R.F₁ (X.₁ PA.hom) ∘ unit.η (E G) ≈⟨ refl⟩∘⟨ unit.sym-commute _ ⟩
+                  R.F₁ (Rδ A i ∘ A.d) ∘ unit.η A.E ∘ PA.hom              ≈⟨ sym-assoc ⟩
+                  Ladjunct (Rδ A i ∘ A.d) ∘ PA.hom                       ∎
