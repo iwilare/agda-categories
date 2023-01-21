@@ -134,7 +134,7 @@ mealy-comp : {X Y Z : Obj} →
 mealy-comp = record
   { F₀ = λ {(M1 , M2) → record
     { E = E M1 × E M2
-    ; d = {!   !}
+    ; d = second (MealyObj.d M2) ∘ BinaryProducts.assocˡ products
     ; s = MealyObj.s M1 ∘ second (MealyObj.s M2) ∘ BinaryProducts.assocˡ products
     }}
   ; F₁ = {!   !}
