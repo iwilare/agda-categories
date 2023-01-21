@@ -31,6 +31,7 @@ import Categories.Morphism.Reasoning as MR
 open import Categories.Morphism C
 
 record MealyObj I O : Set (o ⊔ l ⊔ e) where
+  constructor mobj
   field
     E : Obj
     d : E × I ⇒ E
@@ -39,6 +40,7 @@ record MealyObj I O : Set (o ⊔ l ⊔ e) where
 open MealyObj
 
 record Mealy⇒ {I} {O} (X Y : MealyObj I O) : Set (o ⊔ l ⊔ e) where
+  constructor mmor
   module X = MealyObj X
   module Y = MealyObj Y
   field
@@ -137,8 +139,14 @@ mealy-comp = record
     ; d = second (MealyObj.d M2) ∘ BinaryProducts.assocˡ products
     ; s = MealyObj.s M1 ∘ second (MealyObj.s M2) ∘ BinaryProducts.assocˡ products
     }}
-  ; F₁ = {!   !}
+  ; F₁ = λ { {mobj E₁ dE₁ sE₁ , mobj E₂ dE₂ sE₂} {mobj F₁ dF₁ sF₁ , mobj F₂ dF₂ sF₂} (mmor f₁ comm-d₁ comm-s₁ , mmor f₂ comm-d₂ comm-s₂) → mmor ((products BinaryProducts.⁂ f₁) f₂)
+    (begin {!   !} ≈⟨ {!   !} ⟩
+           {!   !} ≈⟨ {!   !} ⟩
+           {!   !} ∎)
+    (begin {!   !} ≈⟨ {!   !} ⟩
+           {!   !} ≈⟨ {!   !} ⟩
+           {!   !} ∎)}
   ; identity = {!   !}
   ; homomorphism = {!   !}
   ; F-resp-≈ = {!   !}
-  }
+  } where open HomReasoning
