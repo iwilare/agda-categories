@@ -1,3 +1,5 @@
+{-# OPTIONS --allow-unsolved-metas #-}
+
 open import Level
 open import Categories.Category
 -- open import Data.Product
@@ -26,7 +28,7 @@ import Categories.Morphism.Reasoning as MR
 
 open import Categories.Morphism C
 
-record MealyObj {I O : Obj} : Set (o ⊔ l ⊔ e) where
+record MealyObj I O : Set (o ⊔ l ⊔ e) where
   field
     E : Obj
     d : E × I ⇒ E
@@ -34,7 +36,7 @@ record MealyObj {I O : Obj} : Set (o ⊔ l ⊔ e) where
 
 open MealyObj
 
-record Mealy⇒ {I O : Obj} (X Y : MealyObj {I} {O}) : Set (o ⊔ l ⊔ e) where
+record Mealy⇒ {I} {O} (X Y : MealyObj I O) : Set (o ⊔ l ⊔ e) where
   module X = MealyObj X
   module Y = MealyObj Y
   field
@@ -44,8 +46,8 @@ record Mealy⇒ {I O : Obj} (X Y : MealyObj {I} {O}) : Set (o ⊔ l ⊔ e) where
 
 open Mealy⇒
 
-comp : {I O : Obj} {A B C : MealyObj {I} {O}} → (g : Mealy⇒ B C) → (f : Mealy⇒ A B) → Mealy⇒ A C
-comp {I = I} g f = record
+comp : ∀ {I} {O} {A B C : MealyObj I O} → (g : Mealy⇒ B C) → (f : Mealy⇒ A B) → Mealy⇒ A C
+comp g f = record
   { hom = g.hom ∘ f.hom
   ; comm-d = begin _ ≈⟨ MR.pullʳ C f.comm-d ⟩
                    _ ≈⟨ MR.pullˡ C g.comm-d ⟩
@@ -59,13 +61,13 @@ comp {I = I} g f = record
           module g = Mealy⇒ g
           open HomReasoning
 
-Mealy : {I O : Obj} → Category (o ⊔ l ⊔ e) (o ⊔ l ⊔ e) e
-Mealy {I} {O} = record
-  { Obj = MealyObj {I} {O}
+Mealy : ∀ I O → Category (o ⊔ l ⊔ e) (o ⊔ l ⊔ e) e
+Mealy I O = record
+  { Obj = MealyObj I O
   ; _⇒_ = Mealy⇒
   ; _≈_ = λ f g → hom f ≈ hom g
   ; id = λ {A} → let module A = MealyObj A in
-    record { hom = {!   !} -- SymmetricMonoidalCategory.id C {A.E}
+    record { hom = {! SymmetricMonoidalCategory.id C {A.E}  !} -- SymmetricMonoidalCategory.id C {A.E}
            ; comm-d = identityˡ ○ MR.introʳ C {!   !}
            ; comm-s = MR.introʳ C {!   !}
            }
@@ -82,9 +84,9 @@ Mealy {I} {O} = record
 private
   variable
     I O : Obj
-    X Y Z : MealyObj {I} {O}
+    X Y Z : MealyObj I O
 
-
+{-
 2Mealy : Category o (o ⊔ l ⊔ e) (l ⊔ e)
 2Mealy = record
   { Obj = Obj
@@ -121,3 +123,4 @@ private
         ; d-iso = {!   !}
         ; s-iso = {!   !}
         } where open HomReasoning
+-}
