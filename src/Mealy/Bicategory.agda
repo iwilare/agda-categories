@@ -35,6 +35,7 @@ MealyBicategory = record
       ; s = π₂
       })
     ; ⊚ = {!   !}
+    -- ^ 1-cell composition
     ; ⊚-assoc = {!   !}
     ; unitˡ = {!   !}
     ; unitʳ = {!   !}

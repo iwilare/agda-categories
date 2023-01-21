@@ -3,6 +3,7 @@
 open import Level
 open import Categories.Category
 -- open import Data.Product
+open import Categories.Category.Product
 open import Categories.Monad
 open import Function hiding (_∘_)
 open import Categories.Object.Terminal
@@ -22,6 +23,7 @@ open Terminal Cart.terminal
 open BinaryProducts products
 
 open import Categories.Functor
+open import Data.Product hiding (_×_)
 open import Categories.Monad.Strong
 open import Categories.Functor renaming (id to idF)
 import Categories.Morphism.Reasoning as MR
@@ -46,8 +48,8 @@ record Mealy⇒ {I} {O} (X Y : MealyObj I O) : Set (o ⊔ l ⊔ e) where
 
 open Mealy⇒
 
-comp : ∀ {I} {O} {A B C : MealyObj I O} → (g : Mealy⇒ B C) → (f : Mealy⇒ A B) → Mealy⇒ A C
-comp g f = record
+comp : ∀ {I} {O} {A B C : MealyObj I O} → (f : Mealy⇒ A B) → (g : Mealy⇒ B C) → Mealy⇒ A C
+comp f g = record
   { hom = g.hom ∘ f.hom
   ; comm-d = begin _ ≈⟨ MR.pullʳ C f.comm-d ⟩
                    _ ≈⟨ MR.pullˡ C g.comm-d ⟩
@@ -71,7 +73,7 @@ Mealy I O = record
            ; comm-d = identityˡ ○ MR.introʳ C {!   !}
            ; comm-s = MR.introʳ C {!   !}
            }
-  ; _∘_ = comp
+  ; _∘_ = flip comp
   ; assoc = assoc
   ; sym-assoc = sym-assoc
   ; identityˡ = identityˡ
@@ -124,3 +126,19 @@ private
         ; s-iso = {!   !}
         } where open HomReasoning
 -}
+
+mealy-comp : {X Y Z : Obj} →
+      Functor
+      (Product (Mealy Y Z) (Mealy X Y))
+      (Mealy X Z)
+mealy-comp = record
+  { F₀ = λ {(M1 , M2) → record
+    { E = E M1 × E M2
+    ; d = {!   !}
+    ; s = MealyObj.s M1 ∘ second (MealyObj.s M2) ∘ BinaryProducts.assocˡ products
+    }}
+  ; F₁ = {!   !}
+  ; identity = {!   !}
+  ; homomorphism = {!   !}
+  ; F-resp-≈ = {!   !}
+  }
