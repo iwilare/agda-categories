@@ -196,36 +196,50 @@ module _ {R : Functor C C} (adj : X ⊣ R) {complete : ∀ {o ℓ e} → Complet
           }
         ; π₁ = record
           { hom = P∞.p₁
-          ; comm-d = {!   !}
-          ; comm-s =  begin
+          ; comm-d = P∞.p₁∘universal≈h₁
+          ; comm-s = begin
                R∞.π 0 ∘ behaviour A ∘ P∞.p₁ ≈⟨ pullˡ (Equiv.sym (comm-s (⊤.! {A}))) ⟩
                A.s ∘ P∞.p₁                  ∎
           }
         ; π₂ = record
           { hom = P∞.p₂
-          ; comm-d = {!   !}
+          ; comm-d = P∞.p₂∘universal≈h₂
           ; comm-s = begin
                R∞.π 0 ∘ behaviour A ∘ P∞.p₁ ≈⟨ refl⟩∘⟨ P∞.commute ⟩
                R∞.π 0 ∘ behaviour B ∘ P∞.p₂ ≈⟨ pullˡ (Equiv.sym (comm-s (⊤.! {B}))) ⟩
                B.s ∘ P∞.p₂ ∎
           }
-        ; ⟨_,_⟩ = λ {C} PA PB →
-          let module PA = XMoore⇒ PA
-              module PB = XMoore⇒ PB
-              in record
-          { hom = P∞.universal {_} {_} {E C} {PA.hom} {PB.hom} (universal-⟨-,-⟩ PA PB)
-          ; comm-d = {!  !}
-          ; comm-s = begin
-              s C                                 ≈⟨ comm-s (⊤.! {C}) ⟩
-              R∞.π 0 ∘ behaviour C                ≈⟨ refl⟩∘⟨ commute-behaviour PA (⊤.! {C}) ⟩
-              R∞.π 0 ∘ behaviour A ∘ PA.hom       ≈⟨ refl⟩∘⟨ Equiv.sym (pullʳ P∞.p₁∘universal≈h₁) ⟩
-              R∞.π 0 ∘ P∞.diag ∘ P∞.universal _   ≈⟨ sym-assoc ⟩
-              (R∞.π 0 ∘ P∞.diag) ∘ P∞.universal _ ∎
-          }
-        ; project₁ = P∞.p₁∘universal≈h₁
-        ; project₂ = P∞.p₂∘universal≈h₂
-        ; unique = λ a b → Equiv.sym (P∞.unique a b)
-        } }
+        ; ⟨_,_⟩ =
+            λ {C} PA PB →
+            let module PA = XMoore⇒ PA
+                module PB = XMoore⇒ PB
+                in record
+            { hom = P∞.universal {_} {_} {E C} {PA.hom} {PB.hom} (universal-⟨-,-⟩ PA PB)
+            ; comm-d = P∞.unique-diagram
+                         (begin P∞.p₁ ∘ P∞.universal (universal-⟨-,-⟩ PA PB) ∘ d C                             ≈⟨ pullˡ (P∞.p₁∘universal≈h₁ {h₁ = PA.hom} {_} {eq = (universal-⟨-,-⟩ PA PB)}) ⟩
+                                PA.hom ∘ d C                                                                   ≈⟨ PA.comm-d ⟩
+                                A.d ∘ X.F₁ PA.hom                                                              ≈⟨ refl⟩∘⟨ X.F-resp-≈ (Equiv.sym P∞.p₁∘universal≈h₁)  ⟩
+                                A.d ∘ X.F₁ (P∞.p₁ ∘ P∞.universal (universal-⟨-,-⟩ PA PB))                      ≈⟨ refl⟩∘⟨ X.homomorphism ⟩
+                                A.d ∘ X.F₁ P∞.p₁ ∘ X.F₁ (P∞.universal (universal-⟨-,-⟩ PA PB))                 ≈⟨ extendʳ (Equiv.sym P∞.p₁∘universal≈h₁ ) ⟩
+                                P∞.p₁ ∘ P∞.universal universal-d ∘ X.F₁ (P∞.universal (universal-⟨-,-⟩ PA PB)) ∎)
+                         (begin P∞.p₂ ∘ P∞.universal (universal-⟨-,-⟩ PA PB) ∘ d C                             ≈⟨ pullˡ (P∞.p₂∘universal≈h₂ ) ⟩
+                                PB.hom ∘ d C                                                                   ≈⟨ PB.comm-d ⟩
+                                B.d ∘ X.F₁ PB.hom                                                              ≈⟨ refl⟩∘⟨ X.F-resp-≈ (Equiv.sym P∞.p₂∘universal≈h₂) ⟩
+                                B.d ∘ X.F₁ (P∞.p₂ ∘ P∞.universal (universal-⟨-,-⟩ PA PB))                      ≈⟨ refl⟩∘⟨ X.homomorphism ⟩
+                                B.d ∘ X.F₁ P∞.p₂ ∘ X.F₁ (P∞.universal (universal-⟨-,-⟩ PA PB))                 ≈⟨ extendʳ (Equiv.sym P∞.p₂∘universal≈h₂ ) ⟩
+                                P∞.p₂ ∘ P∞.universal universal-d ∘ X.F₁ (P∞.universal (universal-⟨-,-⟩ PA PB)) ∎)
+            ; comm-s = begin
+                s C                                 ≈⟨ comm-s (⊤.! {C}) ⟩
+                R∞.π 0 ∘ behaviour C                ≈⟨ refl⟩∘⟨ commute-behaviour PA (⊤.! {C}) ⟩
+                R∞.π 0 ∘ behaviour A ∘ PA.hom       ≈⟨ refl⟩∘⟨ Equiv.sym (pullʳ P∞.p₁∘universal≈h₁) ⟩
+                R∞.π 0 ∘ P∞.diag ∘ P∞.universal _   ≈⟨ sym-assoc ⟩
+                (R∞.π 0 ∘ P∞.diag) ∘ P∞.universal _ ∎
+            }
+            ; project₁ = P∞.p₁∘universal≈h₁
+            ; project₂ = P∞.p₂∘universal≈h₂
+            ; unique = λ a b → Equiv.sym (P∞.unique a b)
+            }
+        }
     } where
         module _ {A B : XMooreObj} where
           private
@@ -233,25 +247,16 @@ module _ {R : Functor C C} (adj : X ⊣ R) {complete : ∀ {o ℓ e} → Complet
             module B = XMooreObj B
             module P = Pullback (complete⇒pullback complete (behaviour A) (behaviour B))
 
-          -- Pullback on i-step behaviour
-          module Pi i = Pullback (complete⇒pullback complete (Rδ A i) (Rδ B i))
-
-          -- Pullback on full behaviour
           module P∞ = Pullback (complete⇒pullback complete (behaviour A) (behaviour B))
 
-          -- Product of pullbacks
-          module Pall = IndexedProductOf (Complete⇒IndexedProductOf {0ℓ} {0ℓ} {0ℓ} {0ℓ} complete {I = ℕ} λ i → Pi.P i)
-
-          universal-d : behaviour A ∘ A.d ∘ X.F₁ P∞.p₁
-                      ≈ behaviour B ∘ B.d ∘ X.F₁ P∞.p₂
-          universal-d = begin
-            behaviour A ∘ A.d ∘ X.F₁ P∞.p₁      ≈⟨ extendʳ (comm-d (⊤.! {A})) ⟩
-            _ ∘ X.F₁ (behaviour A) ∘ X.F₁ P∞.p₁ ≈⟨ refl⟩∘⟨ (Equiv.sym X.homomorphism ○ X.F-resp-≈ P∞.commute ○ X.homomorphism) ⟩
-            _ ∘ X.₁ (behaviour B) ∘ X.F₁ P∞.p₂  ≈⟨ extendʳ (Equiv.sym (comm-d (⊤.! {B}))) ⟩
-            behaviour B ∘ B.d ∘ X.F₁ P∞.p₂ ∎
-
-          --module E×F = Product {! Complete⇒FinitelyComplete  !} --(complete⇒product complete A.E B.E)
-          --module WidePullback = IndexedPullbackOf {! allIndexedPullbacks Level.zero {ℕ} (P)  !}
+          abstract
+            universal-d : behaviour A ∘ A.d ∘ X.F₁ P∞.p₁
+                        ≈ behaviour B ∘ B.d ∘ X.F₁ P∞.p₂
+            universal-d = begin
+              behaviour A ∘ A.d ∘ X.F₁ P∞.p₁      ≈⟨ extendʳ (comm-d (⊤.! {A})) ⟩
+              _ ∘ X.F₁ (behaviour A) ∘ X.F₁ P∞.p₁ ≈⟨ refl⟩∘⟨ (Equiv.sym X.homomorphism ○ X.F-resp-≈ P∞.commute ○ X.homomorphism) ⟩
+              _ ∘ X.₁ (behaviour B) ∘ X.F₁ P∞.p₂  ≈⟨ extendʳ (Equiv.sym (comm-d (⊤.! {B}))) ⟩
+              behaviour B ∘ B.d ∘ X.F₁ P∞.p₂ ∎
 
           private
             variable
