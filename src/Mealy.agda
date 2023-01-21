@@ -129,10 +129,7 @@ private
         } where open HomReasoning
 -}
 
-mealy-comp : {X Y Z : Obj} →
-      Functor
-      (Product (Mealy Y Z) (Mealy X Y))
-      (Mealy X Z)
+mealy-comp : {X Y Z : Obj} → Functor (Product (Mealy Y Z) (Mealy X Y)) (Mealy X Z)
 mealy-comp = record
   { F₀ = λ {(M1 , M2) → record
     { E = E M1 × E M2
@@ -140,19 +137,19 @@ mealy-comp = record
     ; s = MealyObj.s M1 ∘ second (MealyObj.s M2) ∘ BinaryProducts.assocˡ products
     }}
   ; F₁ = λ { {mobj E₁ dE₁ sE₁ , mobj E₂ dE₂ sE₂} {mobj F₁ dF₁ sF₁ , mobj F₂ dF₂ sF₂} (mmor f₁ comm-d₁ comm-s₁ , mmor f₂ comm-d₂ comm-s₂) → mmor ((products BinaryProducts.⁂ f₁) f₂)
-    (begin {!   !} ≈⟨ (refl⟩∘⟨ second∘⟨⟩) ⟩
-           {!   !} ≈⟨ {!   !} ⟩
+    (begin {!   !} ≈⟨ refl⟩∘⟨ second∘⟨⟩ ⟩
+           {!   !} ≈⟨ ⁂∘⟨⟩ ⟩
            {!   !} ≈⟨ {!   !} ⟩
            {!   !} ∎)
-    (begin {!   !} ≈⟨ (comm-s₁ ⟩∘⟨refl) ⟩
-           {!   !} ≈⟨ (refl⟩∘⟨ second∘⟨⟩) ⟩
-           {!   !} ≈⟨ (MR.pullʳ C first∘⟨⟩) ⟩
-           {!   !} ≈⟨ (refl⟩∘⟨ ⟨⟩-congˡ ( comm-s₂ ⟩∘⟨refl)) ⟩
-           {!   !} ≈⟨ (refl⟩∘⟨ ⟨⟩-congˡ (MR.pullʳ C first∘⟨⟩)) ⟩
+    (begin {!   !} ≈⟨ comm-s₁ ⟩∘⟨refl ⟩
+           {!   !} ≈⟨ refl⟩∘⟨ second∘⟨⟩ ⟩
+           {!   !} ≈⟨ MR.pullʳ C first∘⟨⟩ ⟩
+           {!   !} ≈⟨ refl⟩∘⟨ ⟨⟩-congˡ (comm-s₂ ⟩∘⟨refl) ⟩
+           {!   !} ≈⟨ refl⟩∘⟨ ⟨⟩-congˡ (MR.pullʳ C first∘⟨⟩) ⟩
            {!   !} ≈⟨ {!   !} ⟩
-           {!   !} ≈⟨ (refl⟩∘⟨ refl⟩∘⟨ {!  !}) ⟩
-           {!   !} ≈⟨ (refl⟩∘⟨ sym-assoc) ⟩
-           {!   !} ≈⟨ sym-assoc ⟩
+           {!   !} ≈⟨ refl⟩∘⟨ refl⟩∘⟨ {!  !} ⟩
+           {!   !} ≈˘⟨ refl⟩∘⟨ assoc ⟩
+           {!   !} ≈˘⟨ assoc ⟩
            {!   !} ∎)}
   ; identity = {!   !}
   ; homomorphism = {!   !}
