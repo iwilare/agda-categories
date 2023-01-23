@@ -94,6 +94,15 @@ record BinaryProducts : Set (levelOfTerm 𝒞) where
   ⁂-cong₂ : f ≈ g → h ≈ i → f ⁂ h ≈ g ⁂ i
   ⁂-cong₂ = [ product ⇒ product ]×-cong₂
 
+  ⁂-congˡ : f ≈ g → f ⁂ i ≈ g ⁂ i
+  ⁂-congˡ a = [ product ⇒ product ]×-cong₂ a Equiv.refl
+
+  ⁂-congʳ : f ≈ g → i ⁂ f ≈ i ⁂ g
+  ⁂-congʳ = [ product ⇒ product ]×-cong₂ Equiv.refl
+
+  ⁂-id : ∀ {A B} → (id {A = A}) ⁂ (id {A = B}) ≈ id
+  ⁂-id = id×id product
+
   ⁂∘⟨⟩ : (f ⁂ g) ∘ ⟨ f′ , g′ ⟩ ≈ ⟨ f ∘ f′ , g ∘ g′ ⟩
   ⁂∘⟨⟩ = [ product ⇒ product ]×∘⟨⟩
 
@@ -141,6 +150,9 @@ record BinaryProducts : Set (levelOfTerm 𝒞) where
             π₁ ∘ first f ≈⟨ refl⟩∘⟨ eq ⟩
             π₁ ∘ id      ≈⟨ identityʳ ⟩
             π₁           ∎
+
+  first-identity : ∀ {A C} → first {C = C} (id {A = A}) ≈ id
+  first-identity = ⟨⟩-cong₂ identityˡ identityˡ ○ η
 
   swap∘⟨⟩ : swap ∘ ⟨ f , g ⟩ ≈ ⟨ g , f ⟩
   swap∘⟨⟩ {f = f} {g = g} = begin

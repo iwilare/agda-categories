@@ -8,29 +8,20 @@ open import Categories.Category.BinaryProducts
 open import Categories.Category.Monoidal.Bundle
   using (SymmetricMonoidalCategory)
 import Categories.Morphism.Reasoning as MR
+open import Categories.Functor renaming (id to idF)
+open import Categories.Category.Cartesian.Bundle
 
-open import Categories.Category.Cartesian
+module Mealy {o l e} (C : CartesianCategory o l e) where
 
-module Mealy {o l e} {C : Category o l e} {K : Cartesian C} where
-
-open module Cart = Cartesian K
-open Category C
+open CartesianCategory C
 
 open HomReasoning
-open MR C
-
-open Terminal Cart.terminal
+open Terminal terminal
 open BinaryProducts products
-
-open import Categories.Monad.Strong
-open import Categories.Functor renaming (id to idF)
-open import Categories.Morphism C
-import Categories.Object.Product.Core as P
-open import Data.Product using (_,_)
-import Categories.Category.Product as CP
+open import Categories.Morphism.Reasoning U
+open import Categories.Morphism U
 
 record MealyObj I O : Set (o ⊔ l ⊔ e) where
-  constructor mobj
   field
     E : Obj
     d : E × I ⇒ E
@@ -74,8 +65,9 @@ Mealy I O = record
   ; _≈_ = λ f g → hom f ≈ hom g
   ; id = λ {A} → let module A = MealyObj A in
     record { hom = id
-           ; comm-d = identityˡ ○ introʳ {!   !}
-           ; comm-s = introʳ {!   !}
+           ; comm-d = identityˡ ○ introʳ
+           first-identity
+           ; comm-s = introʳ first-identity
            }
   ; _∘_ = comp
   ; assoc = assoc
@@ -86,13 +78,12 @@ Mealy I O = record
   ; equiv = record { refl = Equiv.refl ; sym = Equiv.sym ; trans = Equiv.trans }
   ; ∘-resp-≈ = ∘-resp-≈
   }
-
-
+{-
 private
   variable
     I O : Obj
     X Y Z : MealyObj I O
-
+ -}
 {-
 2Mealy : Category o (o ⊔ l ⊔ e) (l ⊔ e)
 2Mealy = record
@@ -132,40 +123,5 @@ private
         }
 -}
 
-
-mealy-comp : {X Y Z : Obj} → Functor (CP.Product (Mealy Y Z) (Mealy X Y)) (Mealy X Z)
-mealy-comp = record
-  { F₀ = λ { (A , B) →
-    let module A = MealyObj A
-        module B = MealyObj B in
-     record
-       { E = A.E × B.E
-       ; d = second B.d ∘ assocˡ
-       ; s = A.s ∘ second B.s ∘ assocˡ
-       }}
-  ; F₁ = λ (f , g) →
-    let module f = Mealy⇒ f
-        module g = Mealy⇒ g in
-      record
-        { hom = f.hom ⁂ g.hom
-        ; comm-d =
-          begin {!   !} ≈⟨ refl⟩∘⟨ second∘⟨⟩ ⟩
-                {!   !} ≈⟨ ⁂∘⟨⟩ ⟩
-                {!   !} ≈⟨ {!  !} ⟩
-                {!   !} ∎
-        ; comm-s =
-          begin {!   !} ≈⟨ f.comm-s ⟩∘⟨refl ⟩
-                {!   !} ≈⟨ refl⟩∘⟨ second∘⟨⟩ ⟩
-                {!   !} ≈⟨ pullʳ first∘⟨⟩ ⟩
-                {!   !} ≈⟨ refl⟩∘⟨ ⟨⟩-congˡ (g.comm-s ⟩∘⟨refl) ⟩
-                {!   !} ≈⟨ refl⟩∘⟨ ⟨⟩-congˡ (pullʳ first∘⟨⟩) ⟩
-                {!   !} ≈⟨ {!   !} ⟩
-                {!   !} ≈⟨ refl⟩∘⟨ refl⟩∘⟨ {!  !} ⟩
-                {!   !} ≈˘⟨ refl⟩∘⟨ assoc ⟩
-                {!   !} ≈˘⟨ assoc ⟩
-                {!   !} ∎
-        }
-  ; identity = λ {A} → ⟨⟩-cong₂ identityˡ identityˡ ○ η
-  ; homomorphism = {!   !}
-  ; F-resp-≈ = λ (f₁≈g₁ , f₂≈g₂) → {!   !}
-  }
+{-
+-}
