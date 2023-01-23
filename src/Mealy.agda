@@ -3,30 +3,31 @@
 open import Level
 open import Categories.Category
 open import Categories.Monad
-open import Function hiding (_∘_)
 open import Categories.Object.Terminal
 open import Categories.Category.BinaryProducts
 open import Categories.Category.Monoidal.Bundle
   using (SymmetricMonoidalCategory)
+import Categories.Morphism.Reasoning as MR
 
 open import Categories.Category.Cartesian
 
 module Mealy {o l e} {C : Category o l e} {K : Cartesian C} where
 
-
 open module Cart = Cartesian K
 open Category C
+
+open HomReasoning
+open MR C
 
 open Terminal Cart.terminal
 open BinaryProducts products
 
-open import Categories.Functor
---open import Data.Product hiding (_×_)
 open import Categories.Monad.Strong
 open import Categories.Functor renaming (id to idF)
-import Categories.Morphism.Reasoning as MR
-
 open import Categories.Morphism C
+import Categories.Object.Product.Core as P
+open import Data.Product using (_,_)
+import Categories.Category.Product as CP
 
 record MealyObj I O : Set (o ⊔ l ⊔ e) where
   constructor mobj
@@ -48,20 +49,23 @@ record Mealy⇒ {I} {O} (X Y : MealyObj I O) : Set (o ⊔ l ⊔ e) where
 
 open Mealy⇒
 
-comp : ∀ {I} {O} {A B C : MealyObj I O} → (f : Mealy⇒ A B) → (g : Mealy⇒ B C) → Mealy⇒ A C
-comp f g = record
+comp : ∀ {I} {O} {A B C : MealyObj I O} → (g : Mealy⇒ B C) → (f : Mealy⇒ A B) → Mealy⇒ A C
+comp {_} {_} {A} {B} {C} g f = record
   { hom = g.hom ∘ f.hom
-  ; comm-d = begin _ ≈⟨ MR.pullʳ C f.comm-d ⟩
-                   _ ≈⟨ MR.pullˡ C g.comm-d ⟩
-                   _ ≈⟨ MR.pullʳ C (Equiv.sym {!   !}) ⟩
-                   _ ∎
-  ; comm-s = begin _ ≈⟨ f.comm-s ⟩
-                   _ ≈⟨ (g.comm-s ⟩∘⟨refl) ⟩
-                   _ ≈⟨ MR.pullʳ C (Equiv.sym {!   !}) ⟩
-                   _ ∎
+  ; comm-d = begin (g.hom ∘ f.hom) ∘ A.d ≈⟨ pullʳ f.comm-d ⟩
+                   g.hom ∘ B.d ∘ first f.hom ≈⟨ pullˡ g.comm-d ⟩
+                   (C.d ∘ first g.hom) ∘ first f.hom ≈⟨ pullʳ first∘first ⟩
+                   C.d ∘ first (g.hom ∘ f.hom) ∎
+  ; comm-s = begin A.s ≈⟨ f.comm-s ⟩
+                   B.s ∘ first f.hom ≈⟨ g.comm-s ⟩∘⟨refl ⟩
+                   (C.s ∘ first g.hom) ∘ first f.hom ≈⟨ pullʳ first∘first ⟩
+                   C.s ∘ first (g.hom ∘ f.hom) ∎
   } where module f = Mealy⇒ f
           module g = Mealy⇒ g
-          open HomReasoning
+          module A = MealyObj A
+          module B = MealyObj B
+          module C = MealyObj C
+
 
 Mealy : ∀ I O → Category (o ⊔ l ⊔ e) (o ⊔ l ⊔ e) e
 Mealy I O = record
@@ -69,11 +73,11 @@ Mealy I O = record
   ; _⇒_ = Mealy⇒
   ; _≈_ = λ f g → hom f ≈ hom g
   ; id = λ {A} → let module A = MealyObj A in
-    record { hom = {! SymmetricMonoidalCategory.id C {A.E}  !} -- SymmetricMonoidalCategory.id C {A.E}
-           ; comm-d = identityˡ ○ MR.introʳ C {!   !}
-           ; comm-s = MR.introʳ C {!   !}
+    record { hom = id
+           ; comm-d = identityˡ ○ introʳ {!   !}
+           ; comm-s = introʳ {!   !}
            }
-  ; _∘_ = flip comp
+  ; _∘_ = comp
   ; assoc = assoc
   ; sym-assoc = sym-assoc
   ; identityˡ = identityˡ
@@ -81,7 +85,8 @@ Mealy I O = record
   ; identity² = identity²
   ; equiv = record { refl = Equiv.refl ; sym = Equiv.sym ; trans = Equiv.trans }
   ; ∘-resp-≈ = ∘-resp-≈
-  } where open HomReasoning
+  }
+
 
 private
   variable
@@ -124,16 +129,9 @@ private
         { e-iso = ≅.sym ×-assoc
         ; d-iso = {!   !}
         ; s-iso = {!   !}
-        } where open HomReasoning
+        }
 -}
 
-import Categories.Object.Product.Core as P
-
-open P.Product product
-
-open import Data.Product using (_,_)
-
-import Categories.Category.Product as CP
 
 mealy-comp : {X Y Z : Obj} → Functor (CP.Product (Mealy Y Z) (Mealy X Y)) (Mealy X Z)
 mealy-comp = record
@@ -158,9 +156,9 @@ mealy-comp = record
         ; comm-s =
           begin {!   !} ≈⟨ f.comm-s ⟩∘⟨refl ⟩
                 {!   !} ≈⟨ refl⟩∘⟨ second∘⟨⟩ ⟩
-                {!   !} ≈⟨ MR.pullʳ C first∘⟨⟩ ⟩
+                {!   !} ≈⟨ pullʳ first∘⟨⟩ ⟩
                 {!   !} ≈⟨ refl⟩∘⟨ ⟨⟩-congˡ (g.comm-s ⟩∘⟨refl) ⟩
-                {!   !} ≈⟨ refl⟩∘⟨ ⟨⟩-congˡ (MR.pullʳ C first∘⟨⟩) ⟩
+                {!   !} ≈⟨ refl⟩∘⟨ ⟨⟩-congˡ (pullʳ first∘⟨⟩) ⟩
                 {!   !} ≈⟨ {!   !} ⟩
                 {!   !} ≈⟨ refl⟩∘⟨ refl⟩∘⟨ {!  !} ⟩
                 {!   !} ≈˘⟨ refl⟩∘⟨ assoc ⟩
@@ -169,5 +167,5 @@ mealy-comp = record
         }
   ; identity = {!   !}
   ; homomorphism = {!   !}
-  ; F-resp-≈ = {!   !}
-  } where open HomReasoning
+  ; F-resp-≈ = λ (f₁≈g₁ , f₂≈g₂) → {!   !}
+  }
