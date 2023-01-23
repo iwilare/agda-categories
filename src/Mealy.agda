@@ -136,9 +136,12 @@ mealy-comp = record
     ; d = second (MealyObj.d M2) ∘ BinaryProducts.assocˡ products
     ; s = MealyObj.s M1 ∘ second (MealyObj.s M2) ∘ BinaryProducts.assocˡ products
     }}
-  ; F₁ = λ { {mobj E₁ dE₁ sE₁ , mobj E₂ dE₂ sE₂} {mobj F₁ dF₁ sF₁ , mobj F₂ dF₂ sF₂} (mmor f₁ comm-d₁ comm-s₁ , mmor f₂ comm-d₂ comm-s₂) → mmor ((products BinaryProducts.⁂ f₁) f₂)
+  ; F₁ = λ { {mobj E₁ _ _ , mobj E₂ _ _} {mobj F₁ _ _ , mobj F₂ _ _}
+           (mmor f₁ comm-d₁ comm-s₁ , mmor f₂ comm-d₂ comm-s₂) →
+             mmor ((products BinaryProducts.⁂ f₁) f₂)
     (begin {!   !} ≈⟨ refl⟩∘⟨ second∘⟨⟩ ⟩
            {!   !} ≈⟨ ⁂∘⟨⟩ ⟩
+           {!   !} ≈⟨ {!   !} ⟩
            {!   !} ≈⟨ {!   !} ⟩
            {!   !} ∎)
     (begin {!   !} ≈⟨ comm-s₁ ⟩∘⟨refl ⟩
@@ -151,7 +154,7 @@ mealy-comp = record
            {!   !} ≈˘⟨ refl⟩∘⟨ assoc ⟩
            {!   !} ≈˘⟨ assoc ⟩
            {!   !} ∎)}
-  ; identity = {!   !}
+  ; identity = λ {A} → ⟨⟩-cong₂ identityˡ identityˡ ○ η
   ; homomorphism = {!   !}
-  ; F-resp-≈ = {!   !}
+  ; F-resp-≈ = λ { {A} {B} {f} {g} → ? }
   } where open HomReasoning
