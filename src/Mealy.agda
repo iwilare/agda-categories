@@ -2,11 +2,11 @@
 
 open import Level
 open import Categories.Category
-open import Categories.Monad
+-- open import Categories.Monad
 open import Categories.Object.Terminal
 open import Categories.Category.BinaryProducts
-open import Categories.Category.Monoidal.Bundle
-  using (SymmetricMonoidalCategory)
+-- open import Categories.Category.Monoidal.Bundle
+--   using (SymmetricMonoidalCategory)
 import Categories.Morphism.Reasoning as MR
 open import Categories.Functor renaming (id to idF)
 open import Categories.Category.Cartesian.Bundle

@@ -7,7 +7,8 @@ open import Categories.Functor renaming (id to idF)
 open Categories.Functor.Functor
 open import Categories.Functor.Construction.Constant
 import Categories.Morphism.Reasoning as MR
-open import Categories.Category.BinaryProducts using (BinaryProducts; module BinaryProducts)
+open import Categories.Category.BinaryProducts
+  using (BinaryProducts; module BinaryProducts)
 open import Categories.Object.Terminal
 open import Categories.NaturalTransformation using ()
 open import Categories.NaturalTransformation.NaturalIsomorphism
@@ -30,7 +31,7 @@ import Categories.Object.Product.Core as P
 open import Data.Product as PP using (_,_)
 import Categories.Category.Product as CP
 
-MealyBicategory : Bicategory {!   !} {!   !} {!   !} {!   !}
+MealyBicategory : Bicategory (o ⊔ l ⊔ e) (o ⊔ l ⊔ e) e o
 MealyBicategory = record
   { enriched = record
     { Obj = Obj
@@ -92,12 +93,12 @@ MealyBicategory = record
             { hom = f.hom ⁂ g.hom
             ; comm-d =
                begin
-                 (f.hom ⁂ g.hom) ∘ (id ⁂ A₂.d) ∘ assocˡ ≈⟨ pullˡ ⁂∘⁂ ⟩
-                 ((f.hom ∘ id) ⁂ (g.hom ∘ A₂.d)) ∘ assocˡ ≈⟨ ⁂-congʳ g.comm-d ⟩∘⟨refl ⟩
+                 (f.hom ⁂ g.hom) ∘ (id ⁂ A₂.d) ∘ assocˡ          ≈⟨ pullˡ ⁂∘⁂ ⟩
+                 ((f.hom ∘ id) ⁂ (g.hom ∘ A₂.d)) ∘ assocˡ        ≈⟨ ⁂-congʳ g.comm-d ⟩∘⟨refl ⟩
                  ((f.hom ∘ id) ⁂ (B₂.d ∘ (g.hom ⁂ id))) ∘ assocˡ ≈⟨ ⁂-congˡ id-comm  ⟩∘⟨refl ⟩
                  ((id ∘ f.hom) ⁂ (B₂.d ∘ (g.hom ⁂ id))) ∘ assocˡ ≈⟨ pushˡ (Equiv.sym ⁂∘⁂) ⟩
-                 (id ⁂ B₂.d) ∘ (f.hom ⁂ (g.hom ⁂ id)) ∘ assocˡ ≈˘⟨ refl⟩∘⟨ assocˡ∘⁂ ⟩
-                 (id ⁂ B₂.d) ∘ assocˡ ∘ ((f.hom ⁂ g.hom) ⁂ id) ≈⟨ sym-assoc ⟩
+                 (id ⁂ B₂.d) ∘ (f.hom ⁂ (g.hom ⁂ id)) ∘ assocˡ   ≈˘⟨ refl⟩∘⟨ assocˡ∘⁂ ⟩
+                 (id ⁂ B₂.d) ∘ assocˡ ∘ ((f.hom ⁂ g.hom) ⁂ id)   ≈⟨ sym-assoc ⟩
                  ((id ⁂ B₂.d) ∘ assocˡ) ∘ ((f.hom ⁂ g.hom) ⁂ id) ∎
             ; comm-s =
               begin
