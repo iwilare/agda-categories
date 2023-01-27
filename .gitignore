@@ -2,3 +2,4 @@
 .DS_Store
 src/MAlonzo
 Everything.agda
+agda-categories.agda-lib
