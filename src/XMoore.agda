@@ -12,6 +12,8 @@ open MR C
 module X = Functor X
 
 record XMooreObj : Set (o ⊔ l) where
+  constructor
+    xobj
   field
     E : Obj
     d : X.F₀ E ⇒ E
@@ -20,6 +22,8 @@ record XMooreObj : Set (o ⊔ l) where
 open XMooreObj
 
 record XMoore⇒ (A B : XMooreObj) : Set (o ⊔ l ⊔ e) where
+  constructor
+    xarr
   private
     module A = XMooreObj A
     module B = XMooreObj B
