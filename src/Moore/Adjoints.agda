@@ -22,12 +22,12 @@ pattern * = lift Data.Unit.tt
 -- behaviour functor
 B : Functor XMoore (X ↘ O)
 B = record
-  { F₀ = λ { (xobj E d s) → record { f = s ∘ d } }
-  ; F₁ = λ { {xobj E d s} {xobj F d' s'} (xarr g dc sc) → record
-    { g = g
+  { F₀ = λ { A → let module A = XMooreObj A in record { f = A.s ∘ A.d } }
+  ; F₁ = λ { F → let module F = XMoore⇒ F in record
+    { g = F.hom
     ; h = *
-    ; commute = begin _ ≈⟨ identityˡ ○ sc ⟩∘⟨refl ⟩
-                      _ ≈⟨ MR.pullʳ C dc ○ sym-assoc ⟩
+    ; commute = begin _ ≈⟨ identityˡ ○ F.comm-s ⟩∘⟨refl ⟩
+                      _ ≈⟨ MR.pullʳ C F.comm-d ○ sym-assoc ⟩
                       _ ∎
     }}
   ; identity = refl , *
@@ -40,8 +40,8 @@ B = record
 -- Alg(X) <-pAlg- XMre -pSlice-> X/O
 pAlg : Functor XMoore (F-Algebras X)
 pAlg = record
-  { F₀ = λ {(xobj E d _) → record { A = E ; α = d }}
-  ; F₁ = λ {(xarr f cd _) → record { f = f ; commutes = cd }}
+  { F₀ = λ { A → let module A = XMooreObj A in record { A = A.E ; α = A.d }}
+  ; F₁ = λ { F → let module F = XMoore⇒ F in record { f = F.hom ; commutes = F.comm-d }}
   ; identity = refl
   ; homomorphism = refl
   ; F-resp-≈ = λ x → x
@@ -49,8 +49,8 @@ pAlg = record
 
 pSlice : Functor XMoore (Slice O)
 pSlice = record
-  { F₀ = λ {(xobj E _ s) → sliceobj s}
-  ; F₁ = λ {(xarr f _ cs) → slicearr {h = f} (Equiv.sym cs) }
+  { F₀ = λ { A → let module A = XMooreObj A in sliceobj A.s}
+  ; F₁ = λ { F → let module F = XMoore⇒ F in slicearr {h = F.hom} (Equiv.sym F.comm-s) }
   ; identity = refl
   ; homomorphism = refl
   ; F-resp-≈ = λ x → x
@@ -84,3 +84,32 @@ open F-Algebra
 
 -- thm : L ⊣ B
 -- thm = {!   !}
+
+import Categories.Category.Complete
+open import Categories.Category.Complete using (Complete)
+open import Categories.Category.Complete.Finitely using (FinitelyComplete)
+open import Categories.Category.Complete.Properties using (Complete⇒FinitelyComplete)
+open import Categories.Category.BinaryProducts
+open import Categories.Object.Product.Indexed
+open import Categories.Object.Product
+open import Categories.Diagram.Pullback.Indexed
+open import Categories.Object.Terminal
+open import Categories.Diagram.Pullback
+open import Categories.Adjoint
+open import Data.Nat
+open import Relation.Binary.PropositionalEquality
+
+module _ {R : Functor C C} (adj : X ⊣ R) {complete : ∀ {o ℓ e} → Complete o ℓ e C}
+   {allIndexedPullbacks : ∀ i → AllPullbacksOf C i}
+   where
+
+  open Pollo adj {complete = complete} {allIndexedPullbacks = allIndexedPullbacks}
+
+  slaicia : Functor XMoore (Slice R∞.X)
+  slaicia = record
+    { F₀ = λ { A → sliceobj (behaviour A) }
+    ; F₁ = λ { F → slicearr (Equiv.sym (commute-behaviour F)) }
+    ; identity = {!   !} --refl
+    ; homomorphism = {!   !} --refl
+    ; F-resp-≈ = {!   !} --λ x → x
+    }
