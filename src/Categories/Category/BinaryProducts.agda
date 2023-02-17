@@ -112,6 +112,12 @@ record BinaryProducts : Set (levelOfTerm 𝒞) where
   second∘⟨⟩ : second g ∘ ⟨ f′ , g′ ⟩ ≈ ⟨ f′ , g ∘ g′ ⟩
   second∘⟨⟩ = [ product ⇒ product ]id×∘⟨⟩
 
+  first∘⁂ : first f ∘ (f′ ⁂ g′) ≈ (f ∘ f′ ⁂ g′)
+  first∘⁂ = Equiv.trans first∘⟨⟩ (⟨⟩-congʳ sym-assoc)
+
+  second∘⁂ : second g ∘ (f′ ⁂ g′) ≈ (f′ ⁂ g ∘ g′)
+  second∘⁂ = Equiv.trans second∘⟨⟩ (⟨⟩-congˡ sym-assoc)
+
   ⁂∘⁂ : (f ⁂ g) ∘ (f′ ⁂ g′) ≈ (f ∘ f′) ⁂ (g ∘ g′)
   ⁂∘⁂ = [ product ⇒ product ⇒ product ]×∘×
 
