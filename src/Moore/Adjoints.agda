@@ -7,6 +7,7 @@ open import Data.Product
 open import Categories.Category.Construction.Comma
 open import Categories.Functor.Algebra
 open import Categories.Category.Construction.F-Algebras
+open import Categories.NaturalTransformation
 import Categories.Morphism.Reasoning as MR
 
 module Moore.Adjoints {o l e} {C : Category o l e} {X : Functor C C} (O : Category.Obj C) where
@@ -65,11 +66,8 @@ forget = record
   ; F-resp-≈ = λ x → x
   }
 
-postulate
-  free : Functor C (F-Algebras X)
-  ad : free ⊣ forget
+module forget = Functor forget
 
-module free = Functor free
 open F-Algebra
 
 -- L : Functor (X ↘ O) XMoore
@@ -97,19 +95,111 @@ open import Categories.Object.Terminal
 open import Categories.Diagram.Pullback
 open import Categories.Adjoint
 open import Data.Nat
-open import Relation.Binary.PropositionalEquality
+import Categories.Morphism.Reasoning as MR
+import Function as Fun
 
 module _ {R : Functor C C} (adj : X ⊣ R) {complete : ∀ {o ℓ e} → Complete o ℓ e C}
    {allIndexedPullbacks : ∀ i → AllPullbacksOf C i}
+   (free : Functor C (F-Algebras X))
+   (Free⊣Forget : free ⊣ forget)
    where
+
+  module free = Functor free
+
+  module Free⊣Forget = Adjoint Free⊣Forget
 
   open Pollo adj {complete = complete} {allIndexedPullbacks = allIndexedPullbacks}
 
+  open MR C
+
   slaicia : Functor XMoore (Slice R∞.X)
   slaicia = record
-    { F₀ = λ { A → sliceobj (behaviour A) }
-    ; F₁ = λ { F → slicearr (Equiv.sym (commute-behaviour F)) }
-    ; identity = {!   !} --refl
-    ; homomorphism = {!   !} --refl
-    ; F-resp-≈ = {!   !} --λ x → x
+    { F₀ = λ { A → sliceobj (F-Algebra-Morphism.f ((Free⊣Forget.Radjunct (behaviour A)))) }
+    ; F₁ = λ { F → slicearr {! Equiv.sym (commute-behaviour F)  !} } --slicearr (Equiv.sym (commute-behaviour F)) }
+    ; identity = {!   !} --Equiv.refl --refl
+    ; homomorphism = {!   !} --Equiv.refl --refl
+    ; F-resp-≈ = {!   !} --Fun.id
     }
+
+  o∞ : F-Algebra X
+  o∞ = record
+    { A = R∞.X
+    ; α = d∞
+    }
+
+{-
+  L : Functor (Slice (forget.₀ o∞)) XMoore
+  L = record
+    { F₀ = λ { (sliceobj {A} arr)  → record
+      { E = forget.₀ (free.₀ A)
+      ; d = F-Algebra.α (free.₀ A)
+      ; s = R∞.π 0 ∘ F-Algebra-Morphism.f (Free⊣Forget.Radjunct {A = A} {B = o∞} arr)
+      } }
+    ; F₁ = λ { Test@(slicearr {arr} △) → record
+      { hom = F-Algebra-Morphism.f (free.₁ arr)
+      ; comm-d = F-Algebra-Morphism.commutes (free.₁ arr)
+      ; comm-s =
+      begin
+        R∞.π 0 ∘ F-Algebra-Morphism.f {!   !} --((F-Algebras X) [ {! Category.id (F-Algebras X)  !} ∘ {!   !} ])
+          ≈⟨ refl⟩∘⟨ pushˡ (Equiv.sym identityˡ) ⟩
+        R∞.π 0 ∘ F-Algebra-Morphism.f {!   !} --((F-Algebras X) [ Free⊣Forget.Radjunct {!  F-Algebra.α (free.₀ _) !} ∘ free.₁ arr ])
+          ≈⟨ refl⟩∘⟨ Equiv.sym (Adjoint.Radjunct-square Free⊣Forget _ _ _ (Category.id (F-Algebras X)) (△ ○ Equiv.sym identityˡ)) ⟩
+        R∞.π 0 ∘ F-Algebra-Morphism.f {! Free⊣Forget.counit.η _  !} ∘ F-Algebra-Morphism.f (free.₁ arr)
+          ≈⟨ sym-assoc ⟩
+        (R∞.π 0 ∘ F-Algebra-Morphism.f {!   !} {-(Adjoint.Radjunct Free⊣Forget ?)-}) ∘ F-Algebra-Morphism.f (free.₁ arr) ∎
+      } }
+    ; identity     = free.identity
+    ; homomorphism = free.homomorphism
+    ; F-resp-≈     = free.F-resp-≈
+    }
+  module L = Functor L
+
+  module _ (A : SliceObj R∞.X) where
+    private module A = SliceObj A
+
+    mister : behaviour (L.₀ A) ≈ F-Algebra-Morphism.f (Adjoint.Radjunct Free⊣Forget A.arr)
+    mister = begin
+      behaviour (₀ L A)
+        ≈⟨ {!   !} ⟩
+      {!   !}
+        ≈⟨ {!   !} ⟩
+      F-Algebra-Morphism.f (Adjoint.Radjunct Free⊣Forget A.arr)
+        ∎
+
+  -- the following is a proof that slaicia is a left adjoint to B
+  -- (which is a right adjoint to R)
+  -- the proof is a bit long, but it is not too complicated
+  adj-slaicia : L ⊣ slaicia
+  adj-slaicia = record
+    { unit = ntHelper record
+      { η = λ A →
+       let module A = SliceObj A in
+              slicearr {_} {h = Free⊣Forget.unit.η A.Y}
+                ({!   !} ⟩∘⟨refl ○ Free⊣Forget.LRadjunct≈id {f = A.arr})
+              --({!   !} ○ Free⊣Forget.LRadjunct≈id {f = A.arr})
+              --(begin
+              --  {!  d∞ ∘ ? !} ≈⟨ {!   !} ⟩
+              --  {!   !} ∎)
+      ; commute = {!   !}
+      }
+    ; counit = {!   !}
+    ; zig = {!   !}
+    ; zag = {!   !}
+    }
+-}
+{-
+
+d∞
+
+
+Categories.Diagram.Cone.Cone⇒.arr
+(IsTerminal.!
+ (Terminal.⊤-is-terminal
+  (Categories.Diagram.Limit.Limit.terminal
+   (complete
+    (Categories.Category.Construction.StrictDiscrete.lift-func C
+     (R ^_$ O)
+     ∘F
+     Categories.Category.Lift.unliftF Level.zero Level.zero Level.zero
+     (Categories.Category.Construction.StrictDiscrete.Discrete ℕ))))))
+-}

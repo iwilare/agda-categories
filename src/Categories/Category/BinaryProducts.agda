@@ -222,6 +222,9 @@ record BinaryProducts : Set (levelOfTerm 𝒞) where
       (f ⁂ (g ⁂ h)) ∘ assocˡ
     ∎
 
+  thm : ∀ {A B C} → (id ⁂ π₂) ∘ (assocˡ {A = A} {B = B} {C = C})  ≈ π₁ ⁂ id
+  thm = Equiv.trans second∘⟨⟩ (⟨⟩-congˡ (Equiv.trans project₂ (Equiv.sym identityˡ)))
+
   Δ : ∀ {C} → C ⇒ C × C
   Δ {C} = ⟨ id {C} , id ⟩
 

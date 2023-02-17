@@ -85,7 +85,6 @@ open import Data.Nat
 open import Relation.Binary.PropositionalEquality
 
 module Pollo {R : Functor C C} (adj : X ⊣ R) {complete : ∀ {o ℓ e} → Complete o ℓ e C}
-   {allIndexedPullbacks : ∀ i → AllPullbacksOf C i}
    where
 
   open import Categories.Object.Product.Indexed.Properties C
@@ -113,6 +112,9 @@ module Pollo {R : Functor C C} (adj : X ⊣ R) {complete : ∀ {o ℓ e} → Com
   behaviour : (A : XMooreObj) → E A ⇒ R∞.X
   behaviour A = R∞.⟨ Rδ A ⟩
 
+  d∞ : X.₀ R∞.X ⇒ R∞.X
+  d∞ = R∞.⟨ (λ i → Radjunct (R∞.π (ℕ.suc i))) ⟩
+
   Terminal-XMoore : Terminal XMoore
   Terminal-XMoore = record
     { ⊤ = record
@@ -137,8 +139,6 @@ module Pollo {R : Functor C C} (adj : X ⊣ R) {complete : ∀ {o ℓ e} → Com
       ; !-unique = λ {A} f → R∞.unique _ _ (uniqueness f)
       }
     } where
-      d∞ : X.₀ R∞.X ⇒ R∞.X
-      d∞ = R∞.⟨ (λ i → Radjunct (R∞.π (ℕ.suc i))) ⟩
 
       module _ {A : XMooreObj} where
         private module A = XMooreObj A

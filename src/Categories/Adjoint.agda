@@ -25,6 +25,9 @@ open import Categories.NaturalTransformation using (NaturalTransformation; ntHel
   renaming (id to idN)
 open import Categories.NaturalTransformation.NaturalIsomorphism
   using (NaturalIsomorphism; unitorˡ; unitorʳ; associator; _≃_)
+open import Categories.Category
+open Definitions using (CommutativeSquare)
+
 import Categories.Morphism.Reasoning as MR
 
 private
@@ -127,7 +130,8 @@ record Adjoint (L : Functor C D) (R : Functor D C) : Set (levelOfTerm L ⊔ leve
 
     Ladjunct-comm : ∀ {X Y A B} {h i : L.F₀ X D.⇒ Y} {f : A ⇒ X} {g : Y D.⇒ B} →
                       h D.≈ i →
-                      R.F₁ (g D.∘ h D.∘ L.F₁ f) ∘ unit.η A ≈ R.F₁ g ∘ (R.F₁ i ∘ unit.η X) ∘ f
+                      R.F₁ (g D.∘ h D.∘ L.F₁ f) ∘ unit.η A
+                    ≈ R.F₁ g ∘ (R.F₁ i ∘ unit.η X) ∘ f
     Ladjunct-comm {X} {Y} {A} {B} {h} {i} {f} {g} eq = begin
       R.F₁ (g D.∘ h D.∘ L.F₁ f) ∘ unit.η A         ≈⟨ R.homomorphism ⟩∘⟨refl ⟩
       (R.F₁ g ∘ R.F₁ (h D.∘ L.F₁ f)) ∘ unit.η A    ≈⟨ (refl⟩∘⟨ R.homomorphism) ⟩∘⟨refl ⟩
@@ -165,6 +169,28 @@ record Adjoint (L : Functor C D) (R : Functor D C) : Set (levelOfTerm L ⊔ leve
 
     Radjunct-resp-≈ : ∀ {A B} {f g : A C.⇒ R.F₀ B} → f C.≈ g → Radjunct f ≈ Radjunct g
     Radjunct-resp-≈ eq = ∘-resp-≈ʳ (L.F-resp-≈ eq)
+
+    Ladjunct-square : ∀ {X Y : C.Obj} {Z W : D.Obj} → (f : X C.⇒ Y) (g : L.₀ X ⇒ Z) (h : L.₀ Y ⇒ W) (i : Z ⇒ W)
+                    → CommutativeSquare D (L.₁ f) g h i
+                    → CommutativeSquare C f (Ladjunct g) (Ladjunct h) (R.₁ i)
+    Ladjunct-square f g h i s = let
+       module H = C.HomReasoning
+       module HR = MR C in
+      H.begin _ H.≈⟨ HR.pullʳ (unit.commute _) ⟩
+              _ H.≈⟨ HR.pullˡ ((C.Equiv.sym R.homomorphism)) ⟩
+              _ H.≈⟨ (R.F-resp-≈ s H.⟩∘⟨refl) ⟩
+              _ H.≈⟨ HR.pushˡ R.homomorphism ⟩
+              _ H.∎
+
+    Radjunct-square : ∀ {X Y : C.Obj} {Z W : D.Obj} → (f : X C.⇒ Y) (g : X C.⇒ R.₀ Z) (h : Y C.⇒ R.₀ W) (i : Z D.⇒ W)
+                    → CommutativeSquare C f g h (R.₁ i)
+                    → CommutativeSquare D (L.₁ f) (Radjunct g) (Radjunct h) i
+    Radjunct-square f g h i s =
+      begin _ ≈⟨ pullʳ (Equiv.sym L.homomorphism) ⟩
+            _ ≈⟨ (refl⟩∘⟨ L.F-resp-≈ s) ⟩
+            _ ≈⟨ (refl⟩∘⟨ L.homomorphism) ⟩
+            _ ≈⟨ extendʳ (counit.commute _) ⟩
+            _ ∎
 
   -- a complication: the two hom functors do not live in the same Setoids,
   -- so they need to be mapped to the same Setoids first before establishing
