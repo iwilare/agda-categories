@@ -159,10 +159,13 @@ MealyBicategory = record
             --(id ⁂ ((id ⁂ Z.d) ∘ assocˡ)) ∘ assocˡ ∘ (assocˡ ⁂ id)        ≈⟨ sym-assoc ⟩
             {!   !} ∎ --((id ⁂ ((id ⁂ Z.d) ∘ assocˡ)) ∘ assocˡ) ∘ (assocˡ ⁂ id)      ∎ -}
           ; comm-s = begin
-            (X.s ∘ (id ⁂ Y.s) ∘ assocˡ) ∘ (id ⁂ Z.s) ∘ assocˡ ≈⟨ {!   !} ⟩
-            {!   !} ≈⟨ {!   !} ⟩
-            {!   !} ≈⟨ {!   !} ⟩
-            (X.s ∘ ⟨ id ∘ π₁ , (Y.s ∘ (id ⁂ Z.s) ∘ assocˡ) ∘ π₂ ⟩ ∘ assocˡ) ∘ (assocˡ ⁂ id) ∎
+            (X.s ∘ (id ⁂ Y.s) ∘ assocˡ) ∘ (id ⁂ Z.s) ∘ assocˡ                             ≈⟨ Equiv.trans assoc (refl⟩∘⟨ assoc) ⟩
+            X.s ∘ (id ⁂ Y.s) ∘ assocˡ ∘ (id ⁂ Z.s) ∘ assocˡ                               ≈⟨ refl⟩∘⟨ refl⟩∘⟨ extendʳ assocˡ∘second ⟩
+            X.s ∘ (id ⁂ Y.s) ∘ (id ⁂ (id ⁂ Z.s)) ∘ assocˡ ∘ assocˡ                        ≈˘⟨ refl⟩∘⟨ refl⟩∘⟨ refl⟩∘⟨ Cartesian-Monoidal.pentagon ⟩
+            X.s ∘ (id ⁂ Y.s) ∘ (id ⁂ (id ⁂ Z.s)) ∘ (id ⁂ assocˡ) ∘ assocˡ ∘ (assocˡ ⁂ id) ≈⟨ refl⟩∘⟨ refl⟩∘⟨ pullˡ second∘second ⟩
+            X.s ∘ (id ⁂ Y.s) ∘ (id ⁂ ((id ⁂ Z.s) ∘ assocˡ)) ∘ assocˡ ∘ (assocˡ ⁂ id)      ≈⟨ refl⟩∘⟨ pullˡ second∘second ⟩
+            X.s ∘ (id ⁂ (Y.s ∘ (id ⁂ Z.s) ∘ assocˡ)) ∘ assocˡ ∘ (assocˡ ⁂ id)             ≈˘⟨ Equiv.trans assoc (refl⟩∘⟨ assoc) ⟩
+            (X.s ∘ (id ⁂ (Y.s ∘ (id ⁂ Z.s) ∘ assocˡ)) ∘ assocˡ) ∘ (assocˡ ⁂ id)           ∎
           } }
         ; commute = λ ((X PP., Y) PP., Z) → assocˡ∘⁂
         }
@@ -174,10 +177,10 @@ MealyBicategory = record
          record
           { hom = assocʳ
           ; comm-d = begin
-            assocʳ ∘ ⟨ X.d ∘ ⟨ id ∘ π₁ , (Y.s ∘ (id ⁂ Z.s) ∘ assocˡ) ∘ π₂ ⟩ , (⟨ Y.d ∘ (id ⁂ Z.s) , Z.d ∘ π₂ ⟩ ∘ assocˡ) ∘ π₂ ⟩ ∘ assocˡ ≈⟨ {!   !} ⟩
+            assocʳ ∘ ⟨ X.d ∘ (id ⁂ (Y.s ∘ (id ⁂ Z.s) ∘ assocˡ)) , (⟨ Y.d ∘ (id ⁂ Z.s) , Z.d ∘ π₂ ⟩ ∘ assocˡ) ∘ π₂ ⟩ ∘ assocˡ ≈⟨ {!   !} ⟩
             {!   !} ≈⟨ {!   !} ⟩
             {!   !} ≈⟨ {!   !} ⟩
-            (⟨  (⟨ X.d ∘ (id ⁂ Y.s) , Y.d ∘ π₂ ⟩ ∘ assocˡ) ∘ (id ⁂ Z.s)  , Z.d ∘ π₂ ⟩ ∘ assocˡ) ∘ (assocʳ ⁂ id) ∎
+            (⟨  (⟨ X.d ∘ (id ⁂ Y.s) , Y.d ∘ π₂ ⟩ ∘ assocˡ) ∘ (id ⁂ Z.s) , Z.d ∘ π₂ ⟩ ∘ assocˡ) ∘ (assocʳ ⁂ id) ∎
           {-begin
             assocˡ ∘ ⟨ ({!   !} ∘ {!  id !}) ∘ second (Z.s) , Z.d ∘ π₂ ⟩ ∘ assocˡ                                 ≈⟨ {!   !} ⟩ --refl⟩∘⟨ ⁂-congˡ ⁂-id ⟩∘⟨refl ⟩
             --assocˡ ∘ ((id ⁂ id) ⁂ Z.d) ∘ assocˡ                          ≈⟨ extendʳ assocˡ∘⁂ ⟩
@@ -190,6 +193,8 @@ MealyBicategory = record
             X.s ∘ (id ⁂ (Y.s ∘ (id ⁂ Z.s) ∘ assocˡ)) ∘ assocˡ ≈⟨ {!   !} ⟩
             {!   !} ≈⟨ {!   !} ⟩
             {!   !} ≈⟨ {!   !} ⟩
+            {!   !} ≈⟨ {!   !} ⟩
+            X.s ∘ (id ⁂ Y.s) ∘ assocˡ ∘ (id ⁂ Z.s) ∘ assocˡ ∘ (assocʳ ⁂ id) ≈˘⟨ Equiv.trans assoc (Equiv.trans (sym-assoc ⟩∘⟨refl) {! !}) ⟩
             ((X.s ∘ (id ⁂ Y.s) ∘ assocˡ) ∘ (id ⁂ Z.s) ∘ assocˡ) ∘ (assocʳ ⁂ id) ∎
           } }
         ; commute = λ ((X PP., Y) PP., Z) → assocʳ∘⁂
