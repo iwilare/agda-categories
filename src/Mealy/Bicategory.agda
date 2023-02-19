@@ -183,39 +183,67 @@ MealyBicategory = record
          let module X = MealyObj X in
          let module Y = MealyObj Y in
          let module Z = MealyObj Z in
+         let lemmino : ∀ {A B C} → π₂ {A = C} {B = A × B} ∘ assocˡ ≈ π₂ ⁂ id
+             lemmino = begin π₂ ∘ assocˡ ≈⟨ project₂ ⟩ ⟨ π₂ ∘ π₁ , π₂ ⟩ ≈˘⟨ ⟨⟩-congˡ identityˡ ⟩ π₂ ⁂ id ∎ in
+         let lemma : π₂ ∘ assocˡ ∘ π₂ ∘ assocˡ ≈ ((π₂ ∘ π₂) ⁂ id)
+             lemma = begin
+              π₂ ∘ assocˡ ∘ π₂ ∘ assocˡ ≈⟨ refl⟩∘⟨ refl⟩∘⟨ lemmino ⟩
+              π₂ ∘ assocˡ ∘ (π₂ ⁂ id) ≈⟨ pullˡ lemmino ⟩
+              (π₂ ⁂ id) ∘ (π₂ ⁂ id) ≈⟨ first∘first ⟩
+              ((π₂ ∘ π₂) ⁂ id) ∎ in
+         let lemma2 : (id ⁂ Z.s) ∘ assocˡ ∘ π₂ ∘ assocˡ
+                    ≈ π₂ ∘ (id ⁂ id ⁂ Z.s) ∘ (id ⁂ assocˡ) ∘ assocˡ
+             lemma2 =  begin
+              (id ⁂ Z.s) ∘ assocˡ ∘ π₂ ∘ assocˡ ≈˘⟨ refl⟩∘⟨ extendʳ π₂∘⁂ ⟩
+              (id ⁂ Z.s) ∘ π₂ ∘ (id ⁂ assocˡ) ∘ assocˡ ≈⟨ extendʳ (Equiv.sym project₂) ⟩
+              π₂ ∘ (id ⁂ (id ⁂ Z.s)) ∘ (id ⁂ assocˡ) ∘ assocˡ ∎ in
          record
           { hom = assocʳ
           ; comm-d = begin
-            assocʳ ∘ ⟨ X.d ∘ (id ⁂ (Y.s ∘ (id ⁂ Z.s) ∘ assocˡ)) , (⟨ Y.d ∘ (id ⁂ Z.s) , Z.d ∘ π₂ ⟩ ∘ assocˡ) ∘ π₂ ⟩ ∘ assocˡ ≈⟨ {! assocˡ ∘ (assocʳ ⁂ id)  !} ⟩
-            assocʳ ∘ ⟨ (X.d ∘ (id ⁂ (Y.s ∘ (id ⁂ Z.s) ∘ assocˡ))) ∘ assocˡ , ((⟨ Y.d ∘ (id ⁂ Z.s) , Z.d ∘ π₂ ⟩ ∘ assocˡ) ∘ π₂) ∘ assocˡ ⟩  ≈⟨ {! assocˡ  !} ⟩
+            assocʳ ∘ ⟨ X.d ∘ (id ⁂ (Y.s ∘ (id ⁂ Z.s) ∘ assocˡ)) , (⟨ Y.d ∘ (id ⁂ Z.s) , Z.d ∘ π₂ ⟩ ∘ assocˡ) ∘ π₂ ⟩ ∘ assocˡ ≈⟨ refl⟩∘⟨ ⟨⟩∘ ⟩
+            assocʳ ∘ ⟨ (X.d ∘ (id ⁂ (Y.s ∘ (id ⁂ Z.s) ∘ assocˡ))) ∘ assocˡ , ((⟨ Y.d ∘ (id ⁂ Z.s) , Z.d ∘ π₂ ⟩ ∘ assocˡ) ∘ π₂) ∘ assocˡ ⟩  ≈⟨ refl⟩∘⟨ ⟨⟩-cong₂ assoc (Equiv.trans assoc assoc) ⟩
             assocʳ ∘ ⟨ X.d ∘ (id ⁂ (Y.s ∘ (id ⁂ Z.s) ∘ assocˡ)) ∘ assocˡ , ⟨ Y.d ∘ (id ⁂ Z.s) , Z.d ∘ π₂ ⟩ ∘ assocˡ ∘ π₂ ∘ assocˡ ⟩  ≈⟨ ⟨⟩∘ ⟩
             ⟨ ⟨ π₁ , π₁ ∘ π₂ ⟩ ∘ ⟨ _ , _ ⟩ , (π₂ ∘ π₂) ∘ ⟨ _ , _ ⟩ ⟩ ≈⟨ ⟨⟩-cong₂ (⟨⟩-congʳ (Equiv.sym identityˡ) ⟩∘⟨refl) (pullʳ project₂) ⟩
             ⟨ (id ⁂ π₁) ∘ ⟨ _ , _ ⟩ , π₂ ∘ _ ⟩                       ≈⟨ ⟨⟩-cong₂ second∘⟨⟩ (pullˡ project₂) ⟩
-            ⟨ ⟨ X.d ∘ (id ⁂ Y.s ∘ (id ⁂ Z.s) ∘ assocˡ) ∘ assocˡ , π₁ ∘ ⟨ Y.d ∘ (id ⁂ Z.s) , Z.d ∘ π₂ ⟩ ∘ assocˡ ∘ π₂ ∘ assocˡ ⟩ , (Z.d ∘ π₂) ∘ assocˡ ∘ π₂ ∘ assocˡ ⟩ ≈⟨ ⟨⟩-cong₂ (⟨⟩-congˡ (pullˡ project₁)) {!   !} ⟩
-            ⟨ ⟨ X.d ∘ (id ⁂ Y.s ∘ (id ⁂ Z.s) ∘ assocˡ) ∘ assocˡ , (Y.d ∘ (id ⁂ Z.s)) ∘ assocˡ ∘ π₂ ∘ assocˡ ⟩ , Z.d ∘ π₂ ∘ assocˡ ∘ π₂ ∘ assocˡ ⟩ ≈⟨ ⟨⟩-cong₂ {!   !} (refl⟩∘⟨ {! refl⟩∘⟨ ?  !}) ⟩
-            ⟨ ⟨ X.d ∘ (id ⁂ Y.s ∘ (id ⁂ Z.s) ∘ assocˡ) ∘ assocˡ , (Y.d ∘ (id ⁂ Z.s)) ∘ assocˡ ∘ π₂ ∘ assocˡ ⟩ , Z.d ∘ π₂ ∘ assocˡ ∘ (assocʳ ⁂ id) ⟩ ≈⟨ {!   !} ⟩
-
-
-
-
-
-
-            ⟨ ⟨ X.d ∘ (id ⁂ Y.s) , Y.d ∘ π₂ ⟩ ∘ (id ⁂ id ⁂ Z.s) ∘ (id ⁂ assocˡ) ∘ assocˡ , Z.d ∘ π₂ ∘ assocˡ ∘ (assocʳ ⁂ id) ⟩ ≈⟨ {! assocˡ  !} ⟩
-            ⟨ ⟨ X.d ∘ (id ⁂ Y.s) , Y.d ∘ π₂ ⟩ ∘ (id ⁂ id ⁂ Z.s) ∘ (id ⁂ assocˡ) ∘ assocˡ ∘ ((assocˡ ∘ assocʳ) ⁂ id) , Z.d ∘ π₂ ∘ assocˡ ∘ (assocʳ ⁂ id) ⟩ ≈⟨ {!   !} ⟩
-            ⟨ ⟨ X.d ∘ (id ⁂ Y.s) , Y.d ∘ π₂ ⟩ ∘ (id ⁂ id ⁂ Z.s) ∘ (id ⁂ assocˡ) ∘ assocˡ ∘ (assocˡ ⁂ id) ∘ (assocʳ ⁂ id) , Z.d ∘ π₂ ∘ assocˡ ∘ (assocʳ ⁂ id) ⟩
-              ≈˘⟨ ⟨⟩-cong₂ (Equiv.trans assoc (Equiv.trans (refl⟩∘⟨ assoc) (Equiv.trans (refl⟩∘⟨ refl⟩∘⟨ assoc) (refl⟩∘⟨ refl⟩∘⟨ refl⟩∘⟨ assoc)))) (Equiv.trans assoc (refl⟩∘⟨ assoc)) ⟩
-            {!   !} ≈⟨ {!   !} ⟩ --⟨ (⟨ X.d ∘ (id ⁂ Y.s) , Y.d ∘ π₂ ⟩ ∘ (id ⁂ id ⁂ Z.s) ∘ (id ⁂ assocˡ) ∘ assocˡ ∘ (assocˡ ⁂ id)) ∘ (assocʳ ⁂ id) , (Z.d ∘ π₂ ∘ assocˡ) ∘ (assocʳ ⁂ id) ⟩ ≈˘⟨ ⟨⟩∘ ⟩
-            {!   !} ≈⟨ {!   !} ⟩ --⟨ ⟨ X.d ∘ (id ⁂ Y.s) , Y.d ∘ π₂ ⟩ ∘ (id ⁂ id ⁂ Z.s) ∘ (id ⁂ assocˡ) ∘ assocˡ ∘ (assocˡ ⁂ id) , Z.d ∘ π₂ ∘ assocˡ ⟩ ∘ (assocʳ ⁂ id) ≈⟨ ⟨⟩-congʳ (refl⟩∘⟨ refl⟩∘⟨ Cartesian-Monoidal.pentagon) ⟩∘⟨refl ⟩
-            {!   !} ≈⟨ {!   !} ⟩ --⟨ ⟨ X.d ∘ (id ⁂ Y.s) , Y.d ∘ π₂ ⟩ ∘ (id ⁂ id ⁂ Z.s) ∘ assocˡ ∘ assocˡ , Z.d ∘ π₂ ∘ assocˡ ⟩ ∘ (assocʳ ⁂ id)                        ≈⟨ ⟨⟩-congʳ (refl⟩∘⟨ extendʳ (Equiv.sym assocˡ∘second)) ⟩∘⟨refl ⟩
+            ⟨ ⟨ X.d ∘ (id ⁂ Y.s ∘ (id ⁂ Z.s) ∘ assocˡ) ∘ assocˡ , π₁ ∘ ⟨ Y.d ∘ (id ⁂ Z.s) , Z.d ∘ π₂ ⟩ ∘ assocˡ ∘ π₂ ∘ assocˡ ⟩
+            , (Z.d ∘ π₂) ∘ assocˡ ∘ π₂ ∘ assocˡ ⟩ ≈⟨ ⟨⟩-cong₂ (⟨⟩-congˡ (pullˡ project₁)) (pullʳ lemma) ⟩
+            ⟨ ⟨ X.d ∘ (id ⁂ Y.s ∘ (id ⁂ Z.s) ∘ assocˡ) ∘ assocˡ
+              , (Y.d ∘ (id ⁂ Z.s)) ∘ assocˡ ∘ π₂ ∘ assocˡ ⟩
+            , Z.d ∘ ((π₂ ∘ π₂) ⁂ id) ⟩ ≈⟨ ⟨⟩-congʳ (⟨⟩-cong₂ (refl⟩∘⟨ pushˡ (Equiv.sym second∘second)) assoc) ⟩
+            ⟨ ⟨ X.d ∘ (id ⁂ Y.s) ∘ (id ⁂ ((id ⁂ Z.s) ∘ assocˡ)) ∘ assocˡ
+              , Y.d ∘ (id ⁂ Z.s) ∘ assocˡ ∘ π₂ ∘ assocˡ ⟩
+            , Z.d ∘ ((π₂ ∘ π₂) ⁂ id) ⟩ ≈⟨ ⟨⟩-congʳ (⟨⟩-cong₂ (refl⟩∘⟨ refl⟩∘⟨ pushˡ (Equiv.sym second∘second)) (refl⟩∘⟨ lemma2)) ⟩
+            ⟨ ⟨ X.d ∘ (id ⁂ Y.s) ∘ (id ⁂ (id ⁂ Z.s)) ∘ (id ⁂ assocˡ) ∘ assocˡ
+              , Y.d ∘ π₂ ∘ (id ⁂ id ⁂ Z.s) ∘ (id ⁂ assocˡ) ∘ assocˡ ⟩
+            , Z.d ∘ ((π₂ ∘ π₂) ⁂ id) ⟩ ≈⟨ ⟨⟩-congʳ (⟨⟩-cong₂ sym-assoc sym-assoc) ⟩
+            ⟨ ⟨ (X.d ∘ (id ⁂ Y.s)) ∘ (id ⁂ id ⁂ Z.s) ∘ (id ⁂ assocˡ) ∘ assocˡ
+              , (Y.d ∘ π₂) ∘ (id ⁂ id ⁂ Z.s) ∘ (id ⁂ assocˡ) ∘ assocˡ ⟩
+            , Z.d ∘ ((π₂ ∘ π₂) ⁂ id) ⟩ ≈⟨ ⟨⟩-congʳ (Equiv.sym ⟨⟩∘) ⟩
+            ⟨ ⟨ X.d ∘ (id ⁂ Y.s) , Y.d ∘ π₂ ⟩ ∘ (id ⁂ id ⁂ Z.s) ∘ (id ⁂ assocˡ) ∘ assocˡ
+            , Z.d ∘ ((π₂ ∘ π₂) ⁂ id) ⟩ ≈⟨ ⟨⟩-congʳ (refl⟩∘⟨ refl⟩∘⟨ refl⟩∘⟨ introʳ (Equiv.trans (⁂-congˡ assocˡ∘assocʳ) ⁂-id)) ⟩
+            ⟨ ⟨ X.d ∘ (id ⁂ Y.s) , Y.d ∘ π₂ ⟩ ∘ (id ⁂ id ⁂ Z.s) ∘ (id ⁂ assocˡ) ∘ assocˡ ∘ ((assocˡ ∘ assocʳ) ⁂ id)
+            , Z.d ∘ ((π₂ ∘ π₂) ⁂ id) ⟩ ≈⟨ ⟨⟩-congʳ (refl⟩∘⟨ refl⟩∘⟨ refl⟩∘⟨ refl⟩∘⟨ Equiv.sym first∘first) ⟩
+            ⟨ ⟨ X.d ∘ (id ⁂ Y.s) , Y.d ∘ π₂ ⟩ ∘ (id ⁂ id ⁂ Z.s) ∘ (id ⁂ assocˡ) ∘ assocˡ ∘ (assocˡ ⁂ id) ∘ (assocʳ ⁂ id)
+            , Z.d ∘ ((π₂ ∘ π₂) ⁂ id) ⟩
+              ≈˘⟨ ⟨⟩-cong₂ (refl⟩∘⟨ refl⟩∘⟨ Equiv.trans assoc (refl⟩∘⟨ assoc)) (refl⟩∘⟨ ⁂-congˡ project₂) ⟩
+            ⟨ ⟨ X.d ∘ (id ⁂ Y.s) , Y.d ∘ π₂ ⟩ ∘ (id ⁂ id ⁂ Z.s) ∘ ((id ⁂ assocˡ) ∘ assocˡ ∘ (assocˡ ⁂ id)) ∘ (assocʳ ⁂ id)
+            , Z.d ∘ (π₂ ∘ assocʳ ⁂ id) ⟩
+              ≈˘⟨ ⟨⟩-cong₂ (refl⟩∘⟨ refl⟩∘⟨ Equiv.sym Cartesian-Monoidal.pentagon ⟩∘⟨refl) (refl⟩∘⟨ first∘first) ⟩
+            ⟨ ⟨ X.d ∘ (id ⁂ Y.s) , Y.d ∘ π₂ ⟩ ∘ (id ⁂ id ⁂ Z.s) ∘ (assocˡ ∘ assocˡ) ∘ (assocʳ ⁂ id)
+            , Z.d ∘ (π₂ ⁂ id) ∘ (assocʳ ⁂ id) ⟩
+              ≈⟨ ⟨⟩-congʳ (refl⟩∘⟨ refl⟩∘⟨ assoc) ⟩
+            ⟨ ⟨ X.d ∘ (id ⁂ Y.s) , Y.d ∘ π₂ ⟩ ∘ (id ⁂ id ⁂ Z.s) ∘ assocˡ ∘ assocˡ ∘ (assocʳ ⁂ id)
+            , Z.d ∘ (π₂ ⁂ id) ∘ (assocʳ ⁂ id) ⟩
+              ≈⟨ ⟨⟩-congʳ (refl⟩∘⟨ extendʳ (Equiv.sym assocˡ∘second)) ⟩
             ⟨ ⟨ X.d ∘ (id ⁂ Y.s) , Y.d ∘ π₂ ⟩ ∘ assocˡ ∘ (id ⁂ Z.s) ∘ assocˡ ∘ (assocʳ ⁂ id)
-            , Z.d ∘ π₂ ∘ assocˡ ∘ (assocʳ ⁂ id) ⟩
-              ≈˘⟨ ⟨⟩-cong₂ (Equiv.trans assoc (refl⟩∘⟨ assoc)) assoc ⟩
+            , Z.d ∘ (π₂ ⁂ id) ∘ (assocʳ ⁂ id) ⟩
+              ≈˘⟨ ⟨⟩-cong₂ (Equiv.trans assoc (refl⟩∘⟨ assoc)) (pullʳ (pullˡ lemmino)) ⟩
             ⟨ (⟨ X.d ∘ (id ⁂ Y.s) , Y.d ∘ π₂ ⟩ ∘ assocˡ ∘ (id ⁂ Z.s)) ∘ assocˡ ∘ (assocʳ ⁂ id)
             , (Z.d ∘ π₂) ∘ assocˡ ∘ (assocʳ ⁂ id) ⟩
               ≈⟨ Equiv.sym ⟨⟩∘ ⟩
-            ⟨ ⟨ X.d ∘ (id ⁂ Y.s) , Y.d ∘ π₂ ⟩ ∘ assocˡ ∘ (id ⁂ Z.s) , Z.d ∘ π₂ ⟩ ∘ assocˡ ∘ (assocʳ ⁂ id)                                      ≈˘⟨ ⟨⟩-congʳ assoc ⟩∘⟨refl ⟩
-            ⟨ (⟨ X.d ∘ (id ⁂ Y.s) , Y.d ∘ π₂ ⟩ ∘ assocˡ) ∘ (id ⁂ Z.s) , Z.d ∘ π₂ ⟩ ∘ assocˡ ∘ (assocʳ ⁂ id)                                    ≈˘⟨ assoc ⟩
-            (⟨ (⟨ X.d ∘ (id ⁂ Y.s) , Y.d ∘ π₂ ⟩ ∘ assocˡ) ∘ (id ⁂ Z.s) , Z.d ∘ π₂ ⟩ ∘ assocˡ) ∘ (assocʳ ⁂ id)                                  ∎
+            ⟨ ⟨ X.d ∘ (id ⁂ Y.s) , Y.d ∘ π₂ ⟩ ∘ assocˡ ∘ (id ⁂ Z.s) , Z.d ∘ π₂ ⟩ ∘ assocˡ ∘ (assocʳ ⁂ id)     ≈˘⟨ ⟨⟩-congʳ assoc ⟩∘⟨refl ⟩
+            ⟨ (⟨ X.d ∘ (id ⁂ Y.s) , Y.d ∘ π₂ ⟩ ∘ assocˡ) ∘ (id ⁂ Z.s) , Z.d ∘ π₂ ⟩ ∘ assocˡ ∘ (assocʳ ⁂ id)   ≈˘⟨ assoc ⟩
+            (⟨ (⟨ X.d ∘ (id ⁂ Y.s) , Y.d ∘ π₂ ⟩ ∘ assocˡ) ∘ (id ⁂ Z.s) , Z.d ∘ π₂ ⟩ ∘ assocˡ) ∘ (assocʳ ⁂ id) ∎
           ; comm-s = begin
             X.s ∘ (id ⁂ (Y.s ∘ (id ⁂ Z.s) ∘ assocˡ)) ∘ assocˡ                                               ≈⟨ refl⟩∘⟨ pushˡ (Equiv.sym second∘second) ⟩
             X.s ∘ (id ⁂ Y.s) ∘ (id ⁂ ((id ⁂ Z.s) ∘ assocˡ)) ∘ assocˡ                                        ≈⟨ refl⟩∘⟨ refl⟩∘⟨ pushˡ (Equiv.sym second∘second) ⟩
