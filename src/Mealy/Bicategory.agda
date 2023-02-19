@@ -109,17 +109,22 @@ associazione = record
   }
 -}
 
-{-
-<_^_> : ∀ {ℓ} {A : Set ℓ} → A → A → A
-< f ^ g > = f
 
-π₁′ = {!   !}
-π₂′ = {!   !}
+⟨_^_⟩ : {X = X₁ : Obj} {A = A₁ : Obj} {B = B₁ : Obj} →
+      X₁ ⇒ A₁ → X₁ ⇒ B₁ → X₁ ⇒ {!   !} --P.Product.A×B product
+⟨ f ^ g ⟩ = f --⟨ f , g ⟩
 
-{-# DISPLAY P.Product.⟨_,_⟩ f g = < f ^ g > #-}
+π₁′ = π₁
+π₂′ = π₂
+
+
+{-# DISPLAY P.Product.⟨_,_⟩ f g = ⟨ f ^ g ⟩ #-}
 {-# DISPLAY P.Product.π₁ g = π₁′ #-}
 {-# DISPLAY P.Product.π₂ g = π₂′ #-}
--}
+--{-# DISPLAY P.Product.⟨_,_⟩ (π₁′ ∘ π₁′) (⟨ π₂′ ∘ π₁′ ^ π₂′ ⟩) = assocˡ #-}
+
+
+
 
 MealyBicategory : Bicategory (o ⊔ l ⊔ e) (o ⊔ l ⊔ e) e o
 MealyBicategory = record
@@ -133,67 +138,83 @@ MealyBicategory = record
       })
     ; ⊚ = ⊚
     ; ⊚-assoc = record
-      { F⇒G = record
+      { F⇒G = ntHelper record
         { η = λ { ((X PP., Y) PP., Z) →
+         let module X = MealyObj X in
+         let module Y = MealyObj Y in
          let module Z = MealyObj Z in
          record
           { hom = assocˡ
           ; comm-d = begin
+            assocˡ ∘ ⟨ (⟨ X.d ∘ (id ⁂ Y.s) , Y.d ∘ π₂ ⟩ ∘ assocˡ) ∘ (id ⁂ Z.s) , Z.d ∘ π₂ ⟩ ∘ assocˡ ≈⟨ {!   !} ⟩
+            {!   !} ≈⟨ {!   !} ⟩
+            {!   !} ≈⟨ {!   !} ⟩
+            (⟨ X.d ∘ (id ⁂ (Y.s ∘ (id ⁂ Z.s) ∘ assocˡ)) , (⟨ Y.d ∘ (id ⁂ Z.s) , Z.d ∘ π₂ ⟩ ∘ assocˡ) ∘ π₂ ⟩ ∘ assocˡ) ∘ (assocˡ ⁂ id) ∎
+        {-begin
             assocˡ ∘ ⟨ ({!   !} ∘ {!  id !}) ∘ second (Z.s) , Z.d ∘ π₂ ⟩ ∘ assocˡ                                 ≈⟨ {!   !} ⟩ --refl⟩∘⟨ ⁂-congˡ ⁂-id ⟩∘⟨refl ⟩
             --assocˡ ∘ ((id ⁂ id) ⁂ Z.d) ∘ assocˡ                          ≈⟨ extendʳ assocˡ∘⁂ ⟩
             --(id ⁂ (id ⁂ Z.d)) ∘ assocˡ ∘ assocˡ                          ≈˘⟨ refl⟩∘⟨ Cartesian-Monoidal.pentagon ⟩
             --(id ⁂ (id ⁂ Z.d)) ∘ (id ⁂ assocˡ) ∘ assocˡ ∘ (assocˡ ⁂ id)   ≈⟨ pullˡ ⁂∘⁂ ⟩
             --((id ∘ id) ⁂ ((id ⁂ Z.d) ∘ assocˡ)) ∘ assocˡ ∘ (assocˡ ⁂ id) ≈⟨ ⁂-congˡ identity² ⟩∘⟨refl ⟩
             --(id ⁂ ((id ⁂ Z.d) ∘ assocˡ)) ∘ assocˡ ∘ (assocˡ ⁂ id)        ≈⟨ sym-assoc ⟩
-            {!   !} ∎ --((id ⁂ ((id ⁂ Z.d) ∘ assocˡ)) ∘ assocˡ) ∘ (assocˡ ⁂ id)      ∎-}
-          ; comm-s = {!   !}
+            {!   !} ∎ --((id ⁂ ((id ⁂ Z.d) ∘ assocˡ)) ∘ assocˡ) ∘ (assocˡ ⁂ id)      ∎ -}
+          ; comm-s = begin
+            (X.s ∘ (id ⁂ Y.s) ∘ assocˡ) ∘ (id ⁂ Z.s) ∘ assocˡ ≈⟨ {!   !} ⟩
+            {!   !} ≈⟨ {!   !} ⟩
+            {!   !} ≈⟨ {!   !} ⟩
+            (X.s ∘ ⟨ id ∘ π₁ , (Y.s ∘ (id ⁂ Z.s) ∘ assocˡ) ∘ π₂ ⟩ ∘ assocˡ) ∘ (assocˡ ⁂ id) ∎
           } }
-        ; commute = {!   !}
-        ; sym-commute = {!   !}
+        ; commute = λ ((X PP., Y) PP., Z) → assocˡ∘⁂
         }
-      ; F⇐G = {!   !} {-record
-        { η = λ { ((X PP., Y) PP., Z) → record
+      ; F⇐G = ntHelper record
+        { η = λ { ((X PP., Y) PP., Z) →
+         let module X = MealyObj X in
+         let module Y = MealyObj Y in
+         let module Z = MealyObj Z in
+         record
           { hom = assocʳ
-          ; comm-d = {!   !}
-          --begin
-          --   assocʳ ∘ (id ⁂ ((id ⁂ Z.d) ∘ assocˡ)) ∘ assocˡ ≈⟨ refl⟩∘⟨ {!   !} ⟩∘⟨refl ⟩
-          --   assocʳ ∘ ((id ∘ id) ⁂ ((id ⁂ Z.d) ∘ assocˡ)) ∘ assocˡ ≈⟨ {!   !} ⟩
-          --   assocʳ ∘ (id ⁂ (id ⁂ Z.d)) ∘ (id ⁂ assocˡ) ∘ assocˡ ≈⟨ {!   !} ⟩
-          --   ((id ⁂ id) ⁂ Z.d) ∘ assocʳ ∘ (id ⁂ assocˡ) ∘ assocˡ ≈⟨ {!   !} ⟩
-          --   {!   !} ≈⟨ {!   !} ⟩
-          --   {!   !} ≈⟨ {!   !} ⟩
-          --   {!   !} ≈⟨ {!   !} ⟩
-          --   {!   !} ≈⟨ {!   !} ⟩
-          --   {!   !} ∘ (assocʳ ⁂ id) ∎
-          ; comm-s = {!   !}
+          ; comm-d = begin
+            assocʳ ∘ ⟨ X.d ∘ ⟨ id ∘ π₁ , (Y.s ∘ (id ⁂ Z.s) ∘ assocˡ) ∘ π₂ ⟩ , (⟨ Y.d ∘ (id ⁂ Z.s) , Z.d ∘ π₂ ⟩ ∘ assocˡ) ∘ π₂ ⟩ ∘ assocˡ ≈⟨ {!   !} ⟩
+            {!   !} ≈⟨ {!   !} ⟩
+            {!   !} ≈⟨ {!   !} ⟩
+            (⟨  (⟨ X.d ∘ (id ⁂ Y.s) , Y.d ∘ π₂ ⟩ ∘ assocˡ) ∘ (id ⁂ Z.s)  , Z.d ∘ π₂ ⟩ ∘ assocˡ) ∘ (assocʳ ⁂ id) ∎
+          {-begin
+            assocˡ ∘ ⟨ ({!   !} ∘ {!  id !}) ∘ second (Z.s) , Z.d ∘ π₂ ⟩ ∘ assocˡ                                 ≈⟨ {!   !} ⟩ --refl⟩∘⟨ ⁂-congˡ ⁂-id ⟩∘⟨refl ⟩
+            --assocˡ ∘ ((id ⁂ id) ⁂ Z.d) ∘ assocˡ                          ≈⟨ extendʳ assocˡ∘⁂ ⟩
+            --(id ⁂ (id ⁂ Z.d)) ∘ assocˡ ∘ assocˡ                          ≈˘⟨ refl⟩∘⟨ Cartesian-Monoidal.pentagon ⟩
+            --(id ⁂ (id ⁂ Z.d)) ∘ (id ⁂ assocˡ) ∘ assocˡ ∘ (assocˡ ⁂ id)   ≈⟨ pullˡ ⁂∘⁂ ⟩
+            --((id ∘ id) ⁂ ((id ⁂ Z.d) ∘ assocˡ)) ∘ assocˡ ∘ (assocˡ ⁂ id) ≈⟨ ⁂-congˡ identity² ⟩∘⟨refl ⟩
+            --(id ⁂ ((id ⁂ Z.d) ∘ assocˡ)) ∘ assocˡ ∘ (assocˡ ⁂ id)        ≈⟨ sym-assoc ⟩
+            {!   !} ∎ --((id ⁂ ((id ⁂ Z.d) ∘ assocˡ)) ∘ assocˡ) ∘ (assocˡ ⁂ id)      ∎ -}
+          ; comm-s = begin
+            X.s ∘ (id ⁂ (Y.s ∘ (id ⁂ Z.s) ∘ assocˡ)) ∘ assocˡ ≈⟨ {!   !} ⟩
+            {!   !} ≈⟨ {!   !} ⟩
+            {!   !} ≈⟨ {!   !} ⟩
+            ((X.s ∘ (id ⁂ Y.s) ∘ assocˡ) ∘ (id ⁂ Z.s) ∘ assocˡ) ∘ (assocʳ ⁂ id) ∎
           } }
-        ; commute = {!   !}
-        ; sym-commute = {!   !}
-        }-}
-      ; iso = {!   !}
+        ; commute = λ ((X PP., Y) PP., Z) → assocʳ∘⁂
+        }
+      ; iso = λ X → record { isoˡ = assocʳ∘assocˡ ; isoʳ = assocˡ∘assocʳ }
       }
-    ; unitˡ = {!   !}
-    ; unitʳ = unitr
-    }
-  ; triangle = {!   !}
-  ; pentagon = {!   !}
- } where
-    unitr : ∀ {A B} → _
-    unitr = record
+    ; unitˡ = record
       { F⇒G = ntHelper record
         { η = λ (_ PP., X) →
-          let module X = MealyObj X in record
+          let module X = MealyObj X in
+          let lemma : π₂ ∘ assocˡ ≈ π₂ ⁂ id
+              lemma = begin
+                π₂ ∘ assocˡ           ≈⟨ project₂ ⟩
+                ⟨ π₂ ∘ π₁ , π₂ ⟩      ≈⟨ ⟨⟩-congˡ (Equiv.sym identityˡ) ⟩
+                ⟨ π₂ ∘ π₁ , id ∘ π₂ ⟩ ∎ in
+          record
           { hom = π₂
           ; comm-d = begin
-            π₂ ∘ ⟨ ! ∘ ⟨ id ∘ π₁ , X.s ∘ π₂ ⟩ , X.d ∘ π₂ ⟩ ∘ ⟨ π₁ ∘ π₁ , ⟨ π₂ ∘ π₁ , π₂ ⟩ ⟩ ≈⟨ extendʳ project₂ ⟩
-            X.d ∘ π₂ ∘ ⟨ π₁ ∘ π₁ , ⟨ π₂ ∘ π₁ , π₂ ⟩ ⟩ ≈⟨ refl⟩∘⟨ project₂ ⟩
-            X.d ∘ ⟨ π₂ ∘ π₁ , π₂ ⟩ ≈⟨ refl⟩∘⟨ ⟨⟩-congˡ (Equiv.sym identityˡ) ⟩
-            X.d ∘ ⟨ π₂ ∘ π₁ , id ∘ π₂ ⟩ ∎
+            π₂ ∘ ⟨ ! ∘ ⟨ id ∘ π₁ , X.s ∘ π₂ ⟩ , X.d ∘ π₂ ⟩ ∘ assocˡ ≈⟨ extendʳ project₂ ⟩
+            X.d ∘ π₂ ∘ assocˡ                                       ≈⟨ refl⟩∘⟨ lemma ⟩
+            X.d ∘ ⟨ π₂ ∘ π₁ , id ∘ π₂ ⟩                             ∎
           ; comm-s = begin
-            π₂ ∘ ⟨ id ∘ π₁ , X.s ∘ π₂ ⟩ ∘ ⟨ π₁ ∘ π₁ , ⟨ π₂ ∘ π₁ , π₂ ⟩ ⟩ ≈⟨ extendʳ project₂ ⟩
-            X.s ∘ π₂ ∘ ⟨ π₁ ∘ π₁ , ⟨ π₂ ∘ π₁ , π₂ ⟩ ⟩ ≈⟨ refl⟩∘⟨ project₂ ⟩
-            X.s ∘ ⟨ π₂ ∘ π₁ , π₂ ⟩ ≈⟨ refl⟩∘⟨ ⟨⟩-congˡ (Equiv.sym identityˡ) ⟩
-            X.s ∘ ⟨ π₂ ∘ π₁ , id ∘ π₂ ⟩ ∎
+            π₂ ∘ ⟨ id ∘ π₁ , X.s ∘ π₂ ⟩ ∘ assocˡ ≈⟨ extendʳ project₂ ⟩
+            X.s ∘ π₂ ∘ assocˡ                    ≈⟨ refl⟩∘⟨ lemma ⟩
+            X.s ∘ ⟨ π₂ ∘ π₁ , id ∘ π₂ ⟩          ∎
           }
         ; commute = λ _ → project₂
         }
@@ -223,11 +244,75 @@ MealyBicategory = record
           let module f = Mealy⇒ f in begin
             ⟨ ! , id ⟩ ∘ f.hom         ≈⟨ ⟨⟩∘ ⟩
             ⟨ ! ∘ f.hom , id ∘ f.hom ⟩ ≈⟨ ⟨⟩-cong₂ (Equiv.trans (Equiv.sym (!-unique _)) (Equiv.sym identityˡ)) id-comm-sym ⟩
-            ⟨ id ∘ ! , f.hom ∘ id ⟩    ≈⟨ ⁂∘⟨⟩ ⟩
-            (id ⁂ f.hom) ∘ ⟨ ! , id ⟩
+            ⟨ id ∘ ! , f.hom ∘ id ⟩    ≈˘⟨ ⁂∘⟨⟩ ⟩
+            (id ⁂ f.hom) ∘ ⟨ ! , id ⟩  ∎
         }
       ; iso = λ X → record { isoˡ = begin
             ⟨ ! , id ⟩ ∘ π₂ ≈⟨ ⟨⟩∘ ⟩
             ⟨ ! ∘ π₂ , id ∘ π₂ ⟩ ≈⟨ unique !-unique₂ id-comm ⟩
             id ∎ ; isoʳ = project₂ }
       }
+    ; unitʳ = record
+      { F⇒G = ntHelper record
+        { η = λ (X PP., _) →
+          let module X = MealyObj X in
+          let lemma : (id ⁂ π₂) ∘ assocˡ ≈ (π₁ ⁂ id)
+              lemma = begin
+                ⟨ id ∘ π₁ , π₂ ∘ π₂ ⟩ ∘ assocˡ           ≈⟨ ⁂∘⟨⟩ ⟩
+                ⟨ id ∘ π₁ ∘ π₁ , π₂ ∘ ⟨ π₂ ∘ π₁ , π₂ ⟩ ⟩ ≈⟨ ⟨⟩-cong₂ identityˡ (Equiv.trans project₂ (Equiv.sym identityˡ)) ⟩
+                ⟨ π₁ ∘ π₁ , id ∘ π₂ ⟩ ∎ in
+              record
+          { hom = π₁
+          ; comm-d = begin
+            π₁ ∘ ⟨ X.d ∘ ⟨ id ∘ π₁ , π₂ ∘ π₂ ⟩ , ! ∘ π₂ ⟩ ∘ assocˡ ≈⟨ extendʳ project₁ ⟩
+            X.d ∘ ⟨ id ∘ π₁ , π₂ ∘ π₂ ⟩ ∘ assocˡ ≈⟨ refl⟩∘⟨ lemma ⟩
+            X.d ∘ ⟨ π₁ ∘ π₁ , id ∘ π₂ ⟩ ∎
+          ; comm-s = begin
+            X.s ∘ ⟨ id ∘ π₁ , π₂ ∘ π₂ ⟩ ∘ assocˡ ≈⟨ refl⟩∘⟨ lemma ⟩
+            X.s ∘ ⟨ π₁ ∘ π₁ , id ∘ π₂ ⟩  ∎
+          }
+        ; commute = λ _ → project₁
+        }
+      ; F⇐G = ntHelper record
+        { η = λ (X PP., _) →
+          let module X = MealyObj X in record
+          { hom = ⟨ id , ! ⟩
+          ; comm-d = begin
+            ⟨ id , ! ⟩ ∘ X.d ≈⟨ ⟨⟩∘ ⟩
+            ⟨ id ∘ X.d , ! ∘ X.d ⟩ ≈⟨ ⟨⟩-congʳ id-comm-sym ⟩
+            ⟨ X.d ∘ id , ! ∘ X.d ⟩ ≈⟨ ⟨⟩-congʳ (refl⟩∘⟨ Equiv.sym ⁂-id) ⟩
+            ⟨ X.d ∘ ⟨ id ∘ π₁ , id ∘ π₂ ⟩ , ! ∘ X.d ⟩ ≈⟨ ⟨⟩-congʳ (refl⟩∘⟨ ⟨⟩-cong₂ (refl⟩∘⟨ Equiv.sym identityˡ) (Equiv.sym project₂)) ⟩
+            ⟨ X.d ∘ ⟨ id ∘ id ∘ π₁ , π₂ ∘ ⟨ ! ∘ π₁ , id ∘ π₂ ⟩ ⟩  , ! ∘ X.d ⟩ ≈⟨ ⟨⟩-cong₂ (Equiv.sym (pullʳ ⁂∘⟨⟩)) !-unique₂ ⟩
+            ⟨ (X.d ∘ ⟨ id ∘ π₁ , π₂ ∘ π₂ ⟩) ∘ ⟨ id ∘ π₁ , ⟨ ! ∘ π₁ , id ∘ π₂ ⟩ ⟩ , (! ∘ π₂) ∘ ⟨ id ∘ π₁ , ⟨ ! ∘ π₁ , id ∘ π₂ ⟩ ⟩ ⟩ ≈⟨ Equiv.sym ⟨⟩∘ ⟩
+            ⟨ X.d ∘ (id ⁂ π₂) , ! ∘ π₂ ⟩ ∘ ⟨ id ∘ π₁ , ⟨ ! ∘ π₁ , id ∘ π₂ ⟩ ⟩ ≈⟨ Equiv.sym (pullʳ assocˡ∘⟨⟩) ⟩
+            (⟨ X.d ∘ (id ⁂ π₂) , ! ∘ π₂ ⟩ ∘ assocˡ) ∘ ⟨ ⟨ id ∘ π₁ , ! ∘ π₁ ⟩ , id ∘ π₂ ⟩ ≈˘⟨ refl⟩∘⟨ ⟨⟩-congʳ ⟨⟩∘ ⟩
+            (⟨ X.d ∘ (id ⁂ π₂) , ! ∘ π₂ ⟩ ∘ assocˡ) ∘ (⟨ id , ! ⟩ ⁂ id) ∎
+          ; comm-s = begin
+            X.s ≈⟨ introʳ ⁂-id ⟩
+            X.s ∘ ⟨ id ∘ π₁ , id ∘ π₂ ⟩ ≈˘⟨ refl⟩∘⟨ ⟨⟩-cong₂ (pullˡ identity²) project₂ ⟩
+            X.s ∘ ⟨ id ∘ id ∘ π₁ , π₂ ∘ ⟨ ! ∘ π₁ , id ∘ π₂ ⟩ ⟩ ≈˘⟨ refl⟩∘⟨ ⁂∘⟨⟩ ⟩
+            X.s ∘ ⟨ id ∘ π₁ , π₂ ∘ π₂ ⟩ ∘ ⟨ id ∘ π₁ , ⟨ ! ∘ π₁ , id ∘ π₂ ⟩ ⟩ ≈˘⟨ refl⟩∘⟨ refl⟩∘⟨ assocˡ∘⟨⟩ ⟩
+            X.s ∘ ⟨ id ∘ π₁ , π₂ ∘ π₂ ⟩ ∘ assocˡ ∘ ⟨ ⟨ id ∘ π₁ , ! ∘ π₁ ⟩ , id ∘ π₂ ⟩ ≈˘⟨ refl⟩∘⟨ refl⟩∘⟨ refl⟩∘⟨ ⟨⟩-congʳ ⟨⟩∘ ⟩
+            X.s ∘ ⟨ id ∘ π₁ , π₂ ∘ π₂ ⟩ ∘ assocˡ ∘ ⟨ ⟨ id , ! ⟩ ∘ π₁ , id ∘ π₂ ⟩ ≈˘⟨ Equiv.trans assoc (refl⟩∘⟨ assoc) ⟩
+            (X.s ∘  ⟨ id ∘ π₁ , π₂ ∘ π₂ ⟩ ∘ assocˡ) ∘ ⟨ ⟨ id , ! ⟩ ∘ π₁ , id ∘ π₂ ⟩ ∎
+          }
+        ; commute = λ (f PP., _) →
+          let module f = Mealy⇒ f in begin
+            ⟨ id , ! ⟩ ∘ f.hom         ≈⟨ ⟨⟩∘ ⟩
+            ⟨ id ∘ f.hom , ! ∘ f.hom ⟩ ≈⟨ ⟨⟩-cong₂ id-comm-sym (Equiv.trans (Equiv.sym (!-unique _)) (Equiv.sym identityˡ)) ⟩
+            ⟨ f.hom ∘ id  , id ∘ ! ⟩   ≈˘⟨ ⁂∘⟨⟩ ⟩
+            (f.hom ⁂ id) ∘ ⟨ id , ! ⟩  ∎
+        }
+      ; iso = λ X → record
+        { isoˡ =
+         begin
+           ⟨ id , ! ⟩ ∘ π₁ ≈⟨ ⟨⟩∘ ⟩
+           ⟨ id ∘ π₁ , ! ∘ π₁ ⟩ ≈⟨ unique id-comm !-unique₂ ⟩
+           id ∎
+        ; isoʳ = project₁
+        }
+      }
+    }
+ ; triangle = Cartesian-Monoidal.triangle
+ ; pentagon = Cartesian-Monoidal.pentagon
+ }
