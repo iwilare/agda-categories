@@ -248,6 +248,26 @@ record BinaryProducts : Set (levelOfTerm 𝒞) where
       ((f ⁂ id) ⁂ id) ∘ assocʳ
     ∎
 
+  second∘assocʳ : ∀ {A B} → (id ⁂ f) ∘ assocʳ {A = A} {B = B} ≈ assocʳ ∘ (id ⁂ (id ⁂ f))
+  second∘assocʳ {f = f} =
+    begin
+      (id ⁂ f) ∘ assocʳ
+    ≈˘⟨ ⁂-congˡ ⁂-id ⟩∘⟨refl  ⟩
+      ((id ⁂ id) ⁂ f) ∘ assocʳ
+    ≈˘⟨ assocʳ∘⁂ ⟩
+      assocʳ ∘ (id ⁂ (id ⁂ f))
+    ∎
+
+  first∘assocˡ : ∀ {B C} → (f ⁂ id) ∘ assocˡ {B = B} {C = C} ≈ assocˡ ∘ ((f ⁂ id) ⁂ id)
+  first∘assocˡ {f = f} =
+    begin
+      (f ⁂ id) ∘ assocˡ
+    ≈˘⟨ ⁂-congʳ ⁂-id ⟩∘⟨refl ⟩
+      (f ⁂ (id ⁂ id)) ∘ assocˡ
+    ≈˘⟨ assocˡ∘⁂ ⟩
+      assocˡ ∘ ((f ⁂ id) ⁂ id)
+    ∎
+
   thm : ∀ {A B C} → (id ⁂ π₂) ∘ (assocˡ {A = A} {B = B} {C = C})  ≈ π₁ ⁂ id
   thm = Equiv.trans second∘⟨⟩ (⟨⟩-congˡ (Equiv.trans project₂ (Equiv.sym identityˡ)))
 

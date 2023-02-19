@@ -150,14 +150,6 @@ MealyBicategory = record
             {!   !} ≈⟨ {!   !} ⟩
             {!   !} ≈⟨ {!   !} ⟩
             (⟨ X.d ∘ (id ⁂ (Y.s ∘ (id ⁂ Z.s) ∘ assocˡ)) , (⟨ Y.d ∘ (id ⁂ Z.s) , Z.d ∘ π₂ ⟩ ∘ assocˡ) ∘ π₂ ⟩ ∘ assocˡ) ∘ (assocˡ ⁂ id) ∎
-        {-begin
-            assocˡ ∘ ⟨ ({!   !} ∘ {!  id !}) ∘ second (Z.s) , Z.d ∘ π₂ ⟩ ∘ assocˡ                                 ≈⟨ {!   !} ⟩ --refl⟩∘⟨ ⁂-congˡ ⁂-id ⟩∘⟨refl ⟩
-            --assocˡ ∘ ((id ⁂ id) ⁂ Z.d) ∘ assocˡ                          ≈⟨ extendʳ assocˡ∘⁂ ⟩
-            --(id ⁂ (id ⁂ Z.d)) ∘ assocˡ ∘ assocˡ                          ≈˘⟨ refl⟩∘⟨ Cartesian-Monoidal.pentagon ⟩
-            --(id ⁂ (id ⁂ Z.d)) ∘ (id ⁂ assocˡ) ∘ assocˡ ∘ (assocˡ ⁂ id)   ≈⟨ pullˡ ⁂∘⁂ ⟩
-            --((id ∘ id) ⁂ ((id ⁂ Z.d) ∘ assocˡ)) ∘ assocˡ ∘ (assocˡ ⁂ id) ≈⟨ ⁂-congˡ identity² ⟩∘⟨refl ⟩
-            --(id ⁂ ((id ⁂ Z.d) ∘ assocˡ)) ∘ assocˡ ∘ (assocˡ ⁂ id)        ≈⟨ sym-assoc ⟩
-            {!   !} ∎ --((id ⁂ ((id ⁂ Z.d) ∘ assocˡ)) ∘ assocˡ) ∘ (assocˡ ⁂ id)      ∎ -}
           ; comm-s = begin
             (X.s ∘ (id ⁂ Y.s) ∘ assocˡ) ∘ (id ⁂ Z.s) ∘ assocˡ                             ≈⟨ Equiv.trans assoc (refl⟩∘⟨ assoc) ⟩
             X.s ∘ (id ⁂ Y.s) ∘ assocˡ ∘ (id ⁂ Z.s) ∘ assocˡ                               ≈⟨ refl⟩∘⟨ refl⟩∘⟨ extendʳ assocˡ∘second ⟩
@@ -181,20 +173,16 @@ MealyBicategory = record
             {!   !} ≈⟨ {!   !} ⟩
             {!   !} ≈⟨ {!   !} ⟩
             (⟨  (⟨ X.d ∘ (id ⁂ Y.s) , Y.d ∘ π₂ ⟩ ∘ assocˡ) ∘ (id ⁂ Z.s) , Z.d ∘ π₂ ⟩ ∘ assocˡ) ∘ (assocʳ ⁂ id) ∎
-          {-begin
-            assocˡ ∘ ⟨ ({!   !} ∘ {!  id !}) ∘ second (Z.s) , Z.d ∘ π₂ ⟩ ∘ assocˡ                                 ≈⟨ {!   !} ⟩ --refl⟩∘⟨ ⁂-congˡ ⁂-id ⟩∘⟨refl ⟩
-            --assocˡ ∘ ((id ⁂ id) ⁂ Z.d) ∘ assocˡ                          ≈⟨ extendʳ assocˡ∘⁂ ⟩
-            --(id ⁂ (id ⁂ Z.d)) ∘ assocˡ ∘ assocˡ                          ≈˘⟨ refl⟩∘⟨ Cartesian-Monoidal.pentagon ⟩
-            --(id ⁂ (id ⁂ Z.d)) ∘ (id ⁂ assocˡ) ∘ assocˡ ∘ (assocˡ ⁂ id)   ≈⟨ pullˡ ⁂∘⁂ ⟩
-            --((id ∘ id) ⁂ ((id ⁂ Z.d) ∘ assocˡ)) ∘ assocˡ ∘ (assocˡ ⁂ id) ≈⟨ ⁂-congˡ identity² ⟩∘⟨refl ⟩
-            --(id ⁂ ((id ⁂ Z.d) ∘ assocˡ)) ∘ assocˡ ∘ (assocˡ ⁂ id)        ≈⟨ sym-assoc ⟩
-            {!   !} ∎ --((id ⁂ ((id ⁂ Z.d) ∘ assocˡ)) ∘ assocˡ) ∘ (assocˡ ⁂ id)      ∎ -}
           ; comm-s = begin
-            X.s ∘ (id ⁂ (Y.s ∘ (id ⁂ Z.s) ∘ assocˡ)) ∘ assocˡ ≈⟨ {!   !} ⟩
-            {!   !} ≈⟨ {!   !} ⟩
-            {!   !} ≈⟨ {!   !} ⟩
-            {!   !} ≈⟨ {!   !} ⟩
-            X.s ∘ (id ⁂ Y.s) ∘ assocˡ ∘ (id ⁂ Z.s) ∘ assocˡ ∘ (assocʳ ⁂ id) ≈˘⟨ Equiv.trans assoc (Equiv.trans (sym-assoc ⟩∘⟨refl) {! !}) ⟩
+            X.s ∘ (id ⁂ (Y.s ∘ (id ⁂ Z.s) ∘ assocˡ)) ∘ assocˡ ≈⟨ refl⟩∘⟨ pushˡ (Equiv.sym second∘second) ⟩
+            X.s ∘ (id ⁂ Y.s) ∘ (id ⁂ ((id ⁂ Z.s) ∘ assocˡ)) ∘ assocˡ ≈⟨ refl⟩∘⟨ refl⟩∘⟨ pushˡ (Equiv.sym second∘second) ⟩
+            X.s ∘ (id ⁂ Y.s) ∘ (id ⁂ (id ⁂ Z.s)) ∘ (id ⁂ assocˡ) ∘ assocˡ ≈⟨ refl⟩∘⟨ refl⟩∘⟨ refl⟩∘⟨ refl⟩∘⟨ introʳ ⁂-id ⟩
+            X.s ∘ (id ⁂ Y.s) ∘ (id ⁂ (id ⁂ Z.s)) ∘ (id ⁂ assocˡ) ∘ assocˡ ∘ (id ⁂ id) ≈˘⟨ refl⟩∘⟨ refl⟩∘⟨ refl⟩∘⟨ refl⟩∘⟨ refl⟩∘⟨ ⁂-congˡ assocˡ∘assocʳ ⟩
+            X.s ∘ (id ⁂ Y.s) ∘ (id ⁂ (id ⁂ Z.s)) ∘ (id ⁂ assocˡ) ∘ assocˡ ∘ ((assocˡ ∘ assocʳ) ⁂ id) ≈˘⟨ refl⟩∘⟨ refl⟩∘⟨ refl⟩∘⟨ refl⟩∘⟨ refl⟩∘⟨ first∘first ⟩
+            X.s ∘ (id ⁂ Y.s) ∘ (id ⁂ (id ⁂ Z.s)) ∘ (id ⁂ assocˡ) ∘ assocˡ ∘ (assocˡ ⁂ id) ∘ (assocʳ ⁂ id) ≈˘⟨ refl⟩∘⟨ refl⟩∘⟨ refl⟩∘⟨ Equiv.trans assoc (refl⟩∘⟨ assoc) ⟩
+            X.s ∘ (id ⁂ Y.s) ∘ (id ⁂ (id ⁂ Z.s)) ∘ ((id ⁂ assocˡ) ∘ assocˡ ∘ (assocˡ ⁂ id)) ∘ (assocʳ ⁂ id) ≈˘⟨ refl⟩∘⟨ refl⟩∘⟨ refl⟩∘⟨ pullˡ (Equiv.sym Cartesian-Monoidal.pentagon) ⟩
+            X.s ∘ (id ⁂ Y.s) ∘ (id ⁂ (id ⁂ Z.s)) ∘ assocˡ ∘ assocˡ ∘ (assocʳ ⁂ id) ≈˘⟨ refl⟩∘⟨ refl⟩∘⟨ extendʳ assocˡ∘second ⟩
+            X.s ∘ (id ⁂ Y.s) ∘ assocˡ ∘ (id ⁂ Z.s) ∘ assocˡ ∘ (assocʳ ⁂ id) ≈˘⟨ Equiv.trans assoc (Equiv.trans (refl⟩∘⟨ assoc) (Equiv.trans assoc (refl⟩∘⟨ assoc))) ⟩
             ((X.s ∘ (id ⁂ Y.s) ∘ assocˡ) ∘ (id ⁂ Z.s) ∘ assocˡ) ∘ (assocʳ ⁂ id) ∎
           } }
         ; commute = λ ((X PP., Y) PP., Z) → assocʳ∘⁂
