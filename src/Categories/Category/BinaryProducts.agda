@@ -238,8 +238,8 @@ record BinaryProducts : Set (levelOfTerm 𝒞) where
       (id ⁂ (id ⁂ f)) ∘ assocˡ
     ∎
 
-  assocˡ∘first : ∀ {B C} → assocʳ {B = B} {C = C} ∘ (f ⁂ id) ≈ ((f ⁂ id) ⁂ id) ∘ assocʳ
-  assocˡ∘first {f = f} =
+  assocʳ∘first : ∀ {B C} → assocʳ {B = B} {C = C} ∘ (f ⁂ id) ≈ ((f ⁂ id) ⁂ id) ∘ assocʳ
+  assocʳ∘first {f = f} =
     begin
       assocʳ ∘ (f ⁂ id)
     ≈˘⟨ refl⟩∘⟨ ⁂-congʳ ⁂-id ⟩

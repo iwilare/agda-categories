@@ -37,6 +37,7 @@ import Categories.Category.Product as CP
 
 
 
+
 ⊚ : ∀ {X Y Z} → Functor (CP.Product (Mealy Y Z) (Mealy X Y)) (Mealy X Z)
 ⊚ = record
   { F₀ = λ { (A , B) →
@@ -123,6 +124,22 @@ associazione = record
 {-# DISPLAY P.Product.π₂ g = π₂′ #-}
 --{-# DISPLAY P.Product.⟨_,_⟩ (π₁′ ∘ π₁′) (⟨ π₂′ ∘ π₁′ ^ π₂′ ⟩) = assocˡ #-}
 
+{-
+asdf : ∀ {A B C} → π₂ ∘ assocˡ {A = A} {B = B} {C = C} ≈ (assocʳ ⁂ id)
+asdf = begin
+    π₂ ∘ assocˡ
+  ≈⟨ project₂ ⟩
+    ⟨ π₂ ∘ π₁ ^ π₂ ⟩
+  ≈˘⟨ {!   !} ⟩
+    {!   !}
+  ≈˘⟨ {!   !} ⟩
+    {!   !}
+  ≈˘⟨ {!   !} ⟩
+    {!   !}
+  ≈˘⟨ {!   !} ⟩
+    {!  assocʳ ⁂ id !}
+  ∎
+  -}
 
 
 
@@ -169,19 +186,45 @@ MealyBicategory = record
          record
           { hom = assocʳ
           ; comm-d = begin
-            assocʳ ∘ ⟨ X.d ∘ (id ⁂ (Y.s ∘ (id ⁂ Z.s) ∘ assocˡ)) , (⟨ Y.d ∘ (id ⁂ Z.s) , Z.d ∘ π₂ ⟩ ∘ assocˡ) ∘ π₂ ⟩ ∘ assocˡ ≈⟨ {!   !} ⟩
-            {!   !} ≈⟨ {!   !} ⟩
-            {!   !} ≈⟨ {!   !} ⟩
-            (⟨  (⟨ X.d ∘ (id ⁂ Y.s) , Y.d ∘ π₂ ⟩ ∘ assocˡ) ∘ (id ⁂ Z.s) , Z.d ∘ π₂ ⟩ ∘ assocˡ) ∘ (assocʳ ⁂ id) ∎
+            assocʳ ∘ ⟨ X.d ∘ (id ⁂ (Y.s ∘ (id ⁂ Z.s) ∘ assocˡ)) , (⟨ Y.d ∘ (id ⁂ Z.s) , Z.d ∘ π₂ ⟩ ∘ assocˡ) ∘ π₂ ⟩ ∘ assocˡ ≈⟨ {! assocˡ ∘ (assocʳ ⁂ id)  !} ⟩
+            assocʳ ∘ ⟨ (X.d ∘ (id ⁂ (Y.s ∘ (id ⁂ Z.s) ∘ assocˡ))) ∘ assocˡ , ((⟨ Y.d ∘ (id ⁂ Z.s) , Z.d ∘ π₂ ⟩ ∘ assocˡ) ∘ π₂) ∘ assocˡ ⟩  ≈⟨ {! assocˡ  !} ⟩
+            assocʳ ∘ ⟨ X.d ∘ (id ⁂ (Y.s ∘ (id ⁂ Z.s) ∘ assocˡ)) ∘ assocˡ , ⟨ Y.d ∘ (id ⁂ Z.s) , Z.d ∘ π₂ ⟩ ∘ assocˡ ∘ π₂ ∘ assocˡ ⟩  ≈⟨ ⟨⟩∘ ⟩
+            ⟨ ⟨ π₁ , π₁ ∘ π₂ ⟩ ∘ ⟨ _ , _ ⟩ , (π₂ ∘ π₂) ∘ ⟨ _ , _ ⟩ ⟩ ≈⟨ ⟨⟩-cong₂ (⟨⟩-congʳ (Equiv.sym identityˡ) ⟩∘⟨refl) (pullʳ project₂) ⟩
+            ⟨ (id ⁂ π₁) ∘ ⟨ _ , _ ⟩ , π₂ ∘ _ ⟩                       ≈⟨ ⟨⟩-cong₂ second∘⟨⟩ (pullˡ project₂) ⟩
+            ⟨ ⟨ X.d ∘ (id ⁂ Y.s ∘ (id ⁂ Z.s) ∘ assocˡ) ∘ assocˡ , π₁ ∘ ⟨ Y.d ∘ (id ⁂ Z.s) , Z.d ∘ π₂ ⟩ ∘ assocˡ ∘ π₂ ∘ assocˡ ⟩ , (Z.d ∘ π₂) ∘ assocˡ ∘ π₂ ∘ assocˡ ⟩ ≈⟨ ⟨⟩-cong₂ (⟨⟩-congˡ (pullˡ project₁)) {!   !} ⟩
+            ⟨ ⟨ X.d ∘ (id ⁂ Y.s ∘ (id ⁂ Z.s) ∘ assocˡ) ∘ assocˡ , (Y.d ∘ (id ⁂ Z.s)) ∘ assocˡ ∘ π₂ ∘ assocˡ ⟩ , Z.d ∘ π₂ ∘ assocˡ ∘ π₂ ∘ assocˡ ⟩ ≈⟨ ⟨⟩-cong₂ {!   !} (refl⟩∘⟨ {! refl⟩∘⟨ ?  !}) ⟩
+            ⟨ ⟨ X.d ∘ (id ⁂ Y.s ∘ (id ⁂ Z.s) ∘ assocˡ) ∘ assocˡ , (Y.d ∘ (id ⁂ Z.s)) ∘ assocˡ ∘ π₂ ∘ assocˡ ⟩ , Z.d ∘ π₂ ∘ assocˡ ∘ (assocʳ ⁂ id) ⟩ ≈⟨ {!   !} ⟩
+
+
+
+
+
+
+            ⟨ ⟨ X.d ∘ (id ⁂ Y.s) , Y.d ∘ π₂ ⟩ ∘ (id ⁂ id ⁂ Z.s) ∘ (id ⁂ assocˡ) ∘ assocˡ , Z.d ∘ π₂ ∘ assocˡ ∘ (assocʳ ⁂ id) ⟩ ≈⟨ {! assocˡ  !} ⟩
+            ⟨ ⟨ X.d ∘ (id ⁂ Y.s) , Y.d ∘ π₂ ⟩ ∘ (id ⁂ id ⁂ Z.s) ∘ (id ⁂ assocˡ) ∘ assocˡ ∘ ((assocˡ ∘ assocʳ) ⁂ id) , Z.d ∘ π₂ ∘ assocˡ ∘ (assocʳ ⁂ id) ⟩ ≈⟨ {!   !} ⟩
+            ⟨ ⟨ X.d ∘ (id ⁂ Y.s) , Y.d ∘ π₂ ⟩ ∘ (id ⁂ id ⁂ Z.s) ∘ (id ⁂ assocˡ) ∘ assocˡ ∘ (assocˡ ⁂ id) ∘ (assocʳ ⁂ id) , Z.d ∘ π₂ ∘ assocˡ ∘ (assocʳ ⁂ id) ⟩
+              ≈˘⟨ ⟨⟩-cong₂ (Equiv.trans assoc (Equiv.trans (refl⟩∘⟨ assoc) (Equiv.trans (refl⟩∘⟨ refl⟩∘⟨ assoc) (refl⟩∘⟨ refl⟩∘⟨ refl⟩∘⟨ assoc)))) (Equiv.trans assoc (refl⟩∘⟨ assoc)) ⟩
+            {!   !} ≈⟨ {!   !} ⟩ --⟨ (⟨ X.d ∘ (id ⁂ Y.s) , Y.d ∘ π₂ ⟩ ∘ (id ⁂ id ⁂ Z.s) ∘ (id ⁂ assocˡ) ∘ assocˡ ∘ (assocˡ ⁂ id)) ∘ (assocʳ ⁂ id) , (Z.d ∘ π₂ ∘ assocˡ) ∘ (assocʳ ⁂ id) ⟩ ≈˘⟨ ⟨⟩∘ ⟩
+            {!   !} ≈⟨ {!   !} ⟩ --⟨ ⟨ X.d ∘ (id ⁂ Y.s) , Y.d ∘ π₂ ⟩ ∘ (id ⁂ id ⁂ Z.s) ∘ (id ⁂ assocˡ) ∘ assocˡ ∘ (assocˡ ⁂ id) , Z.d ∘ π₂ ∘ assocˡ ⟩ ∘ (assocʳ ⁂ id) ≈⟨ ⟨⟩-congʳ (refl⟩∘⟨ refl⟩∘⟨ Cartesian-Monoidal.pentagon) ⟩∘⟨refl ⟩
+            {!   !} ≈⟨ {!   !} ⟩ --⟨ ⟨ X.d ∘ (id ⁂ Y.s) , Y.d ∘ π₂ ⟩ ∘ (id ⁂ id ⁂ Z.s) ∘ assocˡ ∘ assocˡ , Z.d ∘ π₂ ∘ assocˡ ⟩ ∘ (assocʳ ⁂ id)                        ≈⟨ ⟨⟩-congʳ (refl⟩∘⟨ extendʳ (Equiv.sym assocˡ∘second)) ⟩∘⟨refl ⟩
+            ⟨ ⟨ X.d ∘ (id ⁂ Y.s) , Y.d ∘ π₂ ⟩ ∘ assocˡ ∘ (id ⁂ Z.s) ∘ assocˡ ∘ (assocʳ ⁂ id)
+            , Z.d ∘ π₂ ∘ assocˡ ∘ (assocʳ ⁂ id) ⟩
+              ≈˘⟨ ⟨⟩-cong₂ (Equiv.trans assoc (refl⟩∘⟨ assoc)) assoc ⟩
+            ⟨ (⟨ X.d ∘ (id ⁂ Y.s) , Y.d ∘ π₂ ⟩ ∘ assocˡ ∘ (id ⁂ Z.s)) ∘ assocˡ ∘ (assocʳ ⁂ id)
+            , (Z.d ∘ π₂) ∘ assocˡ ∘ (assocʳ ⁂ id) ⟩
+              ≈⟨ Equiv.sym ⟨⟩∘ ⟩
+            ⟨ ⟨ X.d ∘ (id ⁂ Y.s) , Y.d ∘ π₂ ⟩ ∘ assocˡ ∘ (id ⁂ Z.s) , Z.d ∘ π₂ ⟩ ∘ assocˡ ∘ (assocʳ ⁂ id)                                      ≈˘⟨ ⟨⟩-congʳ assoc ⟩∘⟨refl ⟩
+            ⟨ (⟨ X.d ∘ (id ⁂ Y.s) , Y.d ∘ π₂ ⟩ ∘ assocˡ) ∘ (id ⁂ Z.s) , Z.d ∘ π₂ ⟩ ∘ assocˡ ∘ (assocʳ ⁂ id)                                    ≈˘⟨ assoc ⟩
+            (⟨ (⟨ X.d ∘ (id ⁂ Y.s) , Y.d ∘ π₂ ⟩ ∘ assocˡ) ∘ (id ⁂ Z.s) , Z.d ∘ π₂ ⟩ ∘ assocˡ) ∘ (assocʳ ⁂ id)                                  ∎
           ; comm-s = begin
-            X.s ∘ (id ⁂ (Y.s ∘ (id ⁂ Z.s) ∘ assocˡ)) ∘ assocˡ ≈⟨ refl⟩∘⟨ pushˡ (Equiv.sym second∘second) ⟩
-            X.s ∘ (id ⁂ Y.s) ∘ (id ⁂ ((id ⁂ Z.s) ∘ assocˡ)) ∘ assocˡ ≈⟨ refl⟩∘⟨ refl⟩∘⟨ pushˡ (Equiv.sym second∘second) ⟩
-            X.s ∘ (id ⁂ Y.s) ∘ (id ⁂ (id ⁂ Z.s)) ∘ (id ⁂ assocˡ) ∘ assocˡ ≈⟨ refl⟩∘⟨ refl⟩∘⟨ refl⟩∘⟨ refl⟩∘⟨ introʳ ⁂-id ⟩
-            X.s ∘ (id ⁂ Y.s) ∘ (id ⁂ (id ⁂ Z.s)) ∘ (id ⁂ assocˡ) ∘ assocˡ ∘ (id ⁂ id) ≈˘⟨ refl⟩∘⟨ refl⟩∘⟨ refl⟩∘⟨ refl⟩∘⟨ refl⟩∘⟨ ⁂-congˡ assocˡ∘assocʳ ⟩
-            X.s ∘ (id ⁂ Y.s) ∘ (id ⁂ (id ⁂ Z.s)) ∘ (id ⁂ assocˡ) ∘ assocˡ ∘ ((assocˡ ∘ assocʳ) ⁂ id) ≈˘⟨ refl⟩∘⟨ refl⟩∘⟨ refl⟩∘⟨ refl⟩∘⟨ refl⟩∘⟨ first∘first ⟩
-            X.s ∘ (id ⁂ Y.s) ∘ (id ⁂ (id ⁂ Z.s)) ∘ (id ⁂ assocˡ) ∘ assocˡ ∘ (assocˡ ⁂ id) ∘ (assocʳ ⁂ id) ≈˘⟨ refl⟩∘⟨ refl⟩∘⟨ refl⟩∘⟨ Equiv.trans assoc (refl⟩∘⟨ assoc) ⟩
+            X.s ∘ (id ⁂ (Y.s ∘ (id ⁂ Z.s) ∘ assocˡ)) ∘ assocˡ                                               ≈⟨ refl⟩∘⟨ pushˡ (Equiv.sym second∘second) ⟩
+            X.s ∘ (id ⁂ Y.s) ∘ (id ⁂ ((id ⁂ Z.s) ∘ assocˡ)) ∘ assocˡ                                        ≈⟨ refl⟩∘⟨ refl⟩∘⟨ pushˡ (Equiv.sym second∘second) ⟩
+            X.s ∘ (id ⁂ Y.s) ∘ (id ⁂ (id ⁂ Z.s)) ∘ (id ⁂ assocˡ) ∘ assocˡ                                   ≈⟨ refl⟩∘⟨ refl⟩∘⟨ refl⟩∘⟨ refl⟩∘⟨ introʳ ⁂-id ⟩
+            X.s ∘ (id ⁂ Y.s) ∘ (id ⁂ (id ⁂ Z.s)) ∘ (id ⁂ assocˡ) ∘ assocˡ ∘ (id ⁂ id)                       ≈˘⟨ refl⟩∘⟨ refl⟩∘⟨ refl⟩∘⟨ refl⟩∘⟨ refl⟩∘⟨ ⁂-congˡ assocˡ∘assocʳ ⟩
+            X.s ∘ (id ⁂ Y.s) ∘ (id ⁂ (id ⁂ Z.s)) ∘ (id ⁂ assocˡ) ∘ assocˡ ∘ ((assocˡ ∘ assocʳ) ⁂ id)        ≈˘⟨ refl⟩∘⟨ refl⟩∘⟨ refl⟩∘⟨ refl⟩∘⟨ refl⟩∘⟨ first∘first ⟩
+            X.s ∘ (id ⁂ Y.s) ∘ (id ⁂ (id ⁂ Z.s)) ∘ (id ⁂ assocˡ) ∘ assocˡ ∘ (assocˡ ⁂ id) ∘ (assocʳ ⁂ id)   ≈˘⟨ refl⟩∘⟨ refl⟩∘⟨ refl⟩∘⟨ Equiv.trans assoc (refl⟩∘⟨ assoc) ⟩
             X.s ∘ (id ⁂ Y.s) ∘ (id ⁂ (id ⁂ Z.s)) ∘ ((id ⁂ assocˡ) ∘ assocˡ ∘ (assocˡ ⁂ id)) ∘ (assocʳ ⁂ id) ≈˘⟨ refl⟩∘⟨ refl⟩∘⟨ refl⟩∘⟨ pullˡ (Equiv.sym Cartesian-Monoidal.pentagon) ⟩
-            X.s ∘ (id ⁂ Y.s) ∘ (id ⁂ (id ⁂ Z.s)) ∘ assocˡ ∘ assocˡ ∘ (assocʳ ⁂ id) ≈˘⟨ refl⟩∘⟨ refl⟩∘⟨ extendʳ assocˡ∘second ⟩
+            X.s ∘ (id ⁂ Y.s) ∘ (id ⁂ (id ⁂ Z.s)) ∘ assocˡ ∘ assocˡ ∘ (assocʳ ⁂ id)                          ≈˘⟨ refl⟩∘⟨ refl⟩∘⟨ extendʳ assocˡ∘second ⟩
             X.s ∘ (id ⁂ Y.s) ∘ assocˡ ∘ (id ⁂ Z.s) ∘ assocˡ ∘ (assocʳ ⁂ id) ≈˘⟨ Equiv.trans assoc (Equiv.trans (refl⟩∘⟨ assoc) (Equiv.trans assoc (refl⟩∘⟨ assoc))) ⟩
             ((X.s ∘ (id ⁂ Y.s) ∘ assocˡ) ∘ (id ⁂ Z.s) ∘ assocˡ) ∘ (assocʳ ⁂ id) ∎
           } }
