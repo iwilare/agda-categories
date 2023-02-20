@@ -35,9 +35,6 @@ import Categories.Object.Product.Core as P
 open import Data.Product as PP using (_,_)
 import Categories.Category.Product as CP
 
-
-
-
 ⊚ : ∀ {X Y Z} → Functor (CP.Product (Mealy Y Z) (Mealy X Y)) (Mealy X Z)
 ⊚ = record
   { F₀ = λ { (A , B) →
@@ -88,31 +85,8 @@ import Categories.Category.Product as CP
   ; F-resp-≈     = λ (f₁≈g₁ , f₂≈g₂) → ⁂-cong₂ f₁≈g₁ f₂≈g₂
   }
 
-{-
-associazione : {X Y Z A B : Obj} {C = C₁ : Obj} {D : Obj} →
-      NaturalIsomorphism (⊚ {X = X} {Y = Y} {Z = Z} ∘F (⊚ {X = Y} {Y = {! X  !}} {Z = Z} ∘F CP.πˡ CP.※ idF ∘F CP.πʳ))
-      (⊚ ∘F
-       (idF ∘F CP.πˡ CP.※ ⊚ ∘F CP.πʳ) ∘F
-       (CP.πˡ ∘F CP.πˡ CP.※ CP.πʳ ∘F CP.πˡ CP.※ CP.πʳ))
-associazione = record
-  { F⇒G = record
-    { η = λ { ((X PP., Y) PP., Z) →
-      let module Z = MealyObj Z in record
-        { hom = assocˡ
-        ; comm-d = {!   !}
-        ; comm-s = {!   !}
-        } }
-    ; commute = {!   !}
-    ; sym-commute = {!   !}
-    }
-  ; F⇐G = {!   !}
-  ; iso = {!   !}
-  }
--}
-
-
 ⟨_^_⟩ : {X = X₁ : Obj} {A = A₁ : Obj} {B = B₁ : Obj} →
-      X₁ ⇒ A₁ → X₁ ⇒ B₁ → X₁ ⇒ {!   !} --P.Product.A×B product
+      X₁ ⇒ A₁ → X₁ ⇒ B₁ → X₁ ⇒ {!   !}
 ⟨ f ^ g ⟩ = f --⟨ f , g ⟩
 
 π₁′ = π₁
@@ -122,26 +96,6 @@ associazione = record
 {-# DISPLAY P.Product.⟨_,_⟩ f g = ⟨ f ^ g ⟩ #-}
 {-# DISPLAY P.Product.π₁ g = π₁′ #-}
 {-# DISPLAY P.Product.π₂ g = π₂′ #-}
---{-# DISPLAY P.Product.⟨_,_⟩ (π₁′ ∘ π₁′) (⟨ π₂′ ∘ π₁′ ^ π₂′ ⟩) = assocˡ #-}
-
-{-
-asdf : ∀ {A B C} → π₂ ∘ assocˡ {A = A} {B = B} {C = C} ≈ (assocʳ ⁂ id)
-asdf = begin
-    π₂ ∘ assocˡ
-  ≈⟨ project₂ ⟩
-    ⟨ π₂ ∘ π₁ ^ π₂ ⟩
-  ≈˘⟨ {!   !} ⟩
-    {!   !}
-  ≈˘⟨ {!   !} ⟩
-    {!   !}
-  ≈˘⟨ {!   !} ⟩
-    {!   !}
-  ≈˘⟨ {!   !} ⟩
-    {!  assocʳ ⁂ id !}
-  ∎
-  -}
-
-
 
 MealyBicategory : Bicategory (o ⊔ l ⊔ e) (o ⊔ l ⊔ e) e o
 MealyBicategory = record
@@ -160,12 +114,37 @@ MealyBicategory = record
          let module X = MealyObj X in
          let module Y = MealyObj Y in
          let module Z = MealyObj Z in
+         let lemmazz : assocˡ ∘ (id ⁂ Z.s) ∘ assocˡ -- todo: refactor comm-s with this
+                   ≈ (id ⁂ (id ⁂ Z.s)) ∘ (id ⁂ assocˡ) ∘ assocˡ ∘ (assocˡ ⁂ id)
+             lemmazz = begin
+                assocˡ ∘ (id ⁂ Z.s) ∘ assocˡ ≈⟨ extendʳ assocˡ∘second  ⟩
+                (id ⁂ (id ⁂ Z.s)) ∘ assocˡ ∘ assocˡ ≈˘⟨ refl⟩∘⟨ Cartesian-Monoidal.pentagon ⟩
+                (id ⁂ (id ⁂ Z.s)) ∘ (id ⁂ assocˡ) ∘ assocˡ ∘ (assocˡ ⁂ id)  ∎ in
          record
           { hom = assocˡ
           ; comm-d = begin
-            assocˡ ∘ ⟨ (⟨ X.d ∘ (id ⁂ Y.s) , Y.d ∘ π₂ ⟩ ∘ assocˡ) ∘ (id ⁂ Z.s) , Z.d ∘ π₂ ⟩ ∘ assocˡ ≈⟨ {!   !} ⟩
-            {!   !} ≈⟨ {!   !} ⟩
-            {!   !} ≈⟨ {!   !} ⟩
+            assocˡ ∘ ⟨ (⟨ X.d ∘ (id ⁂ Y.s) , Y.d ∘ π₂ ⟩ ∘ assocˡ) ∘ (id ⁂ Z.s) , Z.d ∘ π₂ ⟩ ∘ assocˡ ≈⟨ refl⟩∘⟨ ⟨⟩∘ ⟩
+            assocˡ ∘ ⟨ ((⟨ X.d ∘ (id ⁂ Y.s) , Y.d ∘ π₂ ⟩ ∘ assocˡ) ∘ (id ⁂ Z.s)) ∘ assocˡ , (Z.d ∘ π₂) ∘ assocˡ ⟩ ≈⟨ refl⟩∘⟨ ⟨⟩-cong₂ (Equiv.trans assoc assoc) assoc ⟩
+            assocˡ ∘ ⟨ ⟨ X.d ∘ (id ⁂ Y.s) , Y.d ∘ π₂ ⟩ ∘ assocˡ ∘ (id ⁂ Z.s) ∘ assocˡ , Z.d ∘ π₂ ∘ assocˡ ⟩ ≈⟨ ⟨⟩∘ ⟩
+            ⟨ (π₁ ∘ π₁) ∘ ⟨ _ , _ ⟩ , ⟨ π₂ ∘ π₁ , π₂ ⟩ ∘ ⟨ _ , _ ⟩ ⟩ ≈⟨ ⟨⟩-cong₂ (pullʳ project₁) (⟨⟩-congˡ (Equiv.sym identityˡ) ⟩∘⟨refl) ⟩
+            ⟨ π₁ ∘ ⟨ _ , _ ⟩ ∘ _ , ⟨ π₂ ∘ π₁ , id ∘ π₂ ⟩ ∘ ⟨ _ , _ ⟩ ⟩ ≈⟨ ⟨⟩-cong₂ (pullˡ project₁) first∘⟨⟩ ⟩
+            ⟨ (X.d ∘ (id ⁂ Y.s)) ∘ assocˡ ∘ (id ⁂ Z.s) ∘ assocˡ , ⟨ π₂ ∘ _ , _ ⟩ ⟩ ≈⟨ ⟨⟩-cong₂ assoc (⟨⟩-congʳ (pullˡ project₂)) ⟩ --⟨⟩∘ ⟩
+            ⟨ X.d ∘ (id ⁂ Y.s) ∘ assocˡ ∘ (id ⁂ Z.s) ∘ assocˡ ,
+             ⟨ (Y.d ∘ π₂) ∘ assocˡ ∘ (id ⁂ Z.s) ∘ assocˡ
+             , Z.d ∘ π₂ ∘ assocˡ ⟩ ⟩ ≈⟨ ⟨⟩-cong₂ (refl⟩∘⟨ refl⟩∘⟨ lemmazz) (⟨⟩-cong₂ {!   !} {!   !}) ⟩ --
+            ⟨ X.d ∘ (id ⁂ Y.s) ∘ (id ⁂ (id ⁂ Z.s)) ∘ (id ⁂ assocˡ) ∘ assocˡ ∘ (assocˡ ⁂ id)
+            , ⟨ (Y.d ∘ (id ⁂ Z.s)) ∘ assocˡ ∘ π₂ ∘ assocˡ ∘ (assocˡ ⁂ id)
+            , (Z.d ∘ π₂) ∘ assocˡ ∘ π₂ ∘ assocˡ ∘ (assocˡ ⁂ id) ⟩ ⟩ ≈⟨ {!   !} ⟩ --⟨⟩-cong₂ (refl⟩∘⟨ refl⟩∘⟨ pullˡ second∘second) {!   !} ⟩
+            ⟨ X.d ∘ (id ⁂ Y.s) ∘ (id ⁂ (id ⁂ Z.s)) ∘ (id ⁂ assocˡ) ∘ assocˡ ∘ (assocˡ ⁂ id)
+            , ⟨ Y.d ∘ (id ⁂ Z.s)
+            , Z.d ∘ π₂ ⟩ ∘ assocˡ ∘ π₂ ∘ assocˡ ∘ (assocˡ ⁂ id) ⟩ ≈⟨ ⟨⟩-cong₂ (refl⟩∘⟨ refl⟩∘⟨ pullˡ second∘second) {!   !} ⟩
+            ⟨ X.d ∘ (id ⁂ Y.s) ∘ (id ⁂ ((id ⁂ Z.s) ∘ assocˡ)) ∘ assocˡ ∘ (assocˡ ⁂ id)
+            , ⟨ Y.d ∘ (id ⁂ Z.s) , Z.d ∘ π₂ ⟩ ∘ assocˡ ∘ π₂ ∘ assocˡ ∘ (assocˡ ⁂ id) ⟩ ≈⟨ ⟨⟩-cong₂ (refl⟩∘⟨ pullˡ second∘second ) {!   !} ⟩
+            ⟨ X.d ∘ (id ⁂ Y.s ∘ (id ⁂ Z.s) ∘ assocˡ) ∘ assocˡ ∘ (assocˡ ⁂ id)
+            , ⟨ Y.d ∘ (id ⁂ Z.s) , Z.d ∘ π₂ ⟩ ∘ assocˡ ∘ π₂ ∘ assocˡ ∘ (assocˡ ⁂ id) ⟩ ≈˘⟨ ⟨⟩-cong₂ assoc (Equiv.trans assoc assoc) ⟩
+            ⟨ (X.d ∘ (id ⁂ Y.s ∘ (id ⁂ Z.s) ∘ assocˡ)) ∘ assocˡ ∘ (assocˡ ⁂ id)
+            , ((⟨ Y.d ∘ (id ⁂ Z.s) , Z.d ∘ π₂ ⟩ ∘ assocˡ) ∘ π₂) ∘ assocˡ ∘ (assocˡ ⁂ id) ⟩ ≈˘⟨ ⟨⟩∘ ⟩
+            ⟨ X.d ∘ (id ⁂ (Y.s ∘ (id ⁂ Z.s) ∘ assocˡ)) , (⟨ Y.d ∘ (id ⁂ Z.s) , Z.d ∘ π₂ ⟩ ∘ assocˡ) ∘ π₂ ⟩ ∘ assocˡ ∘ (assocˡ ⁂ id) ≈˘⟨ assoc ⟩
             (⟨ X.d ∘ (id ⁂ (Y.s ∘ (id ⁂ Z.s) ∘ assocˡ)) , (⟨ Y.d ∘ (id ⁂ Z.s) , Z.d ∘ π₂ ⟩ ∘ assocˡ) ∘ π₂ ⟩ ∘ assocˡ) ∘ (assocˡ ⁂ id) ∎
           ; comm-s = begin
             (X.s ∘ (id ⁂ Y.s) ∘ assocˡ) ∘ (id ⁂ Z.s) ∘ assocˡ                             ≈⟨ Equiv.trans assoc (refl⟩∘⟨ assoc) ⟩
