@@ -85,18 +85,6 @@ import Categories.Category.Product as CP
   ; F-resp-≈     = λ (f₁≈g₁ , f₂≈g₂) → ⁂-cong₂ f₁≈g₁ f₂≈g₂
   }
 
-⟨_^_⟩ : {X = X₁ : Obj} {A = A₁ : Obj} {B = B₁ : Obj} →
-      X₁ ⇒ A₁ → X₁ ⇒ B₁ → X₁ ⇒ {!   !}
-⟨ f ^ g ⟩ = f --⟨ f , g ⟩
-
-π₁′ = π₁
-π₂′ = π₂
-
-
-{-# DISPLAY P.Product.⟨_,_⟩ f g = ⟨ f ^ g ⟩ #-}
-{-# DISPLAY P.Product.π₁ g = π₁′ #-}
-{-# DISPLAY P.Product.π₂ g = π₂′ #-}
-
 MealyBicategory : Bicategory (o ⊔ l ⊔ e) (o ⊔ l ⊔ e) e o
 MealyBicategory = record
   { enriched = record
@@ -108,7 +96,10 @@ MealyBicategory = record
       ; s = π₂
       })
     ; ⊚ = ⊚
-    ; ⊚-assoc = record
+    ; ⊚-assoc =
+      let lemmino : ∀ {A B C} → π₂ {A = C} {B = A × B} ∘ assocˡ ≈ π₂ ⁂ id
+          lemmino = begin π₂ ∘ assocˡ ≈⟨ project₂ ⟩ ⟨ π₂ ∘ π₁ , π₂ ⟩ ≈˘⟨ ⟨⟩-congˡ identityˡ ⟩ π₂ ⁂ id ∎ in
+             record
       { F⇒G = ntHelper record
         { η = λ { ((X PP., Y) PP., Z) →
          let module X = MealyObj X in
@@ -119,7 +110,17 @@ MealyBicategory = record
              lemmazz = begin
                 assocˡ ∘ (id ⁂ Z.s) ∘ assocˡ ≈⟨ extendʳ assocˡ∘second  ⟩
                 (id ⁂ (id ⁂ Z.s)) ∘ assocˡ ∘ assocˡ ≈˘⟨ refl⟩∘⟨ Cartesian-Monoidal.pentagon ⟩
-                (id ⁂ (id ⁂ Z.s)) ∘ (id ⁂ assocˡ) ∘ assocˡ ∘ (assocˡ ⁂ id)  ∎ in
+                (id ⁂ (id ⁂ Z.s)) ∘ (id ⁂ assocˡ) ∘ assocˡ ∘ (assocˡ ⁂ id) ∎
+             lemmag : π₂ ∘ assocˡ ∘ (id ⁂ Z.s) ∘ assocˡ
+                    ≈ (id ⁂ Z.s) ∘ assocˡ ∘ π₂ ∘ assocˡ ∘ (assocˡ ⁂ id)
+             lemmag = begin
+                π₂ ∘ assocˡ ∘ (id ⁂ Z.s) ∘ assocˡ ≈⟨ {! pullˡ lemmino  !} ⟩ --pullˡ project₂ ⟩
+                π₂ ∘ assocˡ ∘ (id ⁂ Z.s) ∘ assocˡ ≈⟨ {!   !} ⟩
+                 {!   !} ≈⟨ {!   !} ⟩
+                 {!   !} ≈⟨ {!   !} ⟩
+                 (id ⁂ Z.s) ∘ assocˡ ∘ π₂ ∘ assocˡ ∘ (assocˡ ⁂ id) ∎
+             inn : π₂ ∘ assocˡ ∘ (assocˡ ⁂ id) ≈ id
+             inn = {!   !} in
          record
           { hom = assocˡ
           ; comm-d = begin
@@ -128,18 +129,24 @@ MealyBicategory = record
             assocˡ ∘ ⟨ ⟨ X.d ∘ (id ⁂ Y.s) , Y.d ∘ π₂ ⟩ ∘ assocˡ ∘ (id ⁂ Z.s) ∘ assocˡ , Z.d ∘ π₂ ∘ assocˡ ⟩ ≈⟨ ⟨⟩∘ ⟩
             ⟨ (π₁ ∘ π₁) ∘ ⟨ _ , _ ⟩ , ⟨ π₂ ∘ π₁ , π₂ ⟩ ∘ ⟨ _ , _ ⟩ ⟩ ≈⟨ ⟨⟩-cong₂ (pullʳ project₁) (⟨⟩-congˡ (Equiv.sym identityˡ) ⟩∘⟨refl) ⟩
             ⟨ π₁ ∘ ⟨ _ , _ ⟩ ∘ _ , ⟨ π₂ ∘ π₁ , id ∘ π₂ ⟩ ∘ ⟨ _ , _ ⟩ ⟩ ≈⟨ ⟨⟩-cong₂ (pullˡ project₁) first∘⟨⟩ ⟩
-            ⟨ (X.d ∘ (id ⁂ Y.s)) ∘ assocˡ ∘ (id ⁂ Z.s) ∘ assocˡ , ⟨ π₂ ∘ _ , _ ⟩ ⟩ ≈⟨ ⟨⟩-cong₂ assoc (⟨⟩-congʳ (pullˡ project₂)) ⟩ --⟨⟩∘ ⟩
+            ⟨ (X.d ∘ (id ⁂ Y.s)) ∘ assocˡ ∘ (id ⁂ Z.s) ∘ assocˡ , ⟨ π₂ ∘ _ , _ ⟩ ⟩ ≈⟨ ⟨⟩-cong₂ assoc (⟨⟩-congʳ (pullˡ project₂)) ⟩
             ⟨ X.d ∘ (id ⁂ Y.s) ∘ assocˡ ∘ (id ⁂ Z.s) ∘ assocˡ ,
              ⟨ (Y.d ∘ π₂) ∘ assocˡ ∘ (id ⁂ Z.s) ∘ assocˡ
-             , Z.d ∘ π₂ ∘ assocˡ ⟩ ⟩ ≈⟨ ⟨⟩-cong₂ (refl⟩∘⟨ refl⟩∘⟨ lemmazz) (⟨⟩-cong₂ {!   !} {!   !}) ⟩ --
+             , Z.d ∘ π₂ ∘ assocˡ ⟩ ⟩ ≈⟨ ⟨⟩-congˡ (⟨⟩-congʳ assoc) ⟩
+            ⟨ X.d ∘ (id ⁂ Y.s) ∘ assocˡ ∘ (id ⁂ Z.s) ∘ assocˡ ,
+             ⟨ Y.d ∘ π₂ ∘ assocˡ ∘ (id ⁂ Z.s) ∘ assocˡ
+             , Z.d ∘ π₂ ∘ assocˡ ⟩ ⟩ ≈⟨ ⟨⟩-cong₂ (refl⟩∘⟨ refl⟩∘⟨ lemmazz) (⟨⟩-cong₂ (refl⟩∘⟨ lemmag) (refl⟩∘⟨ {! refl⟩∘⟨ ?  !})) ⟩
+            ⟨ X.d ∘ (id ⁂ Y.s) ∘ (id ⁂ (id ⁂ Z.s)) ∘ (id ⁂ assocˡ) ∘ assocˡ ∘ (assocˡ ⁂ id)
+            , ⟨ Y.d ∘ (id ⁂ Z.s) ∘ assocˡ ∘ π₂ ∘ assocˡ ∘ (assocˡ ⁂ id)
+            , Z.d ∘ π₂ ∘ assocˡ ∘ π₂ ∘ assocˡ ∘ (assocˡ ⁂ id) ⟩ ⟩ ≈⟨ ⟨⟩-congˡ (⟨⟩-cong₂ sym-assoc sym-assoc) ⟩
             ⟨ X.d ∘ (id ⁂ Y.s) ∘ (id ⁂ (id ⁂ Z.s)) ∘ (id ⁂ assocˡ) ∘ assocˡ ∘ (assocˡ ⁂ id)
             , ⟨ (Y.d ∘ (id ⁂ Z.s)) ∘ assocˡ ∘ π₂ ∘ assocˡ ∘ (assocˡ ⁂ id)
-            , (Z.d ∘ π₂) ∘ assocˡ ∘ π₂ ∘ assocˡ ∘ (assocˡ ⁂ id) ⟩ ⟩ ≈⟨ {!   !} ⟩ --⟨⟩-cong₂ (refl⟩∘⟨ refl⟩∘⟨ pullˡ second∘second) {!   !} ⟩
+            , (Z.d ∘ π₂) ∘ assocˡ ∘ π₂ ∘ assocˡ ∘ (assocˡ ⁂ id) ⟩ ⟩ ≈⟨ ⟨⟩-congˡ (Equiv.sym ⟨⟩∘) ⟩
             ⟨ X.d ∘ (id ⁂ Y.s) ∘ (id ⁂ (id ⁂ Z.s)) ∘ (id ⁂ assocˡ) ∘ assocˡ ∘ (assocˡ ⁂ id)
             , ⟨ Y.d ∘ (id ⁂ Z.s)
-            , Z.d ∘ π₂ ⟩ ∘ assocˡ ∘ π₂ ∘ assocˡ ∘ (assocˡ ⁂ id) ⟩ ≈⟨ ⟨⟩-cong₂ (refl⟩∘⟨ refl⟩∘⟨ pullˡ second∘second) {!   !} ⟩
+            , Z.d ∘ π₂ ⟩ ∘ assocˡ ∘ π₂ ∘ assocˡ ∘ (assocˡ ⁂ id) ⟩ ≈⟨ ⟨⟩-congʳ (refl⟩∘⟨ refl⟩∘⟨ pullˡ second∘second) ⟩
             ⟨ X.d ∘ (id ⁂ Y.s) ∘ (id ⁂ ((id ⁂ Z.s) ∘ assocˡ)) ∘ assocˡ ∘ (assocˡ ⁂ id)
-            , ⟨ Y.d ∘ (id ⁂ Z.s) , Z.d ∘ π₂ ⟩ ∘ assocˡ ∘ π₂ ∘ assocˡ ∘ (assocˡ ⁂ id) ⟩ ≈⟨ ⟨⟩-cong₂ (refl⟩∘⟨ pullˡ second∘second ) {!   !} ⟩
+            , ⟨ Y.d ∘ (id ⁂ Z.s) , Z.d ∘ π₂ ⟩ ∘ assocˡ ∘ π₂ ∘ assocˡ ∘ (assocˡ ⁂ id) ⟩ ≈⟨ ⟨⟩-congʳ (refl⟩∘⟨ pullˡ second∘second ) ⟩
             ⟨ X.d ∘ (id ⁂ Y.s ∘ (id ⁂ Z.s) ∘ assocˡ) ∘ assocˡ ∘ (assocˡ ⁂ id)
             , ⟨ Y.d ∘ (id ⁂ Z.s) , Z.d ∘ π₂ ⟩ ∘ assocˡ ∘ π₂ ∘ assocˡ ∘ (assocˡ ⁂ id) ⟩ ≈˘⟨ ⟨⟩-cong₂ assoc (Equiv.trans assoc assoc) ⟩
             ⟨ (X.d ∘ (id ⁂ Y.s ∘ (id ⁂ Z.s) ∘ assocˡ)) ∘ assocˡ ∘ (assocˡ ⁂ id)
@@ -162,8 +169,6 @@ MealyBicategory = record
          let module X = MealyObj X in
          let module Y = MealyObj Y in
          let module Z = MealyObj Z in
-         let lemmino : ∀ {A B C} → π₂ {A = C} {B = A × B} ∘ assocˡ ≈ π₂ ⁂ id
-             lemmino = begin π₂ ∘ assocˡ ≈⟨ project₂ ⟩ ⟨ π₂ ∘ π₁ , π₂ ⟩ ≈˘⟨ ⟨⟩-congˡ identityˡ ⟩ π₂ ⁂ id ∎ in
          let lemma : π₂ ∘ assocˡ ∘ π₂ ∘ assocˡ ≈ ((π₂ ∘ π₂) ⁂ id)
              lemma = begin
               π₂ ∘ assocˡ ∘ π₂ ∘ assocˡ ≈⟨ refl⟩∘⟨ refl⟩∘⟨ lemmino ⟩
