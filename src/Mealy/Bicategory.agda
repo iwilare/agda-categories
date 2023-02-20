@@ -176,8 +176,8 @@ MealyBicategory = record
          let module X = MealyObj X in
          let module Y = MealyObj Y in
          let module Z = MealyObj Z in
-         let lemme4 : π₂ ∘ assocˡ ∘ π₂ ∘ assocˡ ≈ ((π₂ ∘ π₂) ⁂ id)
-             lemme4 = begin
+         let lemma4 : π₂ ∘ assocˡ ∘ π₂ ∘ assocˡ ≈ ((π₂ ∘ π₂) ⁂ id)
+             lemma4 = begin
               π₂ ∘ assocˡ ∘ π₂ ∘ assocˡ ≈⟨ refl⟩∘⟨ refl⟩∘⟨ π₂∘assocˡ ⟩
               π₂ ∘ assocˡ ∘ (π₂ ⁂ id) ≈⟨ pullˡ π₂∘assocˡ ⟩
               (π₂ ⁂ id) ∘ (π₂ ⁂ id) ≈⟨ first∘first ⟩
@@ -197,7 +197,7 @@ MealyBicategory = record
             ⟨ ⟨ π₁ , π₁ ∘ π₂ ⟩ ∘ ⟨ _ , _ ⟩ , (π₂ ∘ π₂) ∘ ⟨ _ , _ ⟩ ⟩ ≈⟨ ⟨⟩-cong₂ (⟨⟩-congʳ (Equiv.sym identityˡ) ⟩∘⟨refl) (pullʳ project₂) ⟩
             ⟨ (id ⁂ π₁) ∘ ⟨ _ , _ ⟩ , π₂ ∘ _ ⟩                       ≈⟨ ⟨⟩-cong₂ second∘⟨⟩ (pullˡ project₂) ⟩
             ⟨ ⟨ X.d ∘ (id ⁂ Y.s ∘ (id ⁂ Z.s) ∘ assocˡ) ∘ assocˡ , π₁ ∘ ⟨ Y.d ∘ (id ⁂ Z.s) , Z.d ∘ π₂ ⟩ ∘ assocˡ ∘ π₂ ∘ assocˡ ⟩
-            , (Z.d ∘ π₂) ∘ assocˡ ∘ π₂ ∘ assocˡ ⟩ ≈⟨ ⟨⟩-cong₂ (⟨⟩-congˡ (pullˡ project₁)) (pullʳ lemme4) ⟩
+            , (Z.d ∘ π₂) ∘ assocˡ ∘ π₂ ∘ assocˡ ⟩ ≈⟨ ⟨⟩-cong₂ (⟨⟩-congˡ (pullˡ project₁)) (pullʳ lemma4) ⟩
             ⟨ ⟨ X.d ∘ (id ⁂ Y.s ∘ (id ⁂ Z.s) ∘ assocˡ) ∘ assocˡ
               , (Y.d ∘ (id ⁂ Z.s)) ∘ assocˡ ∘ π₂ ∘ assocˡ ⟩
             , Z.d ∘ ((π₂ ∘ π₂) ⁂ id) ⟩ ≈⟨ ⟨⟩-congʳ (⟨⟩-cong₂ (refl⟩∘⟨ pushˡ (Equiv.sym second∘second)) assoc) ⟩
