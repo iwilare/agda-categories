@@ -119,8 +119,13 @@ MealyBicategory = record
                  {!   !} ≈⟨ {!   !} ⟩
                  {!   !} ≈⟨ {!   !} ⟩
                  (id ⁂ Z.s) ∘ assocˡ ∘ π₂ ∘ assocˡ ∘ (assocˡ ⁂ id) ∎
-             inn : π₂ ∘ assocˡ ∘ (assocˡ ⁂ id) ≈ id
-             inn = {!   !} in
+             inn :  π₂ ∘ assocˡ ≈ π₂ ∘ assocˡ ∘ π₂ ∘ assocˡ ∘ (assocˡ ⁂ id)
+             inn = begin
+                {!   !} ≈⟨ {! pullˡ lemmino  !} ⟩
+                {!   !} ≈⟨ {!   !} ⟩
+                 {!   !} ≈⟨ {!   !} ⟩
+                 {!   !} ≈⟨ {!   !} ⟩
+                 {!   !} ∎ in
          record
           { hom = assocˡ
           ; comm-d = begin
@@ -135,7 +140,7 @@ MealyBicategory = record
              , Z.d ∘ π₂ ∘ assocˡ ⟩ ⟩ ≈⟨ ⟨⟩-congˡ (⟨⟩-congʳ assoc) ⟩
             ⟨ X.d ∘ (id ⁂ Y.s) ∘ assocˡ ∘ (id ⁂ Z.s) ∘ assocˡ ,
              ⟨ Y.d ∘ π₂ ∘ assocˡ ∘ (id ⁂ Z.s) ∘ assocˡ
-             , Z.d ∘ π₂ ∘ assocˡ ⟩ ⟩ ≈⟨ ⟨⟩-cong₂ (refl⟩∘⟨ refl⟩∘⟨ lemmazz) (⟨⟩-cong₂ (refl⟩∘⟨ lemmag) (refl⟩∘⟨ {! refl⟩∘⟨ ?  !})) ⟩
+             , Z.d ∘ π₂ ∘ assocˡ ⟩ ⟩ ≈⟨ ⟨⟩-cong₂ (refl⟩∘⟨ refl⟩∘⟨ lemmazz) (⟨⟩-cong₂ (refl⟩∘⟨ lemmag) (refl⟩∘⟨ inn)) ⟩
             ⟨ X.d ∘ (id ⁂ Y.s) ∘ (id ⁂ (id ⁂ Z.s)) ∘ (id ⁂ assocˡ) ∘ assocˡ ∘ (assocˡ ⁂ id)
             , ⟨ Y.d ∘ (id ⁂ Z.s) ∘ assocˡ ∘ π₂ ∘ assocˡ ∘ (assocˡ ⁂ id)
             , Z.d ∘ π₂ ∘ assocˡ ∘ π₂ ∘ assocˡ ∘ (assocˡ ⁂ id) ⟩ ⟩ ≈⟨ ⟨⟩-congˡ (⟨⟩-cong₂ sym-assoc sym-assoc) ⟩
