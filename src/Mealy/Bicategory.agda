@@ -106,26 +106,27 @@ MealyBicategory = record
          let module Y = MealyObj Y in
          let module Z = MealyObj Z in
          let lemmazz : assocˡ ∘ (id ⁂ Z.s) ∘ assocˡ -- todo: refactor comm-s with this
-                   ≈ (id ⁂ (id ⁂ Z.s)) ∘ (id ⁂ assocˡ) ∘ assocˡ ∘ (assocˡ ⁂ id)
+                     ≈ (id ⁂ (id ⁂ Z.s)) ∘ (id ⁂ assocˡ) ∘ assocˡ ∘ (assocˡ ⁂ id)
              lemmazz = begin
-                assocˡ ∘ (id ⁂ Z.s) ∘ assocˡ ≈⟨ extendʳ assocˡ∘second  ⟩
-                (id ⁂ (id ⁂ Z.s)) ∘ assocˡ ∘ assocˡ ≈˘⟨ refl⟩∘⟨ Cartesian-Monoidal.pentagon ⟩
-                (id ⁂ (id ⁂ Z.s)) ∘ (id ⁂ assocˡ) ∘ assocˡ ∘ (assocˡ ⁂ id) ∎
-             lemmag : π₂ ∘ assocˡ ∘ (id ⁂ Z.s) ∘ assocˡ
-                    ≈ (id ⁂ Z.s) ∘ assocˡ ∘ π₂ ∘ assocˡ ∘ (assocˡ ⁂ id)
+               assocˡ ∘ (id ⁂ Z.s) ∘ assocˡ ≈⟨ extendʳ assocˡ∘second  ⟩
+               (id ⁂ (id ⁂ Z.s)) ∘ assocˡ ∘ assocˡ ≈˘⟨ refl⟩∘⟨ Cartesian-Monoidal.pentagon ⟩
+               (id ⁂ (id ⁂ Z.s)) ∘ (id ⁂ assocˡ) ∘ assocˡ ∘ (assocˡ ⁂ id) ∎ in
+         let lemmag : π₂ ∘ assocˡ ∘ (id ⁂ Z.s) ∘ assocˡ
+                   ≈ (id ⁂ Z.s) ∘ assocˡ ∘ π₂ ∘ assocˡ ∘ (assocˡ ⁂ id)
              lemmag = begin
-                π₂ ∘ assocˡ ∘ (id ⁂ Z.s) ∘ assocˡ ≈⟨ {! pullˡ lemmino  !} ⟩ --pullˡ project₂ ⟩
-                π₂ ∘ assocˡ ∘ (id ⁂ Z.s) ∘ assocˡ ≈⟨ {!   !} ⟩
-                 {!   !} ≈⟨ {!   !} ⟩
-                 {!   !} ≈⟨ {!   !} ⟩
-                 (id ⁂ Z.s) ∘ assocˡ ∘ π₂ ∘ assocˡ ∘ (assocˡ ⁂ id) ∎
-             inn :  π₂ ∘ assocˡ ≈ π₂ ∘ assocˡ ∘ π₂ ∘ assocˡ ∘ (assocˡ ⁂ id)
+                 π₂ ∘ assocˡ ∘ (id ⁂ Z.s) ∘ assocˡ ≈⟨ refl⟩∘⟨ lemmazz ⟩
+                 π₂ ∘ (id ⁂ (id ⁂ Z.s)) ∘ (id ⁂ assocˡ) ∘ assocˡ ∘ (assocˡ ⁂ id) ≈⟨ extendʳ project₂ ⟩
+                 (id ⁂ Z.s) ∘ π₂ ∘ (id ⁂ assocˡ) ∘ assocˡ ∘ (assocˡ ⁂ id) ≈⟨ refl⟩∘⟨ extendʳ project₂ ⟩
+                 (id ⁂ Z.s) ∘ assocˡ ∘ π₂ ∘ assocˡ ∘ (assocˡ ⁂ id) ∎ in
+         let inn :  π₂ ∘ assocˡ ≈ π₂ ∘ assocˡ ∘ π₂ ∘ assocˡ ∘ (assocˡ ⁂ id)
              inn = begin
-                {!   !} ≈⟨ {! pullˡ lemmino  !} ⟩
-                {!   !} ≈⟨ {!   !} ⟩
-                 {!   !} ≈⟨ {!   !} ⟩
-                 {!   !} ≈⟨ {!   !} ⟩
-                 {!   !} ∎ in
+                 π₂ ∘ assocˡ ≈⟨ introˡ ⁂-id ⟩
+                 (id ⁂ id) ∘ π₂ ∘ assocˡ ≈⟨ extendʳ (Equiv.sym project₂) ⟩
+                 π₂ ∘ (π₂ ⁂ (id ⁂ id)) ∘ assocˡ ≈⟨ refl⟩∘⟨ Equiv.sym assocˡ∘⁂ ⟩
+                 π₂ ∘ assocˡ ∘ ((π₂ ⁂ id) ⁂ id) ≈⟨ refl⟩∘⟨ refl⟩∘⟨ ⁂-congˡ (Equiv.sym lemmino) ⟩
+                 π₂ ∘ assocˡ ∘ ((π₂ ∘ assocˡ) ⁂ id) ≈⟨ refl⟩∘⟨ refl⟩∘⟨ Equiv.sym first∘first ⟩
+                 π₂ ∘ assocˡ ∘ (π₂ ⁂ id) ∘ (assocˡ ⁂ id) ≈⟨ refl⟩∘⟨ refl⟩∘⟨ pushˡ (Equiv.sym lemmino) ⟩
+                 π₂ ∘ assocˡ ∘ π₂ ∘ assocˡ ∘ (assocˡ ⁂ id) ∎ in
          record
           { hom = assocˡ
           ; comm-d = begin
