@@ -35,11 +35,11 @@ record Slice⇒ {A : Obj} (X Y : SliceObj A) : Set (ℓ ⊔ e) where
     {h} : X.Y ⇒ Y.Y
     △   : Y.arr ∘ h ≈ X.arr
 
-dom : ∀ {A} {X Y : SliceObj A} → Slice⇒ X Y → SliceObj A
-dom {_} {X} {Y} _ = X
+  dom : SliceObj A
+  dom = X
 
-cod : ∀ {A} {X Y : SliceObj A} → Slice⇒ X Y → SliceObj A
-cod {_} {X} {Y} _ = Y
+  cod : SliceObj A
+  cod = Y
 
 Slice : Obj → Category _ _ _
 Slice A       = record
