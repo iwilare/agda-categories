@@ -139,12 +139,12 @@ module _
 
   L : Functor (Slice (F-Algebras X) o∞) XMoore
   L = record
-    { F₀ = λ { (sliceobj {record { A = A; α = α }} f) →
-      let module f = F-Algebra-Morphism f in record
-      { E = A
-      ; d = α
-      ; s = R∞.π 0 ∘ f.f
-      } }
+    { F₀ = λ { (sliceobj {record { A = A; α = α }} (record { f = f; commutes = commutes })) →
+      record
+        { E = A
+        ; d = α
+        ; s = R∞.π 0 ∘ f
+        } }
     ; F₁ = λ slice@(slicearr {record { f = h; commutes = commutes }} f) →
       record
         { hom = h
@@ -159,13 +159,16 @@ module _
   thm : L ⊣ B
   thm = record
     { unit = ntHelper record
-      { η = λ (sliceobj {Y} (record { f = f; commutes = commutes })) →
+      { η = λ obj@(sliceobj {record { A = A; α = α }} arr@(record { f = f; commutes = commutes })) →
           slicearr {h = Category.id (F-Algebras X)}
-
-           (begin {!   !} ≈⟨ {!   !} ⟩ --F-Algebra-Morphism.f (SliceObj.arr (₀ B (₀ L {! dom   !}))) ∘ id ≈⟨ {!   !} ⟩
-                  {!   !} ≈⟨ {!   !} ⟩
-                  {!   !} ≈⟨ {!   !} ⟩
-                  F-Algebra-Morphism.f (SliceObj.arr {! Y  !}) ∎)
+           (begin behaviour (record { E = A ; d = α ; s = R∞.π 0 ∘ f }) ∘ id ≈⟨ identityʳ ⟩
+                  behaviour (record { E = A ; d = α ; s = R∞.π 0 ∘ f })
+                    ≈⟨ ⊤.!-unique (record
+                       { hom = f
+                       ; comm-d = commutes
+                       ; comm-s = refl
+                       }) ⟩
+                  f ∎)
       ; commute = λ _ → id-comm-sym
       }
     ; counit = ntHelper record

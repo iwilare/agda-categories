@@ -21,6 +21,9 @@ record SliceObj (X : Obj) : Set (o ⊔ ℓ) where
     {Y} : Obj
     arr : Y ⇒ X
 
+  ob : Obj
+  ob = X
+
 private
   variable
     A : Obj
