@@ -58,17 +58,6 @@ pSlice = record
   }
   -}
 
-forget : Functor (F-Algebras X) C
-forget = record
-  { F₀ = F-Algebra.A
-  ; F₁ = F-Algebra-Morphism.f
-  ; identity = refl
-  ; homomorphism = refl
-  ; F-resp-≈ = λ x → x
-  }
-
-module forget = Functor forget
-
 open F-Algebra
 
 -- L : Functor (F ↘ O) XMoore
@@ -81,8 +70,8 @@ open F-Algebra
 --   ; F-resp-≈ = {!   !}
 --   }
 
--- thm : L ⊣ Bout
--- thm = {!   !}
+-- L⊣B : L ⊣ Bout
+-- L⊣B = {!   !}
 
 import Categories.Category.Complete
 open import Categories.Category.Complete using (Complete)
@@ -103,19 +92,10 @@ import Function as Fun
 module _
    {R : Functor C C}
    (adj : X ⊣ R)
-   {complete : ∀ {o ℓ e} → Complete o ℓ e C}
+   {complete : ∀ {o ℓ e} → Complete o ℓ e C} where
 
-   -- Requirement that X is an input process
-   (free : Functor C (F-Algebras X))
-   (Free⊣Forget : free ⊣ forget)
-   where
-
-  module free = Functor free
-
-  module Free⊣Forget = Adjoint Free⊣Forget
   module adj = Adjoint adj
-
-  open Pollo adj {complete = complete}
+  open XMoore-Complete adj {complete = complete}
 
   open MR C
 
@@ -156,8 +136,8 @@ module _
     ; F-resp-≈ = λ x → x
     }
 
-  thm : L ⊣ B
-  thm = record
+  L⊣B : L ⊣ B
+  L⊣B = record
     { unit = ntHelper record
       { η = λ obj@(sliceobj {record { A = A; α = α }} arr@(record { f = f; commutes = commutes })) →
           slicearr {h = Category.id (F-Algebras X)}
@@ -184,6 +164,118 @@ module _
     ; zig = identity²
     ; zag = identity²
     }
+
+  module _ where
+
+    forget : Functor (F-Algebras X) C
+    forget = record
+      { F₀ = F-Algebra.A
+      ; F₁ = F-Algebra-Morphism.f
+      ; identity = refl
+      ; homomorphism = refl
+      ; F-resp-≈ = λ x → x
+      }
+
+    module forget = Functor forget
+
+    -- Requirement that X is an input process
+    module _ (free : Functor C (F-Algebras X))
+             (Free⊣Forget : free ⊣ forget) where
+
+      module free = Functor free
+      module Free⊣Forget = Adjoint Free⊣Forget
+
+      F~ : Functor (Slice C R∞.X) (Slice (F-Algebras X) o∞)
+      F~ = record
+        { F₀ =
+          λ { (sliceobj {Y} f) →
+            sliceobj (record
+              { f = behaviour (record
+                { E = A (free.₀ Y)
+                ; d = α (free.₀ Y)
+                ; s = R∞.π 0 ∘ F-Algebra-Morphism.f (Free⊣Forget.counit.η o∞) ∘ F-Algebra-Morphism.f (free.₁ f)
+                })
+              ; commutes = XMoore⇒.comm-d ⊤.!
+              }) }
+        ; F₁ = λ { arr@(slicearr {h = h} c) →
+            slicearr {h = free.₁ h}
+              (begin
+                  behaviour (record { E = A (free.₀ (SliceObj.Y (Slice⇒.cod arr)))
+                                     ; d = α (free.₀ (SliceObj.Y (Slice⇒.cod arr)))
+                                     ; s = _
+                                     }) ∘ F-Algebra-Morphism.f (free.₁ h)
+                        ≈⟨ Equiv.sym (commute-behaviour (record
+                          { hom = F-Algebra-Morphism.f (free.₁ h)
+                          ; comm-d = F-Algebra-Morphism.commutes (free.₁ h)
+                          ; comm-s = pushʳ (pushʳ (free.F-resp-≈ (Equiv.sym c) ○ free.homomorphism))
+                          })) ⟩
+                  behaviour (record { E = A (free.₀ (SliceObj.Y (Slice⇒.dom arr)))
+                                     ; d = α (free.₀ (SliceObj.Y (Slice⇒.dom arr)))
+                                     ; s = _
+                                     }) ∎) }
+        ; identity = free.identity
+        ; homomorphism = free.homomorphism
+        ; F-resp-≈ = free.F-resp-≈
+        }
+
+      U~ : Functor (Slice (F-Algebras X) o∞) (Slice C R∞.X)
+      U~ = record
+        { F₀ =
+          λ (sliceobj {record { A = A ; α = α }} (record { f = f ; commutes = commutes })) →
+            sliceobj (behaviour (record { E = A ; d = α ; s = R∞.π 0 ∘ f }))
+        ; F₁ = λ (slicearr {h = record { f = f ; commutes = commutes }} c) →
+            slicearr {h = f} (Equiv.sym (commute-behaviour (record
+              { hom = f
+              ; comm-d = commutes
+              ; comm-s = pushʳ (Equiv.sym c)
+              })))
+        ; identity = refl
+        ; homomorphism = refl
+        ; F-resp-≈ = λ x → x
+        }
+
+      F~⊣U~ : F~ ⊣ U~
+      F~⊣U~ = record
+        { unit = ntHelper record
+          { η = λ { (sliceobj {Y} arr) →
+              slicearr {h = Free⊣Forget.unit.η Y}
+                (begin
+                  behaviour (record { E = A (free.F₀ Y)
+                                    ; d = α (free.F₀ Y)
+                                    ; s = R∞.π 0
+                                        ∘ F-Algebra-Morphism.f (SliceObj.arr (₀ F~ (sliceobj arr)))
+                                    }) ∘ Free⊣Forget.unit.η Y ≈⟨ {!  !} ⟩
+                  {!   !} ≈⟨ {! !} ⟩
+                  arr ∎) }
+          ; commute = λ (slicearr {h = h} c) → Free⊣Forget.unit.commute h
+          }
+        ; counit = ntHelper record
+          { η = λ { (sliceobj {Y} (record { f = f ; commutes = commutes })) →
+              slicearr {h = Free⊣Forget.counit.η Y}
+                (begin
+                  f ∘ F-Algebra-Morphism.f (Free⊣Forget.counit.η Y) ≈⟨ Equiv.sym (⊤.!-unique (record
+                    { hom = f ∘ F-Algebra-Morphism.f (Free⊣Forget.counit.η Y)
+                    ; comm-d =
+                        begin (f ∘ F-Algebra-Morphism.f (Free⊣Forget.counit.η Y)) ∘ α (free.F₀ (A Y)) ≈⟨ pullʳ {! Free⊣Forget.counit.commute ? !} ⟩
+                              f ∘ α Y ∘ X.₁ ((F-Algebra-Morphism.f (Free⊣Forget.counit.η Y))) ≈⟨ extendʳ commutes ⟩
+                              d∞ ∘ X.₁ f ∘ X.₁ (F-Algebra-Morphism.f (Free⊣Forget.counit.η Y)) ≈⟨ refl⟩∘⟨ Equiv.sym X.homomorphism ⟩
+                              d∞ ∘ X.₁ (f ∘ F-Algebra-Morphism.f (Free⊣Forget.counit.η Y)) ∎
+                    ; comm-s =
+                        begin R∞.π 0 ∘ F-Algebra-Morphism.f (Free⊣Forget.counit.η o∞) ∘ F-Algebra-Morphism.f (₁ free (SliceObj.arr (₀ U~ (sliceobj (record { f = f ; commutes = commutes })))))
+                                ≈⟨ {!   !} ⟩
+                              {!   !} ≈⟨ {!   !} ⟩
+                              {!   !} ≈⟨ {!   !} ⟩
+                              R∞.π 0 ∘ f ∘ F-Algebra-Morphism.f (Free⊣Forget.counit.η Y) ∎
+                    })) ⟩
+                  behaviour (record { E = A (F₀ (free ∘F forget) Y)
+                                    ; d = α (F₀ (free ∘F forget) Y)
+                                    ; s = _ }) ∎) }
+          ; commute = λ (slicearr {h = h} c) → Free⊣Forget.counit.commute h
+          }
+        ; zig = Free⊣Forget.zig
+        ; zag = Free⊣Forget.zag
+        }
+
 {-
   L : Functor (Slice (forget.₀ o∞)) XMoore
   L = record

@@ -84,7 +84,7 @@ open import Categories.Adjoint
 open import Data.Nat
 open import Relation.Binary.PropositionalEquality
 
-module Pollo {R : Functor C C} (adj : X ⊣ R) {complete : ∀ {o ℓ e} → Complete o ℓ e C}
+module XMoore-Complete {R : Functor C C} (adj : X ⊣ R) {complete : ∀ {o ℓ e} → Complete o ℓ e C}
    where
 
   open import Categories.Object.Product.Indexed.Properties C
