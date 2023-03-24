@@ -28,15 +28,15 @@ thm S = record
   ; monoidal = record
     { ⊗ = record
         { F₀ = λ {(inj₁ x , inj₁ y) → {!   !}
-                ; (inj₁ x , inj₂ y) → {!   !}
-                ; (inj₂ y , inj₁ x) → {!   !}
-                ; (inj₂ y , inj₂ y₁) → {!   !}}
+                ; (inj₁ x , inj₂ (lift tt)) → inj₁ x
+                ; (inj₂ (lift tt) , inj₁ x) → inj₁ x
+                ; (inj₂ (lift tt) , inj₂ (lift tt)) → inj₂ (lift tt)}
         ; F₁ = {!   !}
         ; identity = {!   !}
         ; homomorphism = {!   !}
         ; F-resp-≈ = {!   !}
         }
-    ; unit = {!   !}
+    ; unit = inj₂ (lift tt)
     ; unitorˡ = {!   !}
     ; unitorʳ = {!   !}
     ; associator = {!   !}

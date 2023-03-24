@@ -13,7 +13,7 @@ open import Categories.Category.Semigroupal.Core using (Semigroupal)
 record SemigroupalCategory o ℓ e : Set (suc (o ⊔ ℓ ⊔ e)) where
   field
     U        : Category o ℓ e
-    monoidal : Semigroupal U
+    semigroupal : Semigroupal U
 
 
 -- TODO: decomment after creating all the missing modules
