@@ -5,44 +5,48 @@ module Categories.Category.Semigroupal.Reflection {o ℓ e} (C : Category o ℓ 
 
 
 open import Level
-
+open import Data.Product using (_,_; curry′)
 open import Categories.Category.Core
 open import Categories.Category.Semigroupal.Core 
 open import Categories.Category.Semigroupal.Bundle public
 open import Categories.Category.Monoidal.Core public
 open import Categories.Category.Monoidal.Bundle public
+
+open import Categories.Category.Construction.Coproduct
+open import Categories.Category.Instance.One using (One)
+
 open import Data.Maybe 
 open import Data.Empty
 open import Data.Unit
+open import Data.Sum
 
 open Category
 
 thm : SemigroupalCategory o ℓ e → MonoidalCategory o ℓ e
 thm S = record 
-  { U = record
-    { Obj = Maybe (Obj CS)
-    ; _⇒_ = λ {(just X) (just Y) → CS [ X , Y ]
-               ; (just X) nothing → Lift ℓ ⊥
-               ; nothing (just Y) → Lift ℓ ⊥
-               ; nothing nothing → Lift ℓ ⊤
-               }
-    ; _≈_ = λ { {just X} {just Y} f g → (CS ≈ f) g
-              ; {nothing} {nothing} f g → Lift e ⊤ 
-              }
-    ; id = λ { {just X} → Category.id CS {X}
-             ; {nothing} → lift tt
-             }
-    ; _∘_ = λ { {just A} {just B} {just C} f g → (CS ∘ f) g
-              ; {nothing} {nothing} {nothing} f g → lift tt
-              }
-    ; assoc = {!   !}
-    ; sym-assoc = {!   !}
-    ; identityˡ = {!   !}
-    ; identityʳ = {!   !}
-    ; identity² = {!   !}
-    ; equiv = {!   !}
-    ; ∘-resp-≈ = {!   !}
+  { U = Coproduct CS (One {o} {ℓ} {e})
+  ; monoidal = record
+    { ⊗ = record
+        { F₀ = λ {(inj₁ x , inj₁ y) → {!   !}
+                ; (inj₁ x , inj₂ y) → {!   !}
+                ; (inj₂ y , inj₁ x) → {!   !}
+                ; (inj₂ y , inj₂ y₁) → {!   !}}
+        ; F₁ = {!   !}
+        ; identity = {!   !}
+        ; homomorphism = {!   !}
+        ; F-resp-≈ = {!   !}
+        }
+    ; unit = {!   !}
+    ; unitorˡ = {!   !}
+    ; unitorʳ = {!   !}
+    ; associator = {!   !}
+    ; unitorˡ-commute-from = {!   !}
+    ; unitorˡ-commute-to = {!   !}
+    ; unitorʳ-commute-from = {!   !}
+    ; unitorʳ-commute-to = {!   !}
+    ; assoc-commute-from = {!   !}
+    ; assoc-commute-to = {!   !}
+    ; triangle = {!   !}
+    ; pentagon = {!   !}
     } 
-  ; monoidal = {!   !} 
   } where CS = SemigroupalCategory.U S
-          -- open Category CS
