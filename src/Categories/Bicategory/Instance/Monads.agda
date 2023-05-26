@@ -24,7 +24,6 @@ record Monad⇒₁Obj (S T : Monad 𝒞) : Set (o ⊔ ℓ ⊔ e ⊔ t) where
   module T = Monad T 
   module S = Monad S
   open Bicategory 𝒞
-  open Bicat 𝒞 using (id₁)
   field 
     U : S.C ⇒₁ T.C
     τ : T.T ∘₁ U ⇒₂ U ∘₁ S.T
@@ -33,24 +32,28 @@ record Monad⇒₁Obj (S T : Monad 𝒞) : Set (o ⊔ ℓ ⊔ e ⊔ t) where
     μ-compat : τ ∘ᵥ (T.μ ◁ U) ≈ (U ▷ S.μ ∘ᵥ (α⇒ ∘ᵥ τ ◁ S.T ∘ᵥ (α⇐ ∘ᵥ T.T ▷ τ ∘ᵥ α⇒)))
 
 
-record Monad⇒₁Mor {S T : Monad 𝒞} (U U' : Monad⇒₁Obj S T) : Set {!   !} where 
+record Monad⇒₁Mor {S T : Monad 𝒞} (U U' : Monad⇒₁Obj S T) : Set (o ⊔ ℓ ⊔ e ⊔ t) where 
   module T = Monad T 
   module S = Monad S
   open Bicategory 𝒞
-  open Bicat 𝒞 using (id₁)
   module U = Monad⇒₁Obj U
   module U' = Monad⇒₁Obj U'
   field 
     σ : U.U ⇒₂ U'.U
     τ-compat : U'.τ ∘ᵥ (T.T ▷ σ) ≈ (σ ◁ S.T) ∘ᵥ U.τ
 
-Monad⇒₁ : Monad 𝒞 → Monad 𝒞 → Category (o ⊔ ℓ ⊔ e ⊔ t) {!   !} {!   !} 
-Monad⇒₁ S T = record
+Monad⇒₁ : Monad 𝒞 → Monad 𝒞 → Category (o ⊔ ℓ ⊔ e ⊔ t) (o ⊔ ℓ ⊔ e ⊔ t) _ 
+Monad⇒₁ S T = let  open Bicategory 𝒞 in record
   { Obj = Monad⇒₁Obj S T
-  ; _⇒_ = Monad⇒₁Mor
+  ; _⇒_ = λ U V → Monad⇒₁Mor {S} {T} U V
   ; _≈_ = {!   !}
-  ; id = {!   !}
-  ; _∘_ = {!   !}
+  ; id = {!   !} -- λ { {A} → Bicategory.id₂ {!   !} }
+  ; _∘_ = λ U V → 
+    let module U = Monad⇒₁Mor U
+        module V = Monad⇒₁Mor V in record 
+    { σ = ? --  U.σ ∘ᵥ V.σ 
+    ; τ-compat = λ {A} {B} {C} {D} {f} {g} {h} → {!   !} 
+    }
   ; assoc = {!   !}
   ; sym-assoc = {!   !}
   ; identityˡ = {!   !}
