@@ -20,6 +20,8 @@ module Categories.Bicategory.Instance.Monads {o ℓ e t} (𝒞 : Bicategory o �
 open import Categories.Bicategory.Extras 𝒞 using (module Shorthands)
 open Shorthands
 
+
+
 record Monad⇒₁₀ (S T : Monad 𝒞) : Set (o ⊔ ℓ ⊔ e ⊔ t) where
   module T = Monad T
   module S = Monad S
@@ -42,27 +44,30 @@ record Monad⇒₁₁ {S T : Monad 𝒞} (U U' : Monad⇒₁₀ S T) : Set (o �
     τ-compat : U'.τ ∘ᵥ (T.T ▷ σ) ≈ (σ ◁ S.T) ∘ᵥ U.τ
 
 Monad⇒₁ : Monad 𝒞 → Monad 𝒞 → Category (o ⊔ ℓ ⊔ e ⊔ t) (o ⊔ ℓ ⊔ e ⊔ t) _
-Monad⇒₁ S T = let open Bicategory 𝒞 in record
-  { Obj = Monad⇒₁₀ S T
-  ; _⇒_ = λ U V → Monad⇒₁₁ {S} {T} U V
-  ; _≈_ = {!   !}
-  ; id = λ { {A} → let module A = Monad⇒₁₀ A in
-       record { σ = Bicategory.id₂ 𝒞
-              ; τ-compat = {!  !} } }
-  ; _∘_ = λ U V →
-    let module U = Monad⇒₁₁ U
-        module V = Monad⇒₁₁ V in record
-    { σ = {!   !} --  U.σ ∘ᵥ V.σ
-    ; τ-compat = {!   !} -- λ {A} {B} {C} {D} {f} {g} {h} → {!   !}
-    }
-  ; assoc = {!   !}
-  ; sym-assoc = {!   !}
-  ; identityˡ = {!   !}
-  ; identityʳ = {!   !}
-  ; identity² = {!   !}
-  ; equiv = {!   !}
-  ; ∘-resp-≈ = {!   !}
-  }
+Monad⇒₁ S T =
+  let open Bicategory 𝒞
+      module S = Monad S
+      module T = Monad T in record
+    { Obj = Monad⇒₁₀ S T
+    ; _⇒_ = λ U V → Monad⇒₁₁ {S} {T} U V
+    ; _≈_ = {!   !}
+    ; id = λ { {A} → let module A = Monad⇒₁₀ A in
+         record { σ = Bicategory.id₂ 𝒞
+                ; τ-compat = {!  !} } }
+    ; _∘_ = λ U V →
+      let module U = Monad⇒₁₁ U
+          module V = Monad⇒₁₁ V in record
+      { σ = {!   !} --  U.σ ∘ᵥ V.σ
+      ; τ-compat = {!   !} -- λ {A} {B} {C} {D} {f} {g} {h} → {!   !}
+      }
+    ; assoc = {!   !}
+    ; sym-assoc = {!   !}
+    ; identityˡ = {!   !}
+    ; identityʳ = {!   !}
+    ; identity² = {!   !}
+    ; equiv = {!   !}
+    ; ∘-resp-≈ = {!   !}
+    } where open import Categories.Morphism.Reasoning {!  !}
 
 -- Monad⇒₂
 
