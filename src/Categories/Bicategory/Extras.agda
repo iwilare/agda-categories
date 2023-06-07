@@ -108,6 +108,12 @@ identity₂ˡ = hom.identityˡ
 identity₂ʳ : α ∘ᵥ id₂ ≈ α
 identity₂ʳ = hom.identityʳ
 
+id₂-comm : α ∘ᵥ id₂ ≈ id₂ ∘ᵥ α
+id₂-comm = Bicategory.hom.Equiv.trans Bicat identity₂ʳ (Bicategory.hom.Equiv.sym Bicat identity₂ˡ)
+
+id₂-comm-sym : id₂ ∘ᵥ α ≈ α ∘ᵥ id₂
+id₂-comm-sym = Bicategory.hom.Equiv.sym Bicat id₂-comm
+
 assoc₂ : (α ∘ᵥ β) ∘ᵥ γ ≈ α ∘ᵥ β ∘ᵥ γ
 assoc₂ = hom.assoc
 
