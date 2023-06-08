@@ -1,6 +1,7 @@
 {-# OPTIONS --without-K --safe #-}
 
--- the bicategory of Monads in a given bicategory K
+-- the bicategory of Monads in a given bicategory C, as defined in
+-- `The formal theory of monads`. R. Street. Journal of Pure and Applied Algebra 2 (2): 149 - 168 (1972).
 
 
 open import Level
@@ -62,7 +63,11 @@ Monad⇒₁ S T =
       let module U = Monad⇒₁₁ U
           module V = Monad⇒₁₁ V in record
       { σ = U.σ ∘ᵥ V.σ
-      ; τ-compat = {!   !} -- λ {A} {B} {C} {D} {f} {g} {h} → {!   !}
+      ; τ-compat = begin (U.U'.τ ∘ᵥ (V.U'.T.T ▷ (U.σ ∘ᵥ V.σ))) ≈˘⟨ (refl⟩∘⟨ Bicat.∘ᵥ-distr-▷ ?) ⟩
+                         {!   !} ≈⟨ {!   !} ⟩
+                         {!   !} ≈⟨ {!   !} ⟩
+                         ((U.σ ∘ᵥ V.σ) ◁ V.U'.S.T) ∘ᵥ V.U.τ ∎
+      -- U.U'.τ ∘ᵥ V.U'.T.T ▷ (U.σ ∘ᵥ V.σ) ≈ (U.σ ∘ᵥ V.σ) ◁ V.U'.S.T ∘ᵥ V.U.τ
       }
     ; assoc = {!   !}
     ; sym-assoc = {!   !}
