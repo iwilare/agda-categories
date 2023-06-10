@@ -115,16 +115,34 @@ Monads = record
   { enriched = record
     { Obj = Monad 𝒞
     ; hom = Monad⇒₁
-    ; id = let open Bicat 𝒞 in record
+    ; id = let open Bicat 𝒞
+               open Bicategory.hom.HomReasoning 𝒞 in record
              { F₀ = λ T →
                record { U = id₁
-                      ; τ = {! begin ? ≈⟨ ? ⟩ ? ∎ !}
-                      ; η-compat = {!!}
-                      ; μ-compat = {!!}
+                      ; τ = λ⇐ ∘ᵥ ρ⇒
+                      ; η-compat = begin {!!} ≈⟨ hom.assoc ⟩
+                                         {!   !} ≈⟨ refl⟩∘⟨ ρ⇒-∘ᵥ-◁ ⟩
+                                         {!   !} ≈⟨ hom.sym-assoc ⟩
+                                         {!   !} ≈˘⟨ ▷-∘ᵥ-λ⇐  ⟩∘⟨refl ⟩
+                                         {!   !} ≈⟨ hom.assoc ⟩
+                                         {!   !} ≈⟨ (refl⟩∘⟨ {!!} ) ⟩
+                                         {!   !} ≈⟨ (refl⟩∘⟨ {!!} ) ⟩
+                                         {!   !} ∎
+                      -- (λ⇐ ∘ᵥ ρ⇒) ∘ᵥ η A₁ ◁ id₁ = (id₁ ▷ η A₁ ∘ᵥ ρ⇐ ∘ᵥ λ⇒)
+                      ; μ-compat = begin {!   !} ≈⟨ {!   !} ⟩
+                                         {!   !} ≈⟨ {!   !} ⟩
+                                         {!   !} ∎
                       }
              ; F₁ = λ f →
                record { σ = id₂
-                      ; τ-compat = {!!}
+                      ; τ-compat = begin {!   !} ≈⟨ {!   !} ⟩
+                                         {!   !} ≈⟨ {!   !} ⟩
+                                         {!   !} ≈⟨ {!   !} ⟩
+                                         {!   !} ≈⟨ {!   !} ⟩
+                                         {!   !} ≈⟨ {!   !} ⟩
+                                         {!   !} ≈⟨ {!   !} ⟩
+                                         {!   !} ≈⟨ {!   !} ⟩
+                                          {!   !} ∎
                       }
              ; identity = {!!}
              ; homomorphism = {!!}
@@ -143,4 +161,4 @@ Monads = record
     }
   ; triangle = {!   !}
   ; pentagon = {!   !}
-  } where open Bicategory.hom.HomReasoning 𝒞
+  } -- where open Bicategory.hom.HomReasoning 𝒞
