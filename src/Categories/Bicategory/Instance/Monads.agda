@@ -115,12 +115,32 @@ Monads = record
   { enriched = record
     { Obj = Monad 𝒞
     ; hom = Monad⇒₁
-    ; id = {!   !}
-    ; ⊚ = {!   !}
+    ; id = let open Bicat 𝒞 in record
+             { F₀ = λ T →
+               record { U = id₁
+                      ; τ = {! begin ? ≈⟨ ? ⟩ ? ∎ !}
+                      ; η-compat = {!!}
+                      ; μ-compat = {!!}
+                      }
+             ; F₁ = λ f →
+               record { σ = id₂
+                      ; τ-compat = {!!}
+                      }
+             ; identity = {!!}
+             ; homomorphism = {!!}
+             ; F-resp-≈ = {!!}
+             }
+    ; ⊚ = record
+            { F₀ = {!!}
+            ; F₁ = {!!}
+            ; identity = {!!}
+            ; homomorphism = {!!}
+            ; F-resp-≈ = {!!}
+            }
     ; ⊚-assoc = {!   !}
     ; unitˡ = {!   !}
     ; unitʳ = {!   !}
     }
   ; triangle = {!   !}
   ; pentagon = {!   !}
-  }
+  } where open Bicategory.hom.HomReasoning 𝒞
