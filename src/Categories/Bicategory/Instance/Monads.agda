@@ -65,23 +65,24 @@ Monad⇒₁ S T =
           module V = Monad⇒₁₁ V
           in record
       { σ = U.σ ∘ᵥ V.σ
-      ; τ-compat = begin (U.U'.τ ∘ᵥ (V.U'.T.T ▷ (U.σ ∘ᵥ V.σ))) ≈˘⟨ (refl⟩∘⟨ ∘ᵥ-distr-▷ )  ⟩
-                         (hom V.U'.S.C V.U'.T.C Category.∘ U.U'.τ)
-                           ((hom V.U'.S.C V.U'.T.C Category.∘ (V.U'.T.T ▷ U.σ))
-                            (V.U'.T.T ▷ V.σ)) ≈˘⟨ hom.assoc ⟩
-                         (hom V.U'.S.C V.U'.T.C Category.∘ (U.U'.τ ∘ᵥ (V.U'.T.T ▷ U.σ)))
-                           (V.U'.T.T ▷ V.σ) ≈⟨ (U.τ-compat ⟩∘⟨refl) ⟩
-                         (hom V.U'.S.C V.U'.T.C Category.∘
-                            (hom V.U'.S.C V.U'.T.C Category.∘ (U.σ ◁ V.U'.S.T)) V.U'.τ)
-                           (V.U'.T.T ▷ V.σ) ≈⟨ hom.assoc ⟩
-                         (hom V.U'.S.C V.U'.T.C Category.∘ (U.σ ◁ V.U'.S.T))
-                           (V.U'.τ ∘ᵥ (V.U'.T.T ▷ V.σ)) ≈⟨ (refl⟩∘⟨ V.τ-compat) ⟩
-                         (hom V.U'.S.C V.U'.T.C Category.∘ (U.σ ◁ V.U'.S.T))
-                           ((hom V.U'.S.C V.U'.T.C Category.∘ (V.σ ◁ V.U'.S.T)) V.U.τ) ≈˘⟨ hom.assoc ⟩
-                         (hom V.U'.S.C V.U'.T.C Category.∘
-                            ((U.σ ◁ V.U'.S.T) ∘ᵥ (V.σ ◁ V.U'.S.T)))
-                           V.U.τ ≈⟨ (∘ᵥ-distr-◁  ⟩∘⟨refl) ⟩
-                         ((U.σ ∘ᵥ V.σ) ◁ V.U'.S.T) ∘ᵥ V.U.τ ∎
+      ; τ-compat = {!!}
+        -- begin (U.U'.τ ∘ᵥ (V.U'.T.T ▷ (U.σ ∘ᵥ V.σ))) ≈˘⟨ (refl⟩∘⟨ ∘ᵥ-distr-▷ )  ⟩
+        --   (hom V.U'.S.C V.U'.T.C Category.∘ U.U'.τ)
+        --     ((hom V.U'.S.C V.U'.T.C Category.∘ (V.U'.T.T ▷ U.σ))
+        --     (V.U'.T.T ▷ V.σ)) ≈˘⟨ hom.assoc ⟩
+        --   (hom V.U'.S.C V.U'.T.C Category.∘ (U.U'.τ ∘ᵥ (V.U'.T.T ▷ U.σ)))
+        --     (V.U'.T.T ▷ V.σ) ≈⟨ (U.τ-compat ⟩∘⟨refl) ⟩
+        --   (hom V.U'.S.C V.U'.T.C Category.∘
+        --     (hom V.U'.S.C V.U'.T.C Category.∘ (U.σ ◁ V.U'.S.T)) V.U'.τ)
+        --     (V.U'.T.T ▷ V.σ) ≈⟨ hom.assoc ⟩
+        --   (hom V.U'.S.C V.U'.T.C Category.∘ (U.σ ◁ V.U'.S.T))
+        --     (V.U'.τ ∘ᵥ (V.U'.T.T ▷ V.σ)) ≈⟨ (refl⟩∘⟨ V.τ-compat) ⟩
+        --   (hom V.U'.S.C V.U'.T.C Category.∘ (U.σ ◁ V.U'.S.T))
+        --     ((hom V.U'.S.C V.U'.T.C Category.∘ (V.σ ◁ V.U'.S.T)) V.U.τ) ≈˘⟨ hom.assoc ⟩
+        --   (hom V.U'.S.C V.U'.T.C Category.∘
+        --     ((U.σ ◁ V.U'.S.T) ∘ᵥ (V.σ ◁ V.U'.S.T)))
+        --     V.U.τ ≈⟨ (∘ᵥ-distr-◁  ⟩∘⟨refl) ⟩
+        --   ((U.σ ∘ᵥ V.σ) ◁ V.U'.S.T) ∘ᵥ V.U.τ ∎
       -- U.U'.τ ∘ᵥ V.U'.T.T ▷ (U.σ ∘ᵥ V.σ) ≈ (U.σ ∘ᵥ V.σ) ◁ V.U'.S.T ∘ᵥ V.U.τ
       }
     ; assoc = λ {A} {B} {C} {D} {U} {V} {W} →
@@ -119,7 +120,7 @@ Monads = record
                open Bicategory.hom.HomReasoning 𝒞 in record
              { F₀ = λ T →
                record { U = id₁
-                      ; τ = λ⇐ ∘ᵥ ρ⇒
+                      ; τ = ? -- λ⇐ ∘ᵥ ρ⇒
                       ; η-compat =  {!!}
                         -- begin {!!} ≈⟨ hom.assoc ⟩
                         --    {!   !} ≈⟨ refl⟩∘⟨ ρ⇒-∘ᵥ-◁ ⟩
@@ -134,22 +135,23 @@ Monads = record
                                          {!   !} ≈⟨ {!   !} ⟩
                                          {!   !} ∎
                       }
-             ; F₁ = λ {T} {S} f →
+             ; F₁ = λ {C} {D} f →
                record { σ = id₂
-                      ; τ-compat = begin {!   !} ≈⟨ hom.assoc ⟩
-                                         {!   !} ≈⟨ {! Equiv.sym ▷-∘ᵥ-λ⇐  !} ⟩
-                                         {!   !} ≈⟨ {!   !} ⟩
-                                         {!   !} ≈⟨ {!   !} ⟩
-                                         {!   !} ≈⟨ {!   !} ⟩
-                                         {!   !} ≈⟨ {!   !} ⟩
-                                         {!   !} ≈⟨ {!   !} ⟩
-                                          {!   !} ∎
+                      ; τ-compat =
+                        begin {!   !} ≈⟨ hom.assoc ⟩
+                              {!   !} ≈⟨ hom.Equiv.sym ▷-∘ᵥ-λ⇐ ⟩
+                              -- {!   !} ≈⟨ {!   !} ⟩
+                              -- {!   !} ≈⟨ {!   !} ⟩
+                              -- {!   !} ≈⟨ {!   !} ⟩
+                              -- {!   !} ≈⟨ {!   !} ⟩
+                              {!   !} ≈⟨ {!   !} ⟩
+                              {!   !} ∎
                       }
              ; identity = {!!}
              ; homomorphism = {!!}
              ; F-resp-≈ = {!!}
              }
-    ; ⊚ = ?
+    ; ⊚ = {!!}
     ; ⊚-assoc = {!   !}
     ; unitˡ = {!   !}
     ; unitʳ = {!   !}
