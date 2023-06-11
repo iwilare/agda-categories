@@ -120,23 +120,24 @@ Monads = record
              { F₀ = λ T →
                record { U = id₁
                       ; τ = λ⇐ ∘ᵥ ρ⇒
-                      ; η-compat = begin {!!} ≈⟨ hom.assoc ⟩
-                                         {!   !} ≈⟨ refl⟩∘⟨ ρ⇒-∘ᵥ-◁ ⟩
-                                         {!   !} ≈⟨ hom.sym-assoc ⟩
-                                         {!   !} ≈˘⟨ ▷-∘ᵥ-λ⇐  ⟩∘⟨refl ⟩
-                                         {!   !} ≈⟨ hom.assoc ⟩
-                                         {!   !} ≈⟨ (refl⟩∘⟨ {!!} ) ⟩
-                                         {!   !} ≈⟨ (refl⟩∘⟨ {!!} ) ⟩
-                                         {!   !} ∎
+                      ; η-compat =  {!!}
+                        -- begin {!!} ≈⟨ hom.assoc ⟩
+                        --    {!   !} ≈⟨ refl⟩∘⟨ ρ⇒-∘ᵥ-◁ ⟩
+                        --    {!   !} ≈⟨ hom.sym-assoc ⟩
+                        --    {!   !} ≈˘⟨ ▷-∘ᵥ-λ⇐  ⟩∘⟨refl ⟩
+                        --    {!   !} ≈⟨ hom.assoc ⟩
+                        --    {!   !} ≈⟨ (refl⟩∘⟨ {!!} ) ⟩
+                        --    {!   !} ≈⟨ (refl⟩∘⟨ {!!} ) ⟩
+                        --    {!   !} ∎
                       -- (λ⇐ ∘ᵥ ρ⇒) ∘ᵥ η A₁ ◁ id₁ = (id₁ ▷ η A₁ ∘ᵥ ρ⇐ ∘ᵥ λ⇒)
                       ; μ-compat = begin {!   !} ≈⟨ {!   !} ⟩
                                          {!   !} ≈⟨ {!   !} ⟩
                                          {!   !} ∎
                       }
-             ; F₁ = λ f →
+             ; F₁ = λ {T} {S} f →
                record { σ = id₂
-                      ; τ-compat = begin {!   !} ≈⟨ {!   !} ⟩
-                                         {!   !} ≈⟨ {!   !} ⟩
+                      ; τ-compat = begin {!   !} ≈⟨ hom.assoc ⟩
+                                         {!   !} ≈⟨ {! Equiv.sym ▷-∘ᵥ-λ⇐  !} ⟩
                                          {!   !} ≈⟨ {!   !} ⟩
                                          {!   !} ≈⟨ {!   !} ⟩
                                          {!   !} ≈⟨ {!   !} ⟩
@@ -148,13 +149,7 @@ Monads = record
              ; homomorphism = {!!}
              ; F-resp-≈ = {!!}
              }
-    ; ⊚ = record
-            { F₀ = {!!}
-            ; F₁ = {!!}
-            ; identity = {!!}
-            ; homomorphism = {!!}
-            ; F-resp-≈ = {!!}
-            }
+    ; ⊚ = ?
     ; ⊚-assoc = {!   !}
     ; unitˡ = {!   !}
     ; unitʳ = {!   !}
