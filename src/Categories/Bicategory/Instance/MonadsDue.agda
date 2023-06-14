@@ -15,7 +15,7 @@ open import Categories.NaturalTransformation.NaturalIsomorphism using (NaturalIs
 open import Categories.Bicategory.Monad
 import Categories.Morphism.Reasoning as MR
 
-module Categories.Bicategory.Instance.Monads {o ℓ e t} (𝒞 : Bicategory o ℓ e t) where
+module Categories.Bicategory.Instance.MonadsDue {o ℓ e t} (𝒞 : Bicategory o ℓ e t) where
 
 open import Categories.Bicategory.Extras 𝒞 using (module Shorthands)
 open Shorthands
@@ -42,73 +42,71 @@ record Monad⇒₁₁ {S T : Monad 𝒞} (U U' : Monad⇒₁₀ S T) : Set (o �
     τ-compat : U'.τ ∘ᵥ (T.T ▷ σ) ≈ (σ ◁ S.T) ∘ᵥ U.τ
 
 Monad⇒₁ : Monad 𝒞 → Monad 𝒞 → Category (o ⊔ ℓ ⊔ e ⊔ t) (o ⊔ ℓ ⊔ e ⊔ t) e
-Monad⇒₁ S T =
-  let module S = Monad S
-      module T = Monad T in record
-    { Obj = Monad⇒₁₀ S T
-    ; _⇒_ = λ U V → Monad⇒₁₁ {S} {T} U V
-    ; _≈_ = λ U V → let module U = Monad⇒₁₁ U
-                        module V = Monad⇒₁₁ V
-                        open Bicat 𝒞 in  U.σ ≈ V.σ
-    ; id = λ { {A} → let module A = Monad⇒₁₀ A
-                         open Bicat 𝒞 in
-                         record { σ = Bicategory.id₂ 𝒞
-                                ; τ-compat =
-                                  begin (A.τ ∘ᵥ (A.T.T ▷ id₂)) ≈⟨ (refl⟩∘⟨ ▷id₂) ⟩
-                                        (A.τ ∘ᵥ id₂)           ≈⟨ id₂-comm ⟩
-                                        id₂ ∘ᵥ A.τ             ≈˘⟨ (id₂◁ ⟩∘⟨refl) ⟩
-                                        (id₂ ◁ A.S.T) ∘ᵥ A.τ   ∎
-                                } }
-    ; _∘_ = λ U V →
-      let open Bicat 𝒞
-          module U = Monad⇒₁₁ U
-          module V = Monad⇒₁₁ V
-          in record
-      { σ = U.σ ∘ᵥ V.σ
-      ; τ-compat = {!!}
-        -- begin (U.U'.τ ∘ᵥ (V.U'.T.T ▷ (U.σ ∘ᵥ V.σ))) ≈˘⟨ (refl⟩∘⟨ ∘ᵥ-distr-▷ )  ⟩
-        --   (hom V.U'.S.C V.U'.T.C Category.∘ U.U'.τ)
-        --     ((hom V.U'.S.C V.U'.T.C Category.∘ (V.U'.T.T ▷ U.σ))
-        --     (V.U'.T.T ▷ V.σ)) ≈˘⟨ hom.assoc ⟩
-        --   (hom V.U'.S.C V.U'.T.C Category.∘ (U.U'.τ ∘ᵥ (V.U'.T.T ▷ U.σ)))
-        --     (V.U'.T.T ▷ V.σ) ≈⟨ (U.τ-compat ⟩∘⟨refl) ⟩
-        --   (hom V.U'.S.C V.U'.T.C Category.∘
-        --     (hom V.U'.S.C V.U'.T.C Category.∘ (U.σ ◁ V.U'.S.T)) V.U'.τ)
-        --     (V.U'.T.T ▷ V.σ) ≈⟨ hom.assoc ⟩
-        --   (hom V.U'.S.C V.U'.T.C Category.∘ (U.σ ◁ V.U'.S.T))
-        --     (V.U'.τ ∘ᵥ (V.U'.T.T ▷ V.σ)) ≈⟨ (refl⟩∘⟨ V.τ-compat) ⟩
-        --   (hom V.U'.S.C V.U'.T.C Category.∘ (U.σ ◁ V.U'.S.T))
-        --     ((hom V.U'.S.C V.U'.T.C Category.∘ (V.σ ◁ V.U'.S.T)) V.U.τ) ≈˘⟨ hom.assoc ⟩
-        --   (hom V.U'.S.C V.U'.T.C Category.∘
-        --     ((U.σ ◁ V.U'.S.T) ∘ᵥ (V.σ ◁ V.U'.S.T)))
-        --     V.U.τ ≈⟨ (∘ᵥ-distr-◁  ⟩∘⟨refl) ⟩
-        --   ((U.σ ∘ᵥ V.σ) ◁ V.U'.S.T) ∘ᵥ V.U.τ ∎
-      -- U.U'.τ ∘ᵥ V.U'.T.T ▷ (U.σ ∘ᵥ V.σ) ≈ (U.σ ∘ᵥ V.σ) ◁ V.U'.S.T ∘ᵥ V.U.τ
-      }
-    ; assoc = λ {A} {B} {C} {D} {U} {V} {W} →
-      let module U = Monad⇒₁₁ U
-          module V = Monad⇒₁₁ V
-          module W = Monad⇒₁₁ W
-          open Bicat 𝒞 in hom.assoc
-    ; sym-assoc = λ {A} {B} {C} {D} {U} {V} {W} →
-      let module U = Monad⇒₁₁ U
-          module V = Monad⇒₁₁ V
-          module W = Monad⇒₁₁ W
-          open Bicat 𝒞 in hom.sym-assoc
-    ; identityˡ = λ {A} {B} {U} →
-      let module U = Monad⇒₁₁ U
-          open Bicat 𝒞 in hom.identityˡ
-    ; identityʳ = λ {A} {B} {U} →
-      let module U = Monad⇒₁₁ U
-          open Bicat 𝒞 in hom.identityʳ
-    ; identity² = λ {A} → let open Bicat 𝒞 in hom.identity²
-    ; equiv = let open Bicat 𝒞 in record
+Category.Obj (Monad⇒₁ S T) = Monad⇒₁₀ S T
+Category._⇒_ (Monad⇒₁ S T) = λ U V → Monad⇒₁₁ {S} {T} U V
+Category._≈_ (Monad⇒₁ S T) = λ U V →
+  let module U = Monad⇒₁₁ U
+      module V = Monad⇒₁₁ V
+      open Bicat 𝒞 in  U.σ ≈ V.σ
+Category.id (Monad⇒₁ S T) {A} =
+  record { σ = Bicategory.id₂ 𝒞
+         ; τ-compat = let module A = Monad⇒₁₀ A
+                          open Bicat 𝒞 in
+         begin (A.τ ∘ᵥ (A.T.T ▷ id₂)) ≈⟨ (refl⟩∘⟨ ▷id₂) ⟩
+                 (A.τ ∘ᵥ id₂)           ≈⟨ id₂-comm ⟩
+                 id₂ ∘ᵥ A.τ             ≈˘⟨ (id₂◁ ⟩∘⟨refl) ⟩
+                 (id₂ ◁ A.S.T) ∘ᵥ A.τ   ∎
+         } where open Bicategory.hom.HomReasoning 𝒞
+Category._∘_ (Monad⇒₁ S T) U V =
+  record { σ = let open Bicat 𝒞
+                   module U = Monad⇒₁₁ U
+                   module V = Monad⇒₁₁ V
+                   in U.σ ∘ᵥ V.σ
+         ; τ-compat =
+           let open Bicat 𝒞
+               module U = Monad⇒₁₁ U
+               module V = Monad⇒₁₁ V in
+                       begin (U.U'.τ ∘ᵥ (V.U'.T.T ▷ (U.σ ∘ᵥ V.σ))) ≈˘⟨ (refl⟩∘⟨ ∘ᵥ-distr-▷ )  ⟩
+          (hom V.U'.S.C V.U'.T.C Category.∘ U.U'.τ)
+            ((hom V.U'.S.C V.U'.T.C Category.∘ (V.U'.T.T ▷ U.σ))
+            (V.U'.T.T ▷ V.σ)) ≈˘⟨ hom.assoc ⟩
+          (hom V.U'.S.C V.U'.T.C Category.∘ (U.U'.τ ∘ᵥ (V.U'.T.T ▷ U.σ)))
+            (V.U'.T.T ▷ V.σ) ≈⟨ (U.τ-compat ⟩∘⟨refl) ⟩
+          (hom V.U'.S.C V.U'.T.C Category.∘
+            (hom V.U'.S.C V.U'.T.C Category.∘ (U.σ ◁ V.U'.S.T)) V.U'.τ)
+            (V.U'.T.T ▷ V.σ) ≈⟨ hom.assoc ⟩
+          (hom V.U'.S.C V.U'.T.C Category.∘ (U.σ ◁ V.U'.S.T))
+            (V.U'.τ ∘ᵥ (V.U'.T.T ▷ V.σ)) ≈⟨ (refl⟩∘⟨ V.τ-compat) ⟩
+          (hom V.U'.S.C V.U'.T.C Category.∘ (U.σ ◁ V.U'.S.T))
+            ((hom V.U'.S.C V.U'.T.C Category.∘ (V.σ ◁ V.U'.S.T)) V.U.τ) ≈˘⟨ hom.assoc ⟩
+          (hom V.U'.S.C V.U'.T.C Category.∘
+            ((U.σ ◁ V.U'.S.T) ∘ᵥ (V.σ ◁ V.U'.S.T)))
+            V.U.τ ≈⟨ (∘ᵥ-distr-◁  ⟩∘⟨refl) ⟩
+          ((U.σ ∘ᵥ V.σ) ◁ V.U'.S.T) ∘ᵥ V.U.τ ∎
+         } where open Bicategory.hom.HomReasoning 𝒞
+Category.assoc (Monad⇒₁ S T) = let open Bicat 𝒞 in hom.assoc
+Category.sym-assoc (Monad⇒₁ S T) = let open Bicat 𝒞 in hom.sym-assoc
+Category.identityˡ (Monad⇒₁ S T) = let open Bicat 𝒞 in hom.identityˡ
+Category.identityʳ (Monad⇒₁ S T) = let open Bicat 𝒞 in hom.identityʳ
+Category.identity² (Monad⇒₁ S T) = let open Bicat 𝒞 in hom.identity²
+Category.equiv (Monad⇒₁ S T) = let open Bicat 𝒞 in record
       { refl = hom.Equiv.refl
       ; sym = hom.Equiv.sym
       ; trans = hom.Equiv.trans
       }
-    ; ∘-resp-≈ = let open Bicat 𝒞 in hom.∘-resp-≈
-    } where open Bicategory.hom.HomReasoning 𝒞
+Category.∘-resp-≈ (Monad⇒₁ S T) = let open Bicat 𝒞 in hom.∘-resp-≈
+
+
+
+
+-- Monad⇒₂
+Monads : Bicategory {!   !} {!   !} {!   !} {!   !}
+Bicategory.enriched Monads = {!   !}
+Bicategory.triangle Monads = {!   !}
+Bicategory.pentagon Monads = {!   !}
+
+{-
+
 
 -- Monad⇒₂
 Monads : Bicategory (o ⊔ ℓ ⊔ e ⊔ t) _ _ (o ⊔ ℓ ⊔ e ⊔ t)
@@ -159,3 +157,4 @@ Monads = record
   ; triangle = {!   !}
   ; pentagon = {!   !}
   } -- where open Bicategory.hom.HomReasoning 𝒞
+-}
