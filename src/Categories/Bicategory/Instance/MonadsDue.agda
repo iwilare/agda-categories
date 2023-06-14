@@ -100,8 +100,29 @@ Category.∘-resp-≈ (Monad⇒₁ S T) = let open Bicat 𝒞 in hom.∘-resp-�
 
 
 -- Monad⇒₂
-Monads : Bicategory {!   !} {!   !} {!   !} {!   !}
-Bicategory.enriched Monads = {!   !}
+Monads : Bicategory (o ⊔ ℓ ⊔ e ⊔ t) (o ⊔ ℓ ⊔ e ⊔ t) e {!   !}
+Bicategory.enriched Monads = record
+  { Obj = Monad 𝒞
+  ; hom = Monad⇒₁
+  ; id = λ {T} → let open Bicat 𝒞
+                     open Bicategory.hom.HomReasoning 𝒞 in {!   !}
+  ; ⊚ = record
+    { F₀ = λ (f , g) → let module f = Monad⇒₁₀ f
+                           module g = Monad⇒₁₀ g in
+                             record { U = f.U ∘₁ g.U
+                                    ; τ = {!   !}
+                                    ; η-compat = {!   !}
+                                    ; μ-compat = {!   !} }
+    ; F₁ = λ (x , y) → {!   !}
+    ; identity = {!   !}
+    ; homomorphism = {!   !}
+    ; F-resp-≈ = {!   !}
+    }
+  ; ⊚-assoc = {!   !}
+  ; unitˡ = {!   !}
+  ; unitʳ = {!   !}
+  } where open Bicat 𝒞
+          open Bicategory.hom.HomReasoning 𝒞
 Bicategory.triangle Monads = {!   !}
 Bicategory.pentagon Monads = {!   !}
 
