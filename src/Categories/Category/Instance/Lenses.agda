@@ -134,6 +134,35 @@ module CategoryOfLens where
     }
 
 module _ {P : Set o} where
+  open import Categories.Category.Instance.Sets
+  open import Categories.Monad
+
+  Cont : Monad (Sets o)
+  Cont = record
+    { F = record
+      { F₀ = λ X → (X → P) → P
+      ; F₁ = λ f → (λ x w → x (w ∘ f))
+      ; identity = refl
+      ; homomorphism = refl
+      ; F-resp-≈ = {!   !}
+      }
+    ; η = record
+      { η = λ X → λ x f → f x
+      ; commute = λ _ → refl
+      ; sym-commute = λ _ → refl
+      }
+    ; μ = record
+      { η = λ X → λ xpppp xp → {!   !}
+      ; commute = {!   !}
+      ; sym-commute = {!   !}
+      }
+    ; assoc = {!   !}
+    ; sym-assoc = {!   !}
+    ; identityˡ = {!   !}
+    ; identityʳ = {!   !}
+    }
+{-
+module _ {P : Set o} where
 
   open import Categories.Category.Instance.Sets
   open import Categories.Category.Monoidal.Instance.Sets
@@ -175,55 +204,55 @@ module _ {P : Set o} where
         ; commute = λ f → record { ≈-get = refl ; ≈-put = refl }
         ; sym-commute = λ f → record { ≈-get = refl ; ≈-put = refl }
         }
-      ; associativity = {!   !} --λ f → ? --record { ≈-get = refl ; ≈-put = refl }
+      ; associativity = record { ≈-get = refl ; ≈-put = refl }
       ; unitaryˡ = record { ≈-get = refl ; ≈-put = refl }
       ; unitaryʳ = record { ≈-get = refl ; ≈-put = refl }
       }
     }
+-}
+-- module _ {o ℓ e} (C : MonoidalCategory o ℓ e) where
 
-module _ {o ℓ e} (C : MonoidalCategory o ℓ e) where
+--   open MonoidalCategory C
 
-  open MonoidalCategory C
+--   open import Categories.Bicategory
 
-  open import Categories.Bicategory
+--   record HomObj (A B : Obj) : Set (o ⊔ ℓ) where
+--     field
+--       M : Obj
+--       ϕ : M ⊗₀ A ⇒ B
 
-  record HomObj (A B : Obj) : Set (o ⊔ ℓ) where
-    field
-      M : Obj
-      ϕ : M ⊗₀ A ⇒ B
+--   record 2-Cell {A B} (f g : HomObj A B) : Set {!   !} where
+--     module f = HomObj f
+--     module g = HomObj g
 
-  record 2-Cell {A B} (f g : HomObj A B) : Set {!   !} where
-    module f = HomObj f
-    module g = HomObj g
+--     field
+--       r : f.M ⇒ g.M
+--       comm : {!   !} --? ∘ (? ⊗₁ ?) ≈ ?
 
-    field
-      r : f.M ⇒ g.M
-      comm : {!   !} --? ∘ (? ⊗₁ ?) ≈ ?
-
-  Para : Bicategory (o ⊔ ℓ) ℓ e {!   !}
-  Para = record
-    { enriched = record
-      { Obj = Obj
-      ; hom = λ A B → record
-        { Obj = HomObj A B
-        ; _⇒_ = {!   !}
-        ; _≈_ = {!   !}
-        ; id = {!   !}
-        ; _∘_ = {!   !}
-        ; assoc = {!   !}
-        ; sym-assoc = {!   !}
-        ; identityˡ = {!   !}
-        ; identityʳ = {!   !}
-        ; identity² = {!   !}
-        ; equiv = {!   !}
-        ; ∘-resp-≈ = {!   !}
-        }
-      ; id = {!   !}
-      ; ⊚ = {!   !}
-      ; ⊚-assoc = {!   !}
-      ; unitˡ = {!   !}
-      ; unitʳ = {!   !}
-      }
-    ; triangle = {!   !}
-    ; pentagon = {!   !}
-    }
+--   Para : Bicategory (o ⊔ ℓ) ℓ e {!   !}
+--   Para = record
+--     { enriched = record
+--       { Obj = Obj
+--       ; hom = λ A B → record
+--         { Obj = HomObj A B
+--         ; _⇒_ = {!   !}
+--         ; _≈_ = {!   !}
+--         ; id = {!   !}
+--         ; _∘_ = {!   !}
+--         ; assoc = {!   !}
+--         ; sym-assoc = {!   !}
+--         ; identityˡ = {!   !}
+--         ; identityʳ = {!   !}
+--         ; identity² = {!   !}
+--         ; equiv = {!   !}
+--         ; ∘-resp-≈ = {!   !}
+--         }
+--       ; id = {!   !}
+--       ; ⊚ = {!   !}
+--       ; ⊚-assoc = {!   !}
+--       ; unitˡ = {!   !}
+--       ; unitʳ = {!   !}
+--       }
+--     ; triangle = {!   !}
+--     ; pentagon = {!   !}
+--     }
